@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.model.DiscussBaseInfo;
 import com.example.service.ManageService;
 import com.example.model.ManageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,11 +30,11 @@ public class ManageController {
         }
     }
     @PostMapping("/createDiscuss")
-    public ResponseEntity<String> createDiscuss() {
+    public ResponseEntity<DiscussBaseInfo> createDiscuss() {
         // 调用ManageService的createDiscuss方法创建新的讨论
-        String discussName = manageService.createDiscuss();
+        DiscussBaseInfo discussBaseInfo = manageService.createDiscuss();
 
         // 返回200状态码和创建的讨论名称
-        return ResponseEntity.ok(discussName);
+        return ResponseEntity.ok(discussBaseInfo);
     }
 }
