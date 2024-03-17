@@ -57,6 +57,6 @@ function openDiscuss() {
     const selectedOption = document.getElementById('discussList').value;
     // 从选项的value中获取discussId
     const discussId = selectedOption;
-    // 打开新的tab页面,URL为127.0.0.1:10001/{discussId}
-    window.open(`http://127.0.0.1:10001/${discussId}`);
+    // 打开新的tab页面,URL为aidiscuss-frontend目录下的discuss.html,并传递discussId作为参数
+    window.open(`./discuss.html?discussId=${discussId}`);
 }
