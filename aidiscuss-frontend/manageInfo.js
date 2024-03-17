@@ -3,6 +3,8 @@ window.onload = function() {
     getManageInfo();
     // 为创建讨论区按钮添加点击事件监听器
     document.getElementById('createDiscussBtn').addEventListener('click', createDiscuss);
+    // 为打开讨论区按钮添加点击事件监听器
+    document.getElementById('openDiscussBtn').addEventListener('click', openDiscuss);
 };
 
 // 获取管理信息
@@ -47,4 +49,14 @@ function createDiscuss() {
         .catch(error => {
             console.error('创建讨论区失败:', error);
         });
+}
+
+// 打开讨论区的函数
+function openDiscuss() {
+    // 获取当前选中的选项
+    const selectedOption = document.getElementById('discussList').value;
+    // 从选项的value中获取discussId
+    const discussId = selectedOption;
+    // 打开新的tab页面,URL为127.0.0.1:10001/{discussId}
+    window.open(`http://127.0.0.1:10001/${discussId}`);
 }
