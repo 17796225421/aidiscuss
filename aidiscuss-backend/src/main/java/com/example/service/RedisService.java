@@ -43,4 +43,26 @@ public class RedisService {
 
         return discussBaseInfoList;
     }
+
+    /**
+     * 创建新的讨论
+     * @param discussName 讨论名称
+     */
+    public void createDiscuss(String discussName) {
+        // 获取Redis中的库数量
+        int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+
+        // 遍历每个库,找到一个未使用的库
+        for (int i = 0; i < dbCount; i++) {
+            // 选择库
+            jedis.select(i);
+
+            // 检查当前库是否为空
+            if (jedis.dbSize() == 0) {
+                // 如果当前库为空,则将discussName作为key,当前时间戳作为value存入Redis
+                jedis.set("discussName", discussName);
+                break;
+            }
+        }
+    }
 }

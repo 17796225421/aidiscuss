@@ -5,6 +5,7 @@ import com.example.model.ManageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -26,5 +27,13 @@ public class ManageController {
             // 如果manageInfo为null，说明没有数据，返回204状态码（No Content）
             return ResponseEntity.noContent().build();
         }
+    }
+    @PostMapping("/createDiscuss")
+    public ResponseEntity<String> createDiscuss() {
+        // 调用ManageService的createDiscuss方法创建新的讨论
+        String discussName = manageService.createDiscuss();
+
+        // 返回200状态码和创建的讨论名称
+        return ResponseEntity.ok(discussName);
     }
 }
