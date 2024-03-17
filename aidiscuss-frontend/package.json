@@ -1,0 +1,11 @@
+{
+  "name": "hello-frontend",
+  "version": "1.0.0",
+  "description": "A simple frontend project",
+  "scripts": {
+    "start": "http-server -c-1 -p 10001"
+  },
+  "dependencies": {
+    "http-server": "^0.12.3"
+  }
+}
