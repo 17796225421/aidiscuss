@@ -39,7 +39,7 @@ public class ManageService {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM_dd_HH_mm_ss");
         String discussName = now.format(formatter);
-        String discussId = UUID.randomUUID().toString();
+        String discussId = UUID.randomUUID().toString().replace("-", "");
 
         // 创建新的Redis库，并添加discussName作为key，当前时间作为value
         redisService.createDiscuss(discussName, discussId);

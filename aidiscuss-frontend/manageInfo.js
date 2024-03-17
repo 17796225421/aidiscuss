@@ -18,11 +18,11 @@ function getManageInfo() {
             // 获取下拉列表元素
             const discussList = document.getElementById('discussList');
 
-            // 遍历discusses数组，为每个元素创建一个下拉选项
+            // 遍历discusses数组,为每个元素创建一个下拉选项
             discusses.forEach(discuss => {
                 const option = document.createElement('option');
-                option.value = discuss.redisId;
-                option.text = discuss.discussName;
+                option.text = discuss.discussName; // 设置选项的显示文本为discussName
+                option.value = discuss.discussId; // 设置选项的value属性为discussId
                 discussList.appendChild(option);
             });
         })
@@ -33,7 +33,7 @@ function getManageInfo() {
 
 // 创建讨论区的函数
 function createDiscuss() {
-    // 发送POST请求到指定的URL，不带discussName
+    // 发送POST请求到指定的URL,不带discussName
     fetch('http://127.0.0.1:10002/createDiscuss', {
         method: 'POST', // 指定请求方法为POST
         headers: {
