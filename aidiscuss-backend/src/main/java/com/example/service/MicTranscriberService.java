@@ -11,6 +11,7 @@ import com.alibaba.nls.client.protocol.asr.SpeechTranscriberResponse;
 import javax.sound.sampled.*;
 import java.io.IOException;
 
+import com.sun.tools.jconsole.JConsoleContext;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class MicTranscriberService {
@@ -42,6 +43,7 @@ public class MicTranscriberService {
             for (Mixer.Info info : mixerInfos) {
                 Mixer mixer = AudioSystem.getMixer(info);
                 if (mixer.isLineSupported(new Line.Info(TargetDataLine.class)) && info.getName().contains(micName)) {
+                    System.out.println(info.getName());
                     selectedMixerInfo = info;
                     break;
                 }
@@ -58,10 +60,11 @@ public class MicTranscriberService {
                 transcriber.setEnableITN(false);
                 transcriber.start();
 
-                // 打开麦克风设备并开始读取音频数据
+                // 打开指定的麦克风设备并开始读取音频数据
+                Mixer mixer = AudioSystem.getMixer(selectedMixerInfo);
                 AudioFormat audioFormat = new AudioFormat(16000.0F, 16, 1, true, false);
-                DataLine.Info info = new DataLine.Info(TargetDataLine.class, audioFormat);
-                targetDataLine = (TargetDataLine) AudioSystem.getLine(info);
+                DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, audioFormat);
+                targetDataLine = (TargetDataLine) mixer.getLine(dataLineInfo);
                 targetDataLine.open(audioFormat);
                 targetDataLine.start();
 
@@ -112,7 +115,8 @@ public class MicTranscriberService {
             @Override
             public void onSentenceEnd(SpeechTranscriberResponse response) {
                 System.out.println(String.format(
-                        "index: %d, result: %s, begin_time: %.1f, time: %.1f",
+                        "[%s] index: %d, result: %s, begin_time: %.1f, time: %.1f",
+                        Thread.currentThread().getName(),    // 获取当前线程的名称
                         response.getTransSentenceIndex(),               //句子编号，从1开始递增
                         response.getTransSentenceText(),                //当前的识别结果
                         response.getSentenceBeginTime() / 1000.0,       //句子开始时间，单位是秒
@@ -144,6 +148,26 @@ public class MicTranscriberService {
         }
 
         MicTranscriberService service = new MicTranscriberService();
-        service.startMic("M3");
+
+        // 创建两个子线程,分别调用不同的麦克风
+        Thread thread1 = new Thread(() -> {
+            try {
+                service.startMic("B1");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, "Thread-1");
+
+        Thread thread2 = new Thread(() -> {
+            try {
+                service.startMic("Realtek");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }, "Thread-2");
+
+        // 启动两个子线程
+        thread1.start();
+        thread2.start();
     }
 }
