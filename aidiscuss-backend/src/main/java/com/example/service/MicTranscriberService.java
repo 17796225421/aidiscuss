@@ -10,8 +10,9 @@ import com.alibaba.nls.client.protocol.asr.SpeechTranscriberResponse;
 
 import javax.sound.sampled.*;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import com.sun.tools.jconsole.JConsoleContext;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class MicTranscriberService {
@@ -33,67 +34,77 @@ public class MicTranscriberService {
         }
     }
 
-    public void startMic(String micName) throws Exception {
+    // 创建 targetDataLine 和 transcriber 的方法
+    public MicAndTranscriber createMicAndTranscriber(String micName) throws Exception {
         SpeechTranscriber transcriber = null;
         TargetDataLine targetDataLine = null;
-        try {
-            // 查找指定名称的麦克风设备
-            Mixer.Info selectedMixerInfo = null;
-            Mixer.Info[] mixerInfos = AudioSystem.getMixerInfo();
-            for (Mixer.Info info : mixerInfos) {
-                Mixer mixer = AudioSystem.getMixer(info);
-                if (mixer.isLineSupported(new Line.Info(TargetDataLine.class)) && info.getName().contains(micName)) {
-                    System.out.println(info.getName());
-                    selectedMixerInfo = info;
-                    break;
-                }
-            }
 
-            if (selectedMixerInfo != null) {
-                // 创建语音识别实例并设置参数
-                transcriber = new SpeechTranscriber(client, getTranscriberListener());
-                transcriber.setAppKey(appKey);
-                transcriber.setFormat(InputFormatEnum.PCM);
-                transcriber.setSampleRate(SampleRateEnum.SAMPLE_RATE_16K);
-                transcriber.setEnableIntermediateResult(true);
-                transcriber.setEnablePunctuation(true);
-                transcriber.setEnableITN(false);
-                transcriber.start();
-
-                // 打开指定的麦克风设备并开始读取音频数据
-                Mixer mixer = AudioSystem.getMixer(selectedMixerInfo);
-                AudioFormat audioFormat = new AudioFormat(16000.0F, 16, 1, true, false);
-                DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, audioFormat);
-                targetDataLine = (TargetDataLine) mixer.getLine(dataLineInfo);
-                targetDataLine.open(audioFormat);
-                targetDataLine.start();
-
-                // 从麦克风读取音频数据并发送给服务端
-                int nByte = 0;
-                final int bufSize = 3200;
-                byte[] buffer = new byte[bufSize];
-                while ((nByte = targetDataLine.read(buffer, 0, bufSize)) > 0) {
-                    transcriber.send(buffer, nByte);
-                }
-            } else {
-                System.out.println("Microphone not found: " + micName);
+        // 查找指定名称的麦克风设备
+        Mixer.Info selectedMixerInfo = null;
+        Mixer.Info[] mixerInfos = AudioSystem.getMixerInfo();
+        for (Mixer.Info info : mixerInfos) {
+            Mixer mixer = AudioSystem.getMixer(info);
+            if (mixer.isLineSupported(new Line.Info(TargetDataLine.class)) && info.getName().contains(micName)) {
+                System.out.println(info.getName());
+                selectedMixerInfo = info;
+                break;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            // 关闭语音识别实例和麦克风设备
-            if (transcriber != null) {
-                transcriber.stop();
-                transcriber.close();
-            }
-            if (targetDataLine != null) {
-                targetDataLine.stop();
-                targetDataLine.close();
+        }
+
+        if (selectedMixerInfo != null) {
+            // 创建语音识别实例并设置参数
+            transcriber = new SpeechTranscriber(client, getTranscriberListener());
+            transcriber.setAppKey(appKey);
+            transcriber.setFormat(InputFormatEnum.PCM);
+            transcriber.setSampleRate(SampleRateEnum.SAMPLE_RATE_16K);
+            transcriber.setEnableIntermediateResult(true);
+            transcriber.setEnablePunctuation(true);
+            transcriber.setEnableITN(false);
+
+            // 打开指定的麦克风设备
+            Mixer mixer = AudioSystem.getMixer(selectedMixerInfo);
+            AudioFormat audioFormat = new AudioFormat(16000.0F, 16, 1, true, false);
+            DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, audioFormat);
+            targetDataLine = (TargetDataLine) mixer.getLine(dataLineInfo);
+            targetDataLine.open(audioFormat);
+        } else {
+            System.out.println("Microphone not found: " + micName);
+        }
+
+        return new MicAndTranscriber(targetDataLine, transcriber);
+    }
+
+    // 启动 targetDataLine 和 transcriber 的方法
+    public void startMic(MicAndTranscriber micAndTranscriber) throws Exception {
+        TargetDataLine targetDataLine = micAndTranscriber.getTargetDataLine();
+        SpeechTranscriber transcriber = micAndTranscriber.getTranscriber();
+
+        if (targetDataLine != null && transcriber != null) {
+            targetDataLine.start();
+            transcriber.start();
+
+            // 从麦克风读取音频数据并发送给服务端
+            int nByte = 0;
+            final int bufSize = 3200;
+            byte[] buffer = new byte[bufSize];
+            while ((nByte = targetDataLine.read(buffer, 0, bufSize)) > 0) {
+                transcriber.send(buffer, nByte);
             }
         }
     }
 
+    // 停止 targetDataLine 和 transcriber 的方法
+    public void stopMic(MicAndTranscriber micAndTranscriber) throws Exception {
+        TargetDataLine targetDataLine = micAndTranscriber.getTargetDataLine();
+        SpeechTranscriber transcriber = micAndTranscriber.getTranscriber();
 
+        if (targetDataLine != null) {
+            targetDataLine.stop();
+        }
+        if (transcriber != null) {
+            transcriber.stop();
+        }
+    }
     public SpeechTranscriberListener getTranscriberListener() {
         SpeechTranscriberListener listener = new SpeechTranscriberListener() {
             @Override
@@ -149,10 +160,15 @@ public class MicTranscriberService {
 
         MicTranscriberService service = new MicTranscriberService();
 
+        // 在主线程中创建两个 MicAndTranscriber 对象
+        MicAndTranscriber micAndTranscriber1 = service.createMicAndTranscriber("B1");
+        MicAndTranscriber micAndTranscriber2 = service.createMicAndTranscriber("Realtek");
+
         // 创建两个子线程,分别调用不同的麦克风
         Thread thread1 = new Thread(() -> {
             try {
-                service.startMic("B1");
+                service.startMic(micAndTranscriber1);
+                // 其他处理逻辑...
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -160,7 +176,8 @@ public class MicTranscriberService {
 
         Thread thread2 = new Thread(() -> {
             try {
-                service.startMic("Realtek");
+                service.startMic(micAndTranscriber2);
+                // 其他处理逻辑...
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -169,5 +186,47 @@ public class MicTranscriberService {
         // 启动两个子线程
         thread1.start();
         thread2.start();
+
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    service.stopMic(micAndTranscriber2);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, 10000);
+
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    service.startMic(micAndTranscriber2);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }, 20000);
+    }
+
+    // 内部类,用于封装 targetDataLine 和 transcriber
+    private static class MicAndTranscriber {
+        private TargetDataLine targetDataLine;
+        private SpeechTranscriber transcriber;
+
+        public MicAndTranscriber(TargetDataLine targetDataLine, SpeechTranscriber transcriber) {
+            this.targetDataLine = targetDataLine;
+            this.transcriber = transcriber;
+        }
+
+        public TargetDataLine getTargetDataLine() {
+            return targetDataLine;
+        }
+
+        public SpeechTranscriber getTranscriber() {
+            return transcriber;
+        }
     }
 }
