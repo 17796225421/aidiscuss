@@ -71,4 +71,22 @@ public class RedisService {
         // 如果没有找到对应的discussId,返回null
         return null;
     }
+
+    /**
+     * 更新指定discussId对应的麦克风开关信息
+     * @param discussId 讨论ID
+     * @param micSwitchInfo 麦克风开关信息
+     */
+    public void updateMicSwitchInfo(String discussId, MicSwitchInfo micSwitchInfo) {
+        int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+        for (int i = 0; i < dbCount; i++) {
+            jedis.select(i);
+            // 判断当前库中是否存在discussId对应的key,并且值与传入的discussId相等
+            if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                // 更新micSwitchInfo
+                jedis.set("micSwitchInfo", new Gson().toJson(micSwitchInfo));
+                break;
+            }
+        }
+    }
 }

@@ -16,19 +16,14 @@ public class DiscussService {
         return redisService.getDiscussInfo(discussId);
     }
 
+    /**
+     * 更新指定discussId对应的麦克风开关信息
+     * @param discussInfo 讨论信息
+     */
     public void micSwitch(DiscussInfo discussInfo) {
+        String discussId = discussInfo.getDiscussId();
         MicSwitchInfo micSwitchInfo = discussInfo.getMicSwitchInfo();
-        System.out.println(discussInfo.getDiscussId()+ ' '+ micSwitchInfo.isExternMic());
-        // TODO: 具体处理麦克风开关的逻辑
-        // 可以根据micSwitchInfo的属性值进行相应的操作
-        if (micSwitchInfo.isExternMic()) {
-            // 处理外置麦克风开启的逻辑
-        }
-        if (micSwitchInfo.isWireMic()) {
-            // 处理有线麦克风开启的逻辑
-        }
-        if (micSwitchInfo.isVirtualMic()) {
-            // 处理虚拟麦克风开启的逻辑
-        }
+        // 调用RedisService的updateMicSwitchInfo方法更新麦克风开关信息
+        redisService.updateMicSwitchInfo(discussId, micSwitchInfo);
     }
 }
