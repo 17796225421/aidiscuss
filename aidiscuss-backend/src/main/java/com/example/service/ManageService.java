@@ -1,7 +1,9 @@
 package com.example.service;
 
 import com.example.model.DiscussBaseInfo;
+import com.example.model.DiscussInfo;
 import com.example.model.ManageInfo;
+import com.example.model.MicSwitchInfo;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -41,8 +43,13 @@ public class ManageService {
         String discussName = now.format(formatter);
         String discussId = UUID.randomUUID().toString().replace("-", "");
 
+        DiscussInfo discussInfo = new DiscussInfo();
+        discussInfo.setDiscussId(discussId);
+        discussInfo.setDiscussName(discussName);
+        MicSwitchInfo micSwitchInfo = new MicSwitchInfo();
+        discussInfo.setMicSwitchInfo(micSwitchInfo);
         // 创建新的Redis库，并添加discussName作为key，当前时间作为value
-        redisService.createDiscuss(discussName, discussId);
+        redisService.createDiscuss(discussInfo);
 
         return new DiscussBaseInfo(discussId, discussName);
     }
