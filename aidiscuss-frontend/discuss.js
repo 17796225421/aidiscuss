@@ -51,31 +51,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const micOptions = document.getElementById('micOptions');
-    micOptions.addEventListener('change', handleMicChange);
+    micOptions.addEventListener('change', function(event) {
+        handleMicChange(event, discussId);
+    });
 });
 
 // 处理麦克风选项变更
-function handleMicChange(event) {
+function handleMicChange(event,discussId) {
     const value = event.target.value;
-    let postData = {
-        'externMic': null,
-        'wireMic': null,
-        'virtualMic': null
+    let discussInfo = {
+        'discussId': discussId,
+        'micSwitchInfo': null
     };
+    let micSwitchInfo = new MicSwitchInfo();
 
     if (value === '外挂麦克风') {
-        postData['externMic'] = true;
-        postData['wireMic']=false;
-        postData['virtualMic']=false;
+        micSwitchInfo['externMic'] = true;
+        micSwitchInfo['wireMic']=false;
+        micSwitchInfo['virtualMic']=false;
     } else if (value === '有线耳机麦克风和虚拟麦克风') {
-        postData['externMic']=false;
-        postData['wireMic'] = true;
-        postData['virtualMic'] = true;
+        micSwitchInfo['externMic']=false;
+        micSwitchInfo['wireMic'] = true;
+        micSwitchInfo['virtualMic'] = true;
     } else if (value === '关闭') {
-        postData['externMic']=false;
-        postData['wireMic']=false;
-        postData['virtualMic']=false;
+        micSwitchInfo['externMic']=false;
+        micSwitchInfo['wireMic']=false;
+        micSwitchInfo['virtualMic']=false;
     }
+    discussInfo.micSwitchInfo=micSwitchInfo;
 
     // 发送POST请求
     fetch('http://127.0.0.1:10002/micSwitch', {
@@ -83,7 +86,7 @@ function handleMicChange(event) {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(postData),
+        body: JSON.stringify(discussInfo),
     })
         .then(response => response.json())
         .then(data => {
