@@ -1,10 +1,12 @@
 // 页面加载完成后自动调用获取管理信息的函数
-window.onload = function() {
+window.onload = function () {
     getManageInfo();
     // 为创建讨论区按钮添加点击事件监听器
     document.getElementById('createDiscussBtn').addEventListener('click', createDiscuss);
     // 为打开讨论区按钮添加点击事件监听器
     document.getElementById('openDiscussBtn').addEventListener('click', openDiscuss);
+    // 为结束讨论区按钮添加点击事件监听器
+    document.getElementById('closeDiscussBtn').addEventListener('click', closeDiscuss); // 新增代码
 };
 
 // 获取管理信息
@@ -59,4 +61,26 @@ function openDiscuss() {
     const discussId = selectedOption;
     // 打开新的tab页面,URL为aidiscuss-frontend目录下的discuss.html,并传递discussId作为参数
     window.open(`./discuss.html?discussId=${discussId}`);
+}
+
+// 结束讨论区的函数
+function closeDiscuss() {
+    // 获取当前选中的选项
+    const selectedOption = document.getElementById('discussList').value;
+    // 从选项的value中获取discussId
+    const discussId = selectedOption;
+    // 发送POST请求到指定的URL以结束讨论区
+    fetch('http://127.0.0.1:10002/closeDiscuss', {
+        method: 'POST', // 指定请求方法为POST
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: discussId
+    })
+        .then(response => {
+            console.log('讨论区已结束'); // 可选的成功提示，实际中不需要处理响应
+        })
+        .catch(error => {
+            console.error('结束讨论区失败:', error); // 可选的错误处理
+        });
 }

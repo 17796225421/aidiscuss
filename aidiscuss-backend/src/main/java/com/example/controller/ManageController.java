@@ -1,12 +1,14 @@
 package com.example.controller;
 
 import com.example.model.DiscussBaseInfo;
+import com.example.model.DiscussInfo;
 import com.example.service.ManageService;
 import com.example.model.ManageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -36,5 +38,13 @@ public class ManageController {
 
         // 返回200状态码和创建的讨论名称
         return ResponseEntity.ok(discussBaseInfo);
+    }
+
+    @PostMapping("/closeDiscuss")
+    public ResponseEntity<Void> closeDiscuss(@RequestBody String discussId) {
+        // 调用DiscussService的micSwitch方法处理麦克风开关逻辑
+        manageService.closeDiscuss(discussId);
+        // 返回状态码200
+        return ResponseEntity.ok().build();
     }
 }

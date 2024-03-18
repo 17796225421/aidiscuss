@@ -108,4 +108,16 @@ public class RedisService {
             }
         }
     }
+
+    public void clearDiscuss(String discussId) {
+        int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+        for (int i = 0; i < dbCount; i++) {
+            jedis.select(i);
+            if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                // 清空当前数据库
+                jedis.flushDB();
+                break;
+            }
+        }
+    }
 }
