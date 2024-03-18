@@ -89,4 +89,23 @@ public class RedisService {
             }
         }
     }
+
+    /**
+     * 除了指定discussId所在的库，其他库的micSwitchInfo的3个布尔值都变为false
+     * @param excludeDiscussId 要排除的讨论ID
+     */
+    public void updateOtherMicSwitchInfoToFalse(String excludeDiscussId) {
+        int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+        for (int i = 0; i < dbCount; i++) {
+            jedis.select(i);
+            if (!jedis.exists("discussId") || !jedis.get("discussId").equals(excludeDiscussId)) {
+                if (jedis.exists("micSwitchInfo")) {
+                    // 创建一个所有布尔值都为false的MicSwitchInfo对象
+                    MicSwitchInfo micSwitchInfo = new MicSwitchInfo();
+                    // 更新当前数据库的micSwitchInfo
+                    jedis.set("micSwitchInfo", new Gson().toJson(micSwitchInfo));
+                }
+            }
+        }
+    }
 }
