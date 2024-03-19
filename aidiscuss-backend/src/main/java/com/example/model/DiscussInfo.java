@@ -5,6 +5,8 @@ public class DiscussInfo {
     String discussName;
     MicSwitchInfo micSwitchInfo;
 
+    MicSentences micSentences;
+
     public String getDiscussId() {
         return discussId;
     }
@@ -27,5 +29,13 @@ public class DiscussInfo {
 
     public void setMicSwitchInfo(MicSwitchInfo micSwitchInfo) {
         this.micSwitchInfo = micSwitchInfo;
+    }
+
+    public MicSentences getMicSentences() {
+        return micSentences;
+    }
+
+    public void setMicSentences(MicSentences micSentences) {
+        this.micSentences = micSentences;
     }
 }

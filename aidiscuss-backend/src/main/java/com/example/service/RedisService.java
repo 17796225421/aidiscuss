@@ -1,8 +1,6 @@
 package com.example.service;
 
-import com.example.model.DiscussBaseInfo;
-import com.example.model.DiscussInfo;
-import com.example.model.MicSwitchInfo;
+import com.example.model.*;
 import com.google.gson.Gson;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
@@ -33,6 +31,7 @@ public class RedisService {
         }
         return instance;
     }
+
     public List<DiscussBaseInfo> getDiscussBaseInfoList() {
         try (Jedis jedis = jedisPool.getResource()) {
             List<DiscussBaseInfo> discussBaseInfoList = new ArrayList<>();
@@ -59,6 +58,9 @@ public class RedisService {
                     jedis.set("discussId", discussInfo.getDiscussId());
                     jedis.set("discussName", discussInfo.getDiscussName());
                     jedis.set("micSwitchInfo", new Gson().toJson(discussInfo.getMicSwitchInfo()));
+                    jedis.set("externMicSentences", "");
+                    jedis.set("wireMicSentences", "");
+                    jedis.set("virtualMicSentences", "");
                     break;
                 }
             }
@@ -77,6 +79,14 @@ public class RedisService {
                     discussInfo.setDiscussId(discussId);
                     discussInfo.setDiscussName(discussName);
                     discussInfo.setMicSwitchInfo(new Gson().fromJson(micSwitchInfo, MicSwitchInfo.class));
+                    MicSentences micSentences = new MicSentences();
+                    Sentences externMicSentences = new Gson().fromJson(jedis.get("externMicSentences"), Sentences.class);
+                    Sentences wireMicSentences = new Gson().fromJson(jedis.get("wireMicSentences"), Sentences.class);
+                    Sentences virtualMicSentences = new Gson().fromJson(jedis.get("virtualMicSentences"), Sentences.class);
+                    micSentences.setExternMicSentences(externMicSentences);
+                    micSentences.setWireMicSentences(wireMicSentences);
+                    micSentences.setVirtualMicSentences(virtualMicSentences);
+                    discussInfo.setMicSentences(micSentences);
                     return discussInfo;
                 }
             }
@@ -132,7 +142,6 @@ public class RedisService {
                 jedis.select(i);
                 if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
                     if (jedis.exists("micSwitchInfo")) {
-                        System.out.println(discussId + " " + jedis.get("micSwitchInfo"));
                         MicSwitchInfo micSwitchInfo = new Gson().fromJson(jedis.get("micSwitchInfo"), MicSwitchInfo.class);
                         return micSwitchInfo;
                     }
@@ -140,5 +149,22 @@ public class RedisService {
             }
         }
         return null;
+    }
+
+    public void AddMicSentence(Sentence sentence, String micName, String discussId) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    String key = micName + "Sentences";
+                    if (jedis.exists(key)) {
+                        Sentences sentences = new Gson().fromJson(jedis.get(key), Sentences.class);
+                        sentences.addSentence(sentence);
+                        jedis.set(key, new Gson().toJson(sentences));
+                    }
+                }
+            }
+        }
     }
 }

@@ -11,8 +11,8 @@ public class Sentences {
         queue.add(sentence);
     }
 
-    // 从队列头部弹出句子,如果队列为空则阻塞
-    public Sentence popSentence() throws InterruptedException {
-        return queue.take();
+    // 从队列头部弹出句子，如果队列为空则立即返回null
+    public Sentence popSentence() {
+        return queue.poll();
     }
 }

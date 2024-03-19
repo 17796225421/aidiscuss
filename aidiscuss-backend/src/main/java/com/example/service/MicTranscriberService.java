@@ -112,10 +112,10 @@ public class MicTranscriberService {
         if (targetDataLine == null || transcriber == null) {
             return;
         }
-        if (targetDataLine.isRunning()) {
+//        if (targetDataLine.isRunning()) {
             targetDataLine.stop();
             transcriber.stop();
-        }
+//        }
     }
 
     // 关闭 targetDataLine 和 transcriber 的方法
@@ -198,11 +198,12 @@ public class MicTranscriberService {
         // 在主线程中创建两个 MicAndTranscriber 对象
         MicAndTranscriber micAndTranscriber1 = service.openMic("B1");
         MicAndTranscriber micAndTranscriber2 = service.openMic("Realtek");
+        System.out.println(micAndTranscriber2.getTargetDataLine().isOpen());
 
         // 创建两个子线程,分别调用不同的麦克风
         Thread thread1 = new Thread(() -> {
             try {
-                service.startMic(micAndTranscriber1);
+                service.startMic(micAndTranscriber2);
                 // 其他处理逻辑...
             } catch (Exception e) {
                 e.printStackTrace();
@@ -227,7 +228,9 @@ public class MicTranscriberService {
             @Override
             public void run() {
                 try {
+                    System.out.println(micAndTranscriber2.getTargetDataLine().isOpen());
                     service.stopMic(micAndTranscriber2);
+                    System.out.println(micAndTranscriber2.getTargetDataLine().isOpen());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
