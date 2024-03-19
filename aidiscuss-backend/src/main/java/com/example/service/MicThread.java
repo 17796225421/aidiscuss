@@ -10,7 +10,6 @@ import com.google.gson.Gson;
 class MicThread extends Thread {
     private String discussId;
     private MicAndTranscriber micAndTranscriber;
-    private Sentences sentences;
     private String micName;
     private MicTranscriberService micTranscriberService; // 添加 MicTranscriberService 实例
     private RedisService redisService;
@@ -19,7 +18,6 @@ class MicThread extends Thread {
     public MicThread(String discussId, MicAndTranscriber micAndTranscriber, String micName) {
         this.discussId = discussId;
         this.micAndTranscriber = micAndTranscriber;
-        this.sentences = micAndTranscriber.getSentences();
         this.micName = micName;
         this.redisService = RedisService.getInstance();
         this.micTranscriberService = new MicTranscriberService(); // 初始化 MicTranscriberService
@@ -65,8 +63,10 @@ class MicThread extends Thread {
                 }
             }
 
-            Sentence sentence = sentences.popSentence();
+            Sentence sentence = micAndTranscriber.getSentences().popSentence();
+            System.out.println("获取");
             if (sentence != null) {
+                System.out.println("获取成功");
                 redisService.AddMicSentence(sentence, micName, discussId);
             }
 

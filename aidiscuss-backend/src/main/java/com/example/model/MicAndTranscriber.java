@@ -7,9 +7,12 @@ import javax.sound.sampled.TargetDataLine;
 public class MicAndTranscriber {
     private TargetDataLine targetDataLine;
     private SpeechTranscriber transcriber;
-    private Sentences sentences = new Sentences();
+    private Sentences sentences;
 
-    public MicAndTranscriber() {
+    public MicAndTranscriber(TargetDataLine targetDataLine, SpeechTranscriber transcriber, Sentences sentences) {
+        this.targetDataLine = targetDataLine;
+        this.transcriber = transcriber;
+        this.sentences = sentences;
     }
 
     public TargetDataLine getTargetDataLine() {

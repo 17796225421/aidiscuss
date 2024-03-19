@@ -39,7 +39,6 @@ public class MicTranscriberService {
 
     // 创建 targetDataLine 和 transcriber 的方法
     public MicAndTranscriber openMic(String micName) throws Exception {
-        MicAndTranscriber micAndTranscriber = new MicAndTranscriber();
         SpeechTranscriber transcriber = null;
         TargetDataLine targetDataLine = null;
 
@@ -56,10 +55,9 @@ public class MicTranscriberService {
         }
 
         if (selectedMixerInfo != null) {
-            // 创建 MicAndTranscriber 对象
-
             // 创建语音识别实例并设置参数
-            transcriber = new SpeechTranscriber(client, getTranscriberListener(micAndTranscriber));
+            Sentences sentences = new Sentences();
+            transcriber = new SpeechTranscriber(client, getTranscriberListener(sentences));
             transcriber.setAppKey(appKey);
             transcriber.setFormat(InputFormatEnum.PCM);
             transcriber.setSampleRate(SampleRateEnum.SAMPLE_RATE_16K);
@@ -73,13 +71,12 @@ public class MicTranscriberService {
             DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, audioFormat);
             targetDataLine = (TargetDataLine) mixer.getLine(dataLineInfo);
             targetDataLine.open(audioFormat);
-        } else {
-            System.out.println("Micr ophone not found: " + micName);
-        }
+            return new MicAndTranscriber(targetDataLine, transcriber, sentences);
 
-        micAndTranscriber.setTranscriber(transcriber);
-        micAndTranscriber.setTargetDataLine(targetDataLine);
-        return micAndTranscriber;
+        } else {
+            System.out.println("Microphone not found: " + micName);
+        }
+        return null;
     }
 
     // 启动 targetDataLine 和 transcriber 的方法
@@ -89,7 +86,7 @@ public class MicTranscriberService {
         if (targetDataLine == null || transcriber == null) {
             return;
         }
-        if (targetDataLine.isOpen()) {
+        if (targetDataLine.isRunning()) {
             return;
         }
         targetDataLine.start();
@@ -112,10 +109,10 @@ public class MicTranscriberService {
         if (targetDataLine == null || transcriber == null) {
             return;
         }
-//        if (targetDataLine.isRunning()) {
+        if (targetDataLine.isActive()) {
             targetDataLine.stop();
             transcriber.stop();
-//        }
+        }
     }
 
     // 关闭 targetDataLine 和 transcriber 的方法
@@ -131,7 +128,7 @@ public class MicTranscriberService {
         }
     }
 
-    public SpeechTranscriberListener getTranscriberListener(MicAndTranscriber micAndTranscriber) {
+    public SpeechTranscriberListener getTranscriberListener(Sentences sentences) {
         SpeechTranscriberListener listener = new SpeechTranscriberListener() {
             @Override
             public void onTranscriptionResultChange(SpeechTranscriberResponse response) {
@@ -167,7 +164,8 @@ public class MicTranscriberService {
                         response.getSentenceBeginTime() / 1000.0,
                         response.getTransSentenceTime() / 1000.0
                 );
-                micAndTranscriber.getSentences().addSentence(sentence);
+                System.out.println("插入成功");
+                sentences.addSentence(sentence);
             }
 
             //识别完毕
@@ -198,12 +196,12 @@ public class MicTranscriberService {
         // 在主线程中创建两个 MicAndTranscriber 对象
         MicAndTranscriber micAndTranscriber1 = service.openMic("B1");
         MicAndTranscriber micAndTranscriber2 = service.openMic("Realtek");
-        System.out.println(micAndTranscriber2.getTargetDataLine().isOpen());
+        System.out.println(micAndTranscriber2.getTargetDataLine().isActive());
 
         // 创建两个子线程,分别调用不同的麦克风
         Thread thread1 = new Thread(() -> {
             try {
-                service.startMic(micAndTranscriber2);
+                service.startMic(micAndTranscriber1);
                 // 其他处理逻辑...
             } catch (Exception e) {
                 e.printStackTrace();
@@ -228,9 +226,9 @@ public class MicTranscriberService {
             @Override
             public void run() {
                 try {
-                    System.out.println(micAndTranscriber2.getTargetDataLine().isOpen());
+                    System.out.println(micAndTranscriber2.getTargetDataLine().isActive());
                     service.stopMic(micAndTranscriber2);
-                    System.out.println(micAndTranscriber2.getTargetDataLine().isOpen());
+                    System.out.println(micAndTranscriber2.getTargetDataLine().isActive());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

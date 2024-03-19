@@ -4,6 +4,10 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class Sentences {
+    public BlockingQueue<Sentence> getQueue() {
+        return queue;
+    }
+
     private BlockingQueue<Sentence> queue = new LinkedBlockingQueue<>();
 
     // 将句子插入队列末尾
@@ -15,4 +19,5 @@ public class Sentences {
     public Sentence popSentence() {
         return queue.poll();
     }
+
 }
