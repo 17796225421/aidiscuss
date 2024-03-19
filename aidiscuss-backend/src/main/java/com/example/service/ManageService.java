@@ -1,9 +1,6 @@
 package com.example.service;
 
-import com.example.model.DiscussBaseInfo;
-import com.example.model.DiscussInfo;
-import com.example.model.ManageInfo;
-import com.example.model.MicSwitchInfo;
+import com.example.model.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.springframework.stereotype.Service;
@@ -13,15 +10,21 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
 public class ManageService {
 
     private RedisService redisService;
+    private MicTranscriberService micTranscriberService; // 添加 MicTranscriberService 实例
+    private Map<String, DiscussMicThread> discussMicThreadMap; // 用于保存 discussId 和对应的麦克风线程
 
     public ManageService() {
-        redisService = new RedisService();
+        redisService = RedisService.getInstance();
+        micTranscriberService = new MicTranscriberService(); // 初始化 MicTranscriberService
+        discussMicThreadMap = new HashMap<>(); // 初始化 HashMap
     }
 
     /**
@@ -41,7 +44,7 @@ public class ManageService {
      *
      * @return 创建的讨论名称
      */
-    public DiscussBaseInfo createDiscuss() {
+    public DiscussBaseInfo createDiscuss() throws Exception {
         // 获取当前时间，并格式化为指定格式
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM_dd_HH_mm_ss");
@@ -56,7 +59,20 @@ public class ManageService {
         // 创建新的Redis库，并添加discussName作为key，当前时间作为value
         redisService.createDiscuss(discussInfo);
 
+        // 调用 MicTranscriberService 的 openMic 方法,并创建对应的麦克风线程
+        MicAndTranscriber externMic = micTranscriberService.openMic("M3");
+        MicAndTranscriber wireMic = micTranscriberService.openMic("Realtek");
+        MicAndTranscriber virtualMic = micTranscriberService.openMic("B1");
+
+        // 创建 DiscussMicThread 实例,并启动线程
+        DiscussMicThread discussMicThread = new DiscussMicThread(discussId, externMic, wireMic, virtualMic);
+        discussMicThread.start();
+
+        // 将 discussId 和对应的 DiscussMicThread 实例保存到 HashMap 中
+        discussMicThreadMap.put(discussId, discussMicThread);
+
         return new DiscussBaseInfo(discussId, discussName);
+
     }
 
     public void closeDiscuss(String discussId) {
@@ -68,6 +84,17 @@ public class ManageService {
 
             // 将DiscussInfo保存到文件中
             saveDiscussInfoToFile(discussInfo);
+        }
+
+        // 从 HashMap 中获取对应的 DiscussMicThread 实例,并关闭麦克风
+        DiscussMicThread discussMicThread = discussMicThreadMap.get(discussId);
+        if (discussMicThread != null) {
+            try {
+                discussMicThread.closeMics();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            discussMicThreadMap.remove(discussId); // 从 HashMap 中移除
         }
     }
 

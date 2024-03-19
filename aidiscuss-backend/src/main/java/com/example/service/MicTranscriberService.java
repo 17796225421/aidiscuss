@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.example.model.MicAndTranscriber;
 import com.example.model.Sentence;
 import com.example.model.Sentences;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -73,7 +74,7 @@ public class MicTranscriberService {
             targetDataLine = (TargetDataLine) mixer.getLine(dataLineInfo);
             targetDataLine.open(audioFormat);
         } else {
-            System.out.println("Microphone not found: " + micName);
+            System.out.println("Micr ophone not found: " + micName);
         }
 
         micAndTranscriber.setTranscriber(transcriber);
@@ -85,18 +86,21 @@ public class MicTranscriberService {
     public void startMic(MicAndTranscriber micAndTranscriber) throws Exception {
         TargetDataLine targetDataLine = micAndTranscriber.getTargetDataLine();
         SpeechTranscriber transcriber = micAndTranscriber.getTranscriber();
+        if (targetDataLine == null || transcriber == null) {
+            return;
+        }
+        if (targetDataLine.isOpen()) {
+            return;
+        }
+        targetDataLine.start();
+        transcriber.start();
 
-        if (targetDataLine != null && transcriber != null) {
-            targetDataLine.start();
-            transcriber.start();
-
-            // 从麦克风读取音频数据并发送给服务端
-            int nByte = 0;
-            final int bufSize = 3200;
-            byte[] buffer = new byte[bufSize];
-            while ((nByte = targetDataLine.read(buffer, 0, bufSize)) > 0) {
-                transcriber.send(buffer, nByte);
-            }
+        // 从麦克风读取音频数据并发送给服务端
+        int nByte = 0;
+        final int bufSize = 3200;
+        byte[] buffer = new byte[bufSize];
+        while ((nByte = targetDataLine.read(buffer, 0, bufSize)) > 0) {
+            transcriber.send(buffer, nByte);
         }
     }
 
@@ -105,10 +109,11 @@ public class MicTranscriberService {
         TargetDataLine targetDataLine = micAndTranscriber.getTargetDataLine();
         SpeechTranscriber transcriber = micAndTranscriber.getTranscriber();
 
-        if (targetDataLine != null) {
-            targetDataLine.stop();
+        if (targetDataLine == null || transcriber == null) {
+            return;
         }
-        if (transcriber != null) {
+        if (targetDataLine.isRunning()) {
+            targetDataLine.stop();
             transcriber.stop();
         }
     }
@@ -241,37 +246,4 @@ public class MicTranscriberService {
         }, 20000);
     }
 
-    // 内部类,用于封装 targetDataLine 和 transcriber
-    public class MicAndTranscriber {
-        private TargetDataLine targetDataLine;
-        private SpeechTranscriber transcriber;
-        private Sentences sentences = new Sentences();
-
-        public MicAndTranscriber() {
-        }
-
-        public TargetDataLine getTargetDataLine() {
-            return targetDataLine;
-        }
-
-        public void setTargetDataLine(TargetDataLine targetDataLine) {
-            this.targetDataLine = targetDataLine;
-        }
-
-        public SpeechTranscriber getTranscriber() {
-            return transcriber;
-        }
-
-        public void setTranscriber(SpeechTranscriber transcriber) {
-            this.transcriber = transcriber;
-        }
-
-        public Sentences getSentences() {
-            return sentences;
-        }
-
-        public void setSentences(Sentences sentences) {
-            this.sentences = sentences;
-        }
-    }
 }

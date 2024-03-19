@@ -32,7 +32,7 @@ public class ManageController {
         }
     }
     @PostMapping("/createDiscuss")
-    public ResponseEntity<DiscussBaseInfo> createDiscuss() {
+    public ResponseEntity<DiscussBaseInfo> createDiscuss() throws Exception {
         // 调用ManageService的createDiscuss方法创建新的讨论
         DiscussBaseInfo discussBaseInfo = manageService.createDiscuss();
 
