@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.example.model.Sentence;
+import com.example.model.Sentences;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class MicTranscriberService {
@@ -36,6 +38,7 @@ public class MicTranscriberService {
 
     // 创建 targetDataLine 和 transcriber 的方法
     public MicAndTranscriber openMic(String micName) throws Exception {
+        MicAndTranscriber micAndTranscriber = new MicAndTranscriber();
         SpeechTranscriber transcriber = null;
         TargetDataLine targetDataLine = null;
 
@@ -52,8 +55,10 @@ public class MicTranscriberService {
         }
 
         if (selectedMixerInfo != null) {
+            // 创建 MicAndTranscriber 对象
+
             // 创建语音识别实例并设置参数
-            transcriber = new SpeechTranscriber(client, getTranscriberListener());
+            transcriber = new SpeechTranscriber(client, getTranscriberListener(micAndTranscriber));
             transcriber.setAppKey(appKey);
             transcriber.setFormat(InputFormatEnum.PCM);
             transcriber.setSampleRate(SampleRateEnum.SAMPLE_RATE_16K);
@@ -71,7 +76,9 @@ public class MicTranscriberService {
             System.out.println("Microphone not found: " + micName);
         }
 
-        return new MicAndTranscriber(targetDataLine, transcriber);
+        micAndTranscriber.setTranscriber(transcriber);
+        micAndTranscriber.setTargetDataLine(targetDataLine);
+        return micAndTranscriber;
     }
 
     // 启动 targetDataLine 和 transcriber 的方法
@@ -119,7 +126,7 @@ public class MicTranscriberService {
         }
     }
 
-    public SpeechTranscriberListener getTranscriberListener() {
+    public SpeechTranscriberListener getTranscriberListener(MicAndTranscriber micAndTranscriber) {
         SpeechTranscriberListener listener = new SpeechTranscriberListener() {
             @Override
             public void onTranscriptionResultChange(SpeechTranscriberResponse response) {
@@ -142,11 +149,20 @@ public class MicTranscriberService {
                 System.out.println(String.format(
                         "[%s] index: %d, result: %s, begin_time: %.1f, time: %.1f",
                         Thread.currentThread().getName(),    // 获取当前线程的名称
-                        response.getTransSentenceIndex(),               //句子编号，从1开始递增
+                        response.getTransSentenceIndex(),               //句子编号,从1开始递增
                         response.getTransSentenceText(),                //当前的识别结果
-                        response.getSentenceBeginTime() / 1000.0,       //句子开始时间，单位是秒
-                        response.getTransSentenceTime() / 1000.0        //当前已处理的音频时长，单位是秒
+                        response.getSentenceBeginTime() / 1000.0,       //句子开始时间,单位是秒
+                        response.getTransSentenceTime() / 1000.0        //当前已处理的音频时长,单位是秒
                 ));
+
+                // 将识别结果封装为Sentence对象并插入队列
+                Sentence sentence = new Sentence(
+                        response.getTransSentenceIndex(),
+                        response.getTransSentenceText(),
+                        response.getSentenceBeginTime() / 1000.0,
+                        response.getTransSentenceTime() / 1000.0
+                );
+                micAndTranscriber.getSentences().addSentence(sentence);
             }
 
             //识别完毕
@@ -229,18 +245,33 @@ public class MicTranscriberService {
     public class MicAndTranscriber {
         private TargetDataLine targetDataLine;
         private SpeechTranscriber transcriber;
+        private Sentences sentences = new Sentences();
 
-        public MicAndTranscriber(TargetDataLine targetDataLine, SpeechTranscriber transcriber) {
-            this.targetDataLine = targetDataLine;
-            this.transcriber = transcriber;
+        public MicAndTranscriber() {
         }
 
         public TargetDataLine getTargetDataLine() {
             return targetDataLine;
         }
 
+        public void setTargetDataLine(TargetDataLine targetDataLine) {
+            this.targetDataLine = targetDataLine;
+        }
+
         public SpeechTranscriber getTranscriber() {
             return transcriber;
+        }
+
+        public void setTranscriber(SpeechTranscriber transcriber) {
+            this.transcriber = transcriber;
+        }
+
+        public Sentences getSentences() {
+            return sentences;
+        }
+
+        public void setSentences(Sentences sentences) {
+            this.sentences = sentences;
         }
     }
 }
