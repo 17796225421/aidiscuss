@@ -35,7 +35,7 @@ public class MicTranscriberService {
     }
 
     // 创建 targetDataLine 和 transcriber 的方法
-    public MicAndTranscriber createMicAndTranscriber(String micName) throws Exception {
+    public MicAndTranscriber openMic(String micName) throws Exception {
         SpeechTranscriber transcriber = null;
         TargetDataLine targetDataLine = null;
 
@@ -105,6 +105,20 @@ public class MicTranscriberService {
             transcriber.stop();
         }
     }
+
+    // 关闭 targetDataLine 和 transcriber 的方法
+    public void closeMic(MicAndTranscriber micAndTranscriber) throws Exception {
+        TargetDataLine targetDataLine = micAndTranscriber.getTargetDataLine();
+        SpeechTranscriber transcriber = micAndTranscriber.getTranscriber();
+
+        if (targetDataLine != null) {
+            targetDataLine.close();
+        }
+        if (transcriber != null) {
+            transcriber.close();
+        }
+    }
+
     public SpeechTranscriberListener getTranscriberListener() {
         SpeechTranscriberListener listener = new SpeechTranscriberListener() {
             @Override
@@ -161,8 +175,8 @@ public class MicTranscriberService {
         MicTranscriberService service = new MicTranscriberService();
 
         // 在主线程中创建两个 MicAndTranscriber 对象
-        MicAndTranscriber micAndTranscriber1 = service.createMicAndTranscriber("B1");
-        MicAndTranscriber micAndTranscriber2 = service.createMicAndTranscriber("Realtek");
+        MicAndTranscriber micAndTranscriber1 = service.openMic("B1");
+        MicAndTranscriber micAndTranscriber2 = service.openMic("Realtek");
 
         // 创建两个子线程,分别调用不同的麦克风
         Thread thread1 = new Thread(() -> {
@@ -212,7 +226,7 @@ public class MicTranscriberService {
     }
 
     // 内部类,用于封装 targetDataLine 和 transcriber
-    private static class MicAndTranscriber {
+    public class MicAndTranscriber {
         private TargetDataLine targetDataLine;
         private SpeechTranscriber transcriber;
 
