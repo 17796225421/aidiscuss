@@ -158,11 +158,18 @@ public class RedisService {
                 jedis.select(i);
                 if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
                     String key = micName + "Sentences";
-                    if (jedis.exists(key)) {
-                        Sentences sentences = new Gson().fromJson(jedis.get(key), Sentences.class);
-                        sentences.addSentence(sentence);
-                        jedis.set(key, new Gson().toJson(sentences));
+                    Sentences sentences;
+                    String sentencesJson = jedis.get(key);
+                    if (sentencesJson != null && !sentencesJson.isEmpty()) {
+                        // 如果 sentencesJson 不为 null,则解析为 Sentences 对象
+                        sentences = new Gson().fromJson(sentencesJson, Sentences.class);
+                    } else {
+                        // 如果 sentencesJson 为 null,则创建一个新的 Sentences 对象
+                        sentences = new Sentences();
                     }
+                    sentences.addSentence(sentence);
+                    jedis.set(key, new Gson().toJson(sentences));
+                    break;
                 }
             }
         }

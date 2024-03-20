@@ -1,10 +1,10 @@
 package com.example.model;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Sentences {
-    private BlockingQueue<Sentence> queue = new LinkedBlockingQueue<>();
+    // 使用ConcurrentLinkedQueue来保证线程安全
+    private ConcurrentLinkedQueue<Sentence> queue = new ConcurrentLinkedQueue<>();
 
     // 将句子插入队列末尾
     public void addSentence(Sentence sentence) {
@@ -15,5 +15,4 @@ public class Sentences {
     public Sentence popSentence() {
         return queue.poll();
     }
-
 }

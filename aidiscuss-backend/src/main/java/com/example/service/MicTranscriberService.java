@@ -93,26 +93,47 @@ public class MicTranscriberService {
         targetDataLine.start();
         transcriber.start();
 
-        // 从麦克风读取音频数据并发送给服务端
-        int nByte = 0;
-        final int bufSize = 3200;
-        byte[] buffer = new byte[bufSize];
-        while ((nByte = targetDataLine.read(buffer, 0, bufSize)) > 0) {
-            transcriber.send(buffer, nByte);
-        }
+        // 创建一个新的线程来读取音频数据并发送给服务端
+        Thread audioThread = new Thread(() -> {
+            int nByte = 0;
+            final int bufSize = 3200;
+            byte[] buffer = new byte[bufSize];
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    nByte = targetDataLine.read(buffer, 0, bufSize);
+                    if (nByte > 0) {
+                        transcriber.send(buffer, nByte);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    break;
+                }
+            }
+            // 线程退出时的清理工作
+            targetDataLine.stop();
+            try {
+                transcriber.stop();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        audioThread.start();
+        micAndTranscriber.setAudioThread(audioThread); // 将音频线程保存到 MicAndTranscriber 对象中
     }
+
 
     // 停止 targetDataLine 和 transcriber 的方法
     public void stopMic(MicAndTranscriber micAndTranscriber) throws Exception {
         TargetDataLine targetDataLine = micAndTranscriber.getTargetDataLine();
         SpeechTranscriber transcriber = micAndTranscriber.getTranscriber();
+        Thread audioThread = micAndTranscriber.getAudioThread(); // 获取音频线程
 
-        if (targetDataLine == null || transcriber == null) {
+        if (targetDataLine == null || transcriber == null || audioThread == null) {
             return;
         }
         if (targetDataLine.isActive()) {
-            targetDataLine.stop();
-            transcriber.stop();
+            audioThread.interrupt(); // 中断音频线程,使其退出循环
+            audioThread.join(); // 等待音频线程完成任务
         }
     }
 

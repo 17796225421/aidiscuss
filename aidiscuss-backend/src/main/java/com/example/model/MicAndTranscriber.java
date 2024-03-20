@@ -8,6 +8,7 @@ public class MicAndTranscriber {
     private TargetDataLine targetDataLine;
     private SpeechTranscriber transcriber;
     private Sentences sentences;
+    private Thread audioThread; // 新增音频线程字段
 
     public MicAndTranscriber(TargetDataLine targetDataLine, SpeechTranscriber transcriber, Sentences sentences) {
         this.targetDataLine = targetDataLine;
@@ -37,5 +38,14 @@ public class MicAndTranscriber {
 
     public void setSentences(Sentences sentences) {
         this.sentences = sentences;
+    }
+
+    // 新增获取和设置音频线程的方法
+    public Thread getAudioThread() {
+        return audioThread;
+    }
+
+    public void setAudioThread(Thread audioThread) {
+        this.audioThread = audioThread;
     }
 }
