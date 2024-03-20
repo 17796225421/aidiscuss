@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const discussId = getDiscussIdFromUrl();
     if (discussId) {
         fetchDiscussInfo(discussId);
+        externMicSentencesConnection(discussId);
     } else {
         console.error('缺少discussId参数');
     }
@@ -95,4 +96,20 @@ function handleMicChange(event,discussId) {
         .catch((error) => {
             console.error('Error:', error);
         });
+}
+
+// 建立WebSocket连接,接收externMicSentences的推送
+function externMicSentencesConnection(discussId) {
+    const socket = new SockJS('http://127.0.0.1:10002/ws');
+    const stompClient = Stomp.over(socket); // 使用stomp协议
+
+    stompClient.connect({}, function (frame) {
+        console.log('Connected: ' + frame);
+        stompClient.subscribe(`/topic/externMicSentences/${discussId}`, function (message) {
+            const externMicSentences = message.body;
+            console.log('收到externMicSentences:', externMicSentences);
+            // TODO: 在这里可以对收到的数据进行处理,例如在页面上显示出来
+        });
+    });
+
 }

@@ -30,4 +30,9 @@ public class DiscussService {
         // 更新指定discussId的麦克风开关信息
         redisService.updateMicSwitchInfo(discussId, micSwitchInfo);
     }
+
+    public String getExternMicSentences(String discussId) {
+        // 直接调用RedisService的方法获取数据
+        return RedisService.getInstance().getExternMicSentences(discussId);
+    }
 }

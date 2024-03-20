@@ -174,4 +174,17 @@ public class RedisService {
             }
         }
     }
+    public String getExternMicSentences(String discussId) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    // 直接返回对应的字符串数据
+                    return jedis.get("externMicSentences");
+                }
+            }
+            return "";
+        }
+    }
 }
