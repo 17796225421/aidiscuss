@@ -9,11 +9,11 @@ class DiscussMicThread {
     private MicThread wireMicThread;
     private MicThread virtualMicThread;
 
-    public DiscussMicThread(String discussId, MicAndTranscriber externMic, MicAndTranscriber wireMic, MicAndTranscriber virtualMic) {
+    public DiscussMicThread(String discussId, MicAndTranscriber externMic, MicAndTranscriber wireMic, MicAndTranscriber virtualMic, MicTranscriberService micTranscriberService) {
         this.discussId = discussId;
-        this.externMicThread = new MicThread(discussId, externMic, "externMic");
-        this.wireMicThread = new MicThread(discussId, wireMic, "wireMic");
-        this.virtualMicThread = new MicThread(discussId, virtualMic, "virtualMic");
+        this.externMicThread = new MicThread(discussId, externMic, "externMic",micTranscriberService);
+        this.wireMicThread = new MicThread(discussId, wireMic, "wireMic",micTranscriberService);
+        this.virtualMicThread = new MicThread(discussId, virtualMic, "virtualMic",micTranscriberService);
     }
 
     public void start() {

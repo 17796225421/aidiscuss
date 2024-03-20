@@ -65,7 +65,7 @@ public class ManageService {
         MicAndTranscriber virtualMic = micTranscriberService.openMic("B1");
 
         // 创建 DiscussMicThread 实例,并启动线程
-        DiscussMicThread discussMicThread = new DiscussMicThread(discussId, externMic, wireMic, virtualMic);
+        DiscussMicThread discussMicThread = new DiscussMicThread(discussId, externMic, wireMic, virtualMic,micTranscriberService);
         discussMicThread.start();
 
         // 将 discussId 和对应的 DiscussMicThread 实例保存到 HashMap 中

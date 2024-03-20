@@ -3,7 +3,6 @@ package com.example.service;
 import com.example.model.MicAndTranscriber;
 import com.example.model.MicSwitchInfo;
 import com.example.model.Sentence;
-import com.example.model.Sentences;
 import com.google.gson.Gson;
 
 // MicThread 类,代表单个麦克风的控制线程
@@ -15,12 +14,12 @@ class MicThread extends Thread {
     private RedisService redisService;
     private volatile boolean running = true;
 
-    public MicThread(String discussId, MicAndTranscriber micAndTranscriber, String micName) {
+    public MicThread(String discussId, MicAndTranscriber micAndTranscriber, String micName, MicTranscriberService micTranscriberService) {
         this.discussId = discussId;
         this.micAndTranscriber = micAndTranscriber;
         this.micName = micName;
         this.redisService = RedisService.getInstance();
-        this.micTranscriberService = new MicTranscriberService(); // 初始化 MicTranscriberService
+        this.micTranscriberService = micTranscriberService;
     }
 
     @Override

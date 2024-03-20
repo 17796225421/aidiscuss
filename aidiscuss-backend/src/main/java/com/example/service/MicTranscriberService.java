@@ -71,6 +71,7 @@ public class MicTranscriberService {
             DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, audioFormat);
             targetDataLine = (TargetDataLine) mixer.getLine(dataLineInfo);
             targetDataLine.open(audioFormat);
+            System.out.println(micName + "open");
             return new MicAndTranscriber(targetDataLine, transcriber, sentences);
 
         } else {
