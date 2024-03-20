@@ -18,8 +18,8 @@ class DiscussMicThread {
 
     public void start() {
         externMicThread.start();
-        wireMicThread.start();
-        virtualMicThread.start();
+//        wireMicThread.start();
+//        virtualMicThread.start();
     }
 
     public void closeMics() throws Exception {

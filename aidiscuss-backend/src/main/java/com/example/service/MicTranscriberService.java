@@ -93,28 +93,25 @@ public class MicTranscriberService {
         targetDataLine.start();
         transcriber.start();
 
-        // 创建一个新的线程来读取音频数据并发送给服务端
+        micAndTranscriber.setRunning(true);
         Thread audioThread = new Thread(() -> {
             int nByte = 0;
             final int bufSize = 3200;
             byte[] buffer = new byte[bufSize];
-            while (!Thread.currentThread().isInterrupted()) {
+            System.out.println("Current thread before creating audioThread: " + Long.toBinaryString(Thread.currentThread().getId()));
+            while (!Thread.currentThread().isInterrupted() && micAndTranscriber.isRunning()) { // 使用running变量控制循环
                 try {
+                    System.out.println("bg read");
                     nByte = targetDataLine.read(buffer, 0, bufSize);
                     if (nByte > 0) {
                         transcriber.send(buffer, nByte);
                     }
+                    System.out.println("ed read");
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     break;
                 }
-            }
-            // 线程退出时的清理工作
-            targetDataLine.stop();
-            try {
-                transcriber.stop();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
             }
         });
         audioThread.start();
@@ -131,10 +128,23 @@ public class MicTranscriberService {
         if (targetDataLine == null || transcriber == null || audioThread == null) {
             return;
         }
-        if (targetDataLine.isActive()) {
+        System.out.println("bg stopMic");
+        if (targetDataLine.isRunning()) {
+            System.out.println("bg interrupt");
+            System.out.println("audioThread: " + Long.toBinaryString(audioThread.getId()));
             audioThread.interrupt(); // 中断音频线程,使其退出循环
+            micAndTranscriber.setRunning(false); // 确保循环能够被停止
+            System.out.println("ed interrupt");
             audioThread.join(); // 等待音频线程完成任务
+            targetDataLine.stop(); // 停止 targetDataLine
+            try {
+                transcriber.stop(); // 停止 transcriber
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
+        System.out.println("ed stopMic");
+
     }
 
     // 关闭 targetDataLine 和 transcriber 的方法

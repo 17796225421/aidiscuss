@@ -46,6 +46,8 @@ class MicThread extends Thread {
                         micState = false;
                 }
 
+                System.out.println(micName);
+                System.out.println(micState);
                 // 根据麦克风状态调用 MicAndTranscriber 的方法
                 if (micState) {
                     try {

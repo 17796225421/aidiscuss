@@ -5,6 +5,7 @@ import com.alibaba.nls.client.protocol.asr.SpeechTranscriber;
 import javax.sound.sampled.TargetDataLine;
 
 public class MicAndTranscriber {
+    volatile boolean running = true;
     private TargetDataLine targetDataLine;
     private SpeechTranscriber transcriber;
     private Sentences sentences;
@@ -14,6 +15,14 @@ public class MicAndTranscriber {
         this.targetDataLine = targetDataLine;
         this.transcriber = transcriber;
         this.sentences = sentences;
+    }
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    public void setRunning(boolean running) {
+        this.running = running;
     }
 
     public TargetDataLine getTargetDataLine() {
