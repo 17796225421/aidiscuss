@@ -128,13 +128,9 @@ public class MicTranscriberService {
         if (targetDataLine == null || transcriber == null || audioThread == null) {
             return;
         }
-        System.out.println("bg stopMic");
         if (targetDataLine.isRunning()) {
-            System.out.println("bg interrupt");
-            System.out.println("audioThread: " + Long.toBinaryString(audioThread.getId()));
             audioThread.interrupt(); // 中断音频线程,使其退出循环
             micAndTranscriber.setRunning(false); // 确保循环能够被停止
-            System.out.println("ed interrupt");
             audioThread.join(); // 等待音频线程完成任务
             targetDataLine.stop(); // 停止 targetDataLine
             try {
@@ -143,12 +139,12 @@ public class MicTranscriberService {
                 throw new RuntimeException(e);
             }
         }
-        System.out.println("ed stopMic");
-
     }
 
     // 关闭 targetDataLine 和 transcriber 的方法
     public void closeMic(MicAndTranscriber micAndTranscriber) throws Exception {
+        stopMic(micAndTranscriber);
+
         TargetDataLine targetDataLine = micAndTranscriber.getTargetDataLine();
         SpeechTranscriber transcriber = micAndTranscriber.getTranscriber();
 
