@@ -6,7 +6,7 @@ function getDiscussIdFromUrl() {
 
 // 发送GET请求获取讨论主题信息
 function fetchDiscussInfo(discussId) {
-    fetch(`http://127.0.0.1:10002/getDiscuss/${discussId}`)
+    fetch(`https://s1.v100.vip:27443/getDiscuss/${discussId}`)
         .then(response => response.json())
         .then(data => {
             // 修正：从data.micSwitchInfo中提取麦克风信息来创建MicSwitchInfo对象
@@ -84,7 +84,7 @@ function handleMicChange(event,discussId) {
     discussInfo.micSwitchInfo=micSwitchInfo;
 
     // 发送POST请求
-    fetch('http://127.0.0.1:10002/micSwitch', {
+    fetch('https://s1.v100.vip:27443/micSwitch', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -102,7 +102,7 @@ function handleMicChange(event,discussId) {
 
 // 建立WebSocket连接,接收externMicSentences的推送
 function externMicSentencesConnection(discussId) {
-    const socket = new SockJS('http://127.0.0.1:10002/ws');
+    const socket = new SockJS('https://s1.v100.vip:27443/ws');
     const stompClient = Stomp.over(socket); // 使用stomp协议
 
     stompClient.connect({}, function (frame) {
@@ -124,7 +124,7 @@ function externMicSentencesConnection(discussId) {
 
 // 建立WebSocket连接,接收wireMicSentences的推送
 function wireMicSentencesConnection(discussId) {
-    const socket = new SockJS('http://127.0.0.1:10002/ws');
+    const socket = new SockJS('https://s1.v100.vip:27443/ws');
     const stompClient = Stomp.over(socket); // 使用stomp协议
 
     stompClient.connect({}, function (frame) {
@@ -146,7 +146,7 @@ function wireMicSentencesConnection(discussId) {
 
 // 建立WebSocket连接,接收virtualMicSentences的推送
 function virtualMicSentencesConnection(discussId) {
-    const socket = new SockJS('http://127.0.0.1:10002/ws');
+    const socket = new SockJS('https://s1.v100.vip:27443/ws');
     const stompClient = Stomp.over(socket); // 使用stomp协议
 
     stompClient.connect({}, function (frame) {
