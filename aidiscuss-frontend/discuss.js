@@ -47,6 +47,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (discussId) {
         fetchDiscussInfo(discussId);
         externMicSentencesConnection(discussId);
+        wireMicSentencesConnection(discussId);
+        virtualMicSentencesConnection(discussId);
     } else {
         console.error('缺少discussId参数');
     }
@@ -114,6 +116,50 @@ function externMicSentencesConnection(discussId) {
             // 处理完毕，等待 1 秒钟后重新发送请求
             setTimeout(function() {
                 stompClient.send(`/app/externMicSentencesConnection/${discussId}`, {}, JSON.stringify({/* 消息内容 */}));
+            }, 1000);
+        });
+    });
+
+}
+
+// 建立WebSocket连接,接收wireMicSentences的推送
+function wireMicSentencesConnection(discussId) {
+    const socket = new SockJS('http://127.0.0.1:10002/ws');
+    const stompClient = Stomp.over(socket); // 使用stomp协议
+
+    stompClient.connect({}, function (frame) {
+        console.log('Connected: ' + frame);
+        stompClient.send(`/app/wireMicSentencesConnection/${discussId}`, {}, JSON.stringify({/* 消息内容 */}));
+        stompClient.subscribe(`/topic/wireMicSentencesConnection/${discussId}`, function (message) {
+            const wireMicSentences = message.body;
+            console.log('收到wireMicSentences:', wireMicSentences);
+            // TODO: 在这里可以对收到的数据进行处理,例如在页面上显示出来
+
+            // 处理完毕，等待 1 秒钟后重新发送请求
+            setTimeout(function() {
+                stompClient.send(`/app/wireMicSentencesConnection/${discussId}`, {}, JSON.stringify({/* 消息内容 */}));
+            }, 1000);
+        });
+    });
+
+}
+
+// 建立WebSocket连接,接收virtualMicSentences的推送
+function virtualMicSentencesConnection(discussId) {
+    const socket = new SockJS('http://127.0.0.1:10002/ws');
+    const stompClient = Stomp.over(socket); // 使用stomp协议
+
+    stompClient.connect({}, function (frame) {
+        console.log('Connected: ' + frame);
+        stompClient.send(`/app/virtualMicSentencesConnection/${discussId}`, {}, JSON.stringify({/* 消息内容 */}));
+        stompClient.subscribe(`/topic/virtualMicSentencesConnection/${discussId}`, function (message) {
+            const virtualMicSentences = message.body;
+            console.log('收到virtualMicSentences:', virtualMicSentences);
+            // TODO: 在这里可以对收到的数据进行处理,例如在页面上显示出来
+
+            // 处理完毕，等待 1 秒钟后重新发送请求
+            setTimeout(function() {
+                stompClient.send(`/app/virtualMicSentencesConnection/${discussId}`, {}, JSON.stringify({/* 消息内容 */}));
             }, 1000);
         });
     });

@@ -35,4 +35,14 @@ public class DiscussService {
         // 直接调用RedisService的方法获取数据
         return RedisService.getInstance().getExternMicSentences(discussId);
     }
+
+    public String getWireMicSentences(String discussId) {
+        // 直接调用RedisService的方法获取数据
+        return RedisService.getInstance().getWireMicSentences(discussId);
+    }
+
+    public String getVirtualMicSentences(String discussId) {
+        // 直接调用RedisService的方法获取数据
+        return RedisService.getInstance().getVirtualMicSentences(discussId);
+    }
 }
