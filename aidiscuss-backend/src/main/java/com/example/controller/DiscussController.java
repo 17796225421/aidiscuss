@@ -42,16 +42,11 @@ public class DiscussController {
         return ResponseEntity.ok().build();
     }
 
-    @MessageMapping("/externMicSentences/{discussId}")
-    public void getExternMicSentences(@DestinationVariable String discussId) throws InterruptedException {
-        // 每隔1秒钟向前端推送一次externMicSentences
-        while (true) {
-            System.out.println(1);
-            Thread.sleep(1000);
-            String externMicSentences = discussService.getExternMicSentences(discussId);
-            System.out.println("getExternMicSentences " + externMicSentences);
-            // 将externMicSentences传输到"/topic/externMicSentences/{discussId}"
-            simpMessagingTemplate.convertAndSend("/topic/externMicSentences/" + discussId, externMicSentences);
-        }
+    @MessageMapping("/externMicSentencesConnection/{discussId}")
+    public void externMicSentencesConnection(@DestinationVariable String discussId) throws InterruptedException {
+        String externMicSentences = discussService.getExternMicSentences(discussId);
+        System.out.println("discussId" + discussId + " getExternMicSentences " + externMicSentences);
+        // 将externMicSentences传输到"/topic/externMicSentences/{discussId}"
+        simpMessagingTemplate.convertAndSend("/topic/externMicSentencesConnection/" + discussId, externMicSentences);
     }
 }

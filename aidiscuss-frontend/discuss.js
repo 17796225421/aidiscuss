@@ -105,11 +105,16 @@ function externMicSentencesConnection(discussId) {
 
     stompClient.connect({}, function (frame) {
         console.log('Connected: ' + frame);
-        stompClient.send(`/app/externMicSentences/${discussId}`, {}, JSON.stringify({/* 消息内容 */}));
-        stompClient.subscribe(`/topic/externMicSentences/${discussId}`, function (message) {
+        stompClient.send(`/app/externMicSentencesConnection/${discussId}`, {}, JSON.stringify({/* 消息内容 */}));
+        stompClient.subscribe(`/topic/externMicSentencesConnection/${discussId}`, function (message) {
             const externMicSentences = message.body;
             console.log('收到externMicSentences:', externMicSentences);
             // TODO: 在这里可以对收到的数据进行处理,例如在页面上显示出来
+
+            // 处理完毕，等待 1 秒钟后重新发送请求
+            setTimeout(function() {
+                stompClient.send(`/app/externMicSentencesConnection/${discussId}`, {}, JSON.stringify({/* 消息内容 */}));
+            }, 1000);
         });
     });
 
