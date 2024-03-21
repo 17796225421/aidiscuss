@@ -12,4 +12,36 @@ public class Sentence {
         this.beginTime = beginTime;
         this.totalTime = totalTime;
     }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public double getBeginTime() {
+        return beginTime;
+    }
+
+    public void setBeginTime(double beginTime) {
+        this.beginTime = beginTime;
+    }
+
+    public double getTotalTime() {
+        return totalTime;
+    }
+
+    public void setTotalTime(double totalTime) {
+        this.totalTime = totalTime;
+    }
 }

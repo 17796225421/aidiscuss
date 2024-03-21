@@ -15,4 +15,13 @@ public class Sentences {
     public Sentence popSentence() {
         return queue.poll();
     }
+
+    public ConcurrentLinkedQueue<Sentence> getQueue() {
+        return queue;
+    }
+
+    public void setQueue(ConcurrentLinkedQueue<Sentence> queue) {
+        this.queue = queue;
+    }
+
 }
