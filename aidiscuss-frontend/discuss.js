@@ -105,6 +105,7 @@ function externMicSentencesConnection(discussId) {
 
     stompClient.connect({}, function (frame) {
         console.log('Connected: ' + frame);
+        stompClient.send(`/app/externMicSentences/${discussId}`, {}, JSON.stringify({/* 消息内容 */}));
         stompClient.subscribe(`/topic/externMicSentences/${discussId}`, function (message) {
             const externMicSentences = message.body;
             console.log('收到externMicSentences:', externMicSentences);

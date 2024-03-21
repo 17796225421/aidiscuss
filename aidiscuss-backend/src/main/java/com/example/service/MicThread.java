@@ -27,7 +27,6 @@ class MicThread extends Thread {
         while (running) {
             // 从 redisService 中获取对应的 MicSwitchInfo
             MicSwitchInfo micSwitchInfo = redisService.getMicSwitchInfo(discussId);
-            System.out.println(discussId+ ' '+ new Gson().toJson(micSwitchInfo));
 
             if (micSwitchInfo != null) {
                 // 根据 micName 判断是否需要开启或关闭麦克风
@@ -46,8 +45,6 @@ class MicThread extends Thread {
                         micState = false;
                 }
 
-                System.out.println(micName);
-                System.out.println(micState);
                 // 根据麦克风状态调用 MicAndTranscriber 的方法
                 if (micState) {
                     try {
@@ -65,9 +62,7 @@ class MicThread extends Thread {
             }
 
             Sentence sentence = micAndTranscriber.getSentences().popSentence();
-            System.out.println("获取");
             if (sentence != null) {
-                System.out.println("获取成功");
                 redisService.AddMicSentence(sentence, micName, discussId);
             }
 

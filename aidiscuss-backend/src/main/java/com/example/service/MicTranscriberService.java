@@ -71,7 +71,7 @@ public class MicTranscriberService {
             DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, audioFormat);
             targetDataLine = (TargetDataLine) mixer.getLine(dataLineInfo);
             targetDataLine.open(audioFormat);
-            System.out.println(micName + "open");
+            System.out.println(micName + " open");
             return new MicAndTranscriber(targetDataLine, transcriber, sentences);
 
         } else {
@@ -98,15 +98,12 @@ public class MicTranscriberService {
             int nByte = 0;
             final int bufSize = 3200;
             byte[] buffer = new byte[bufSize];
-            System.out.println("Current thread before creating audioThread: " + Long.toBinaryString(Thread.currentThread().getId()));
             while (!Thread.currentThread().isInterrupted() && micAndTranscriber.isRunning()) { // 使用running变量控制循环
                 try {
-                    System.out.println("bg read");
                     nByte = targetDataLine.read(buffer, 0, bufSize);
                     if (nByte > 0) {
                         transcriber.send(buffer, nByte);
                     }
-                    System.out.println("ed read");
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -192,7 +189,6 @@ public class MicTranscriberService {
                         response.getSentenceBeginTime() / 1000.0,
                         response.getTransSentenceTime() / 1000.0
                 );
-                System.out.println("插入成功");
                 sentences.addSentence(sentence);
             }
 
