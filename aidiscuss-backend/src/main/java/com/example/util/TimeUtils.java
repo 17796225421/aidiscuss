@@ -12,7 +12,8 @@ public class TimeUtils {
      */
     public static String getCurrentFormattedTime() {
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M月d日H时m分s秒S");
+        // 定义日期时间格式: yyyy-MM-dd HH:mm:ss.SSS
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
         return now.format(formatter);
     }
 

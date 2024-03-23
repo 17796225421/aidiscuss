@@ -133,16 +133,22 @@ public class ManageService {
     }
 
     private void saveDiscussInfoToFile(DiscussInfo discussInfo) {
-        // 我觉得可以在项目的根目录下创建一个data文件夹,用来存放数据文件
+        // 在项目的根目录下创建一个data文件夹,用来存放数据文件
         String baseDir = "data/discuss/closed/";
-        // 使用discussName作为文件夹名
-        String dirName = baseDir + discussInfo.getDiscussName();
+
+        System.out.println(discussInfo.getDiscussName());
+        // 这里用replace方法进行替换
+        String formattedDiscussName = discussInfo.getDiscussName().replace(" ", "_").replace(".", "-").replace(":","-");
+
+        System.out.println(formattedDiscussName);
+        // 使用修改后的formattedDiscussName作为文件夹名
+        String dirName = baseDir + formattedDiscussName;
         File dir = new File(dirName);
         if (!dir.exists()) {
             dir.mkdirs();
         }
 
-        // 在discussName文件夹下创建一个json文件,存放DiscussInfo的数据
+        // 在formattedDiscussName文件夹下创建一个json文件,存放DiscussInfo的数据
         String fileName = dirName + "/discussInfo.json";
         try (PrintWriter out = new PrintWriter(fileName)) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
