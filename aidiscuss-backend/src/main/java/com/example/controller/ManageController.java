@@ -40,6 +40,21 @@ public class ManageController {
         return ResponseEntity.ok(discussBaseInfo);
     }
 
+    @PostMapping("/startDiscuss")
+    public ResponseEntity<Void> startDiscuss(@RequestBody String discussId) throws Exception {
+        manageService.startDiscuss(discussId);
+        // 返回状态码200
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/stopDiscuss")
+    public ResponseEntity<Void> stopDiscuss(@RequestBody String discussId) {
+        manageService.stopDiscuss(discussId);
+        // 返回状态码200
+        return ResponseEntity.ok().build();
+    }
+
+
     @PostMapping("/closeDiscuss")
     public ResponseEntity<Void> closeDiscuss(@RequestBody String discussId) {
         // 调用DiscussService的micSwitch方法处理麦克风开关逻辑

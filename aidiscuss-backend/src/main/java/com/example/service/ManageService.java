@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -59,6 +60,15 @@ public class ManageService {
         // 创建新的Redis库，并添加discussName作为key，当前时间作为value
         redisService.createDiscuss(discussInfo);
 
+        return new DiscussBaseInfo(discussId, discussName);
+    }
+
+    public void startDiscuss(String discussId) throws Exception {
+        List<String> allDiscussId = redisService.getAllDiscussId();
+        for (String id : allDiscussId) {
+            stopDiscuss(id);
+        }
+
         // 调用 MicTranscriberService 的 openMic 方法,并创建对应的麦克风线程
         MicAndTranscriber externMic = micTranscriberService.openMic("M3");
         MicAndTranscriber wireMic = micTranscriberService.openMic("Realtek");
@@ -70,22 +80,9 @@ public class ManageService {
 
         // 将 discussId 和对应的 DiscussMicThread 实例保存到 HashMap 中
         discussMicThreadMap.put(discussId, discussMicThread);
-
-        return new DiscussBaseInfo(discussId, discussName);
-
     }
 
-    public void closeDiscuss(String discussId) {
-        // 先从RedisService找到discussId对应的库,读取所有的信息,构造DiscussInfo
-        DiscussInfo discussInfo = redisService.getDiscussInfo(discussId);
-        if (discussInfo != null) {
-            // 将这个库清空
-            redisService.clearDiscuss(discussId);
-
-            // 将DiscussInfo保存到文件中
-            saveDiscussInfoToFile(discussInfo);
-        }
-
+    public void stopDiscuss(String discussId) {
         // 从 HashMap 中获取对应的 DiscussMicThread 实例,并关闭麦克风
         DiscussMicThread discussMicThread = discussMicThreadMap.get(discussId);
         if (discussMicThread != null) {
@@ -95,6 +92,19 @@ public class ManageService {
                 throw new RuntimeException(e);
             }
             discussMicThreadMap.remove(discussId); // 从 HashMap 中移除
+        }
+    }
+
+    public void closeDiscuss(String discussId) {
+        stopDiscuss(discussId);
+        // 先从RedisService找到discussId对应的库,读取所有的信息,构造DiscussInfo
+        DiscussInfo discussInfo = redisService.getDiscussInfo(discussId);
+        if (discussInfo != null) {
+            // 将这个库清空
+            redisService.clearDiscuss(discussId);
+
+            // 将DiscussInfo保存到文件中
+            saveDiscussInfoToFile(discussInfo);
         }
     }
 

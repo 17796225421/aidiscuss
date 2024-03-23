@@ -3,6 +3,10 @@ window.onload = function () {
     getManageInfo();
     // 为创建讨论区按钮添加点击事件监听器
     document.getElementById('createDiscussBtn').addEventListener('click', createDiscuss);
+    // 为开始讨论区按钮添加点击事件监听器
+    document.getElementById('startDiscussBtn').addEventListener('click', startDiscuss);
+    // 为停止讨论区按钮添加点击事件监听器
+    document.getElementById('stopDiscussBtn').addEventListener('click', stopDiscuss);
     // 为打开讨论区按钮添加点击事件监听器
     document.getElementById('openDiscussBtn').addEventListener('click', openDiscuss);
     // 为结束讨论区按钮添加点击事件监听器
@@ -50,6 +54,50 @@ function createDiscuss() {
         })
         .catch(error => {
             console.error('创建讨论区失败:', error);
+        });
+}
+
+// 开始讨论区的函数
+function startDiscuss() {
+    // 获取当前选中的选项
+    const selectedOption = document.getElementById('discussList').value;
+    // 从选项的value中获取discussId
+    const discussId = selectedOption;
+    // 发送POST请求到指定的URL
+    fetch('http://127.0.0.1:10002/startDiscuss', {
+        method: 'POST', // 指定请求方法为POST
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: discussId
+    })
+        .then(response => {
+            console.log('开始讨论区成功');
+        })
+        .catch(error => {
+            console.error('开始讨论区失败:', error);
+        });
+}
+
+// 停止讨论区的函数
+function stopDiscuss() {
+    // 获取当前选中的选项
+    const selectedOption = document.getElementById('discussList').value;
+    // 从选项的value中获取discussId
+    const discussId = selectedOption;
+    // 发送POST请求到指定的URL
+    fetch('http://127.0.0.1:10002/stopDiscuss', {
+        method: 'POST', // 指定请求方法为POST
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: discussId
+    })
+        .then(response => {
+            console.log('停止讨论区成功');
+        })
+        .catch(error => {
+            console.error('停止讨论区失败:', error);
         });
 }
 

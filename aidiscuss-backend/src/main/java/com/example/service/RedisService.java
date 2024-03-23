@@ -32,6 +32,21 @@ public class RedisService {
         return instance;
     }
 
+    public List<String> getAllDiscussId() {
+        try (Jedis jedis = jedisPool.getResource()) {
+            List<String> allDiscussId = new ArrayList<>();
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId")) {
+                    String discussId = jedis.get("discussId");
+                    allDiscussId.add(discussId);
+                }
+            }
+            return allDiscussId;
+        }
+    }
+
     public List<DiscussBaseInfo> getDiscussBaseInfoList() {
         try (Jedis jedis = jedisPool.getResource()) {
             List<DiscussBaseInfo> discussBaseInfoList = new ArrayList<>();
