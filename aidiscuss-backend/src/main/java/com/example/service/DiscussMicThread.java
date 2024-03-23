@@ -23,7 +23,6 @@ class DiscussMicThread {
     }
 
     public void stop() {
-        System.out.println(111);
         externMicThread.stopRunning(); // 设置 running 为 false,通知麦克风线程停止运行
         wireMicThread.stopRunning();
         virtualMicThread.stopRunning();

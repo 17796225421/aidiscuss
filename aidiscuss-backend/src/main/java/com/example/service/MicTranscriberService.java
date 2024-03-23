@@ -83,7 +83,6 @@ public class MicTranscriberService {
         final int bufSize = 3200;
         byte[] buffer = new byte[bufSize];
         while (micThread.isRunning()) { // 使用running变量控制循环
-            System.out.println(222);
             try {
                 nByte = targetDataLine.read(buffer, 0, bufSize);
                 if (nByte > 0) {

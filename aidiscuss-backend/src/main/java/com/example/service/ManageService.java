@@ -59,9 +59,7 @@ public class ManageService {
     public void startDiscuss(String discussId) {
         List<String> allDiscussId = redisService.getAllDiscussId();
         for (String id : allDiscussId) {
-            if (!Objects.equals(id, discussId)) {
-                stopDiscuss(id);
-            }
+            stopDiscuss(id);
         }
 
         DiscussInfo discussInfo = redisService.getDiscussInfo(discussId);
@@ -127,7 +125,7 @@ public class ManageService {
         String baseDir = "data/discuss/closed/";
 
         // 这里用replace方法进行替换
-        String formattedDiscussName = discussInfo.getDiscussName().replace(" ", "_").replace(".", "-").replace(":","-");
+        String formattedDiscussName = discussInfo.getDiscussName().replace(" ", "_").replace(".", "-").replace(":", "-");
 
         // 使用修改后的formattedDiscussName作为文件夹名
         String dirName = baseDir + formattedDiscussName;
