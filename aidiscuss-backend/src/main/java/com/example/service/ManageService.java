@@ -17,12 +17,10 @@ import java.util.*;
 public class ManageService {
 
     private RedisService redisService;
-    private MicTranscriberService micTranscriberService; // 添加 MicTranscriberService 实例
     private Map<String, DiscussMicThread> discussMicThreadMap; // 用于保存 discussId 和对应的麦克风线程
 
     public ManageService() {
         redisService = RedisService.getInstance();
-        micTranscriberService = new MicTranscriberService(); // 初始化 MicTranscriberService
         discussMicThreadMap = new HashMap<>(); // 初始化 HashMap
     }
 
@@ -52,15 +50,13 @@ public class ManageService {
         DiscussInfo discussInfo = new DiscussInfo();
         discussInfo.setDiscussId(discussId);
         discussInfo.setDiscussName(discussName);
-        MicSwitchInfo micSwitchInfo = new MicSwitchInfo();
-        discussInfo.setMicSwitchInfo(micSwitchInfo);
         // 创建新的Redis库，并添加discussName作为key，当前时间作为value
         redisService.createDiscuss(discussInfo);
 
         return new DiscussBaseInfo(discussId, discussName);
     }
 
-    public void startDiscuss(String discussId) throws Exception {
+    public void startDiscuss(String discussId) {
         List<String> allDiscussId = redisService.getAllDiscussId();
         for (String id : allDiscussId) {
             if (!Objects.equals(id, discussId)) {
@@ -82,14 +78,8 @@ public class ManageService {
         redisService.updateStartTimeList(discussId, startTimeList);
         redisService.updateStopTimeList(discussId, stopTimeList);
 
-
-        // 调用 MicTranscriberService 的 openMic 方法,并创建对应的麦克风线程
-        MicAndTranscriber externMic = micTranscriberService.openMic("M3");
-        MicAndTranscriber wireMic = micTranscriberService.openMic("Realtek");
-        MicAndTranscriber virtualMic = micTranscriberService.openMic("B1");
-
         // 创建 DiscussMicThread 实例,并启动线程
-        DiscussMicThread discussMicThread = new DiscussMicThread(discussId, externMic, wireMic, virtualMic, micTranscriberService);
+        DiscussMicThread discussMicThread = new DiscussMicThread(discussId);
         discussMicThread.start();
 
         // 将 discussId 和对应的 DiscussMicThread 实例保存到 HashMap 中
@@ -111,7 +101,7 @@ public class ManageService {
         DiscussMicThread discussMicThread = discussMicThreadMap.get(discussId);
         if (discussMicThread != null) {
             try {
-                discussMicThread.closeMics();
+                discussMicThread.stop();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -136,11 +126,9 @@ public class ManageService {
         // 在项目的根目录下创建一个data文件夹,用来存放数据文件
         String baseDir = "data/discuss/closed/";
 
-        System.out.println(discussInfo.getDiscussName());
         // 这里用replace方法进行替换
         String formattedDiscussName = discussInfo.getDiscussName().replace(" ", "_").replace(".", "-").replace(":","-");
 
-        System.out.println(formattedDiscussName);
         // 使用修改后的formattedDiscussName作为文件夹名
         String dirName = baseDir + formattedDiscussName;
         File dir = new File(dirName);

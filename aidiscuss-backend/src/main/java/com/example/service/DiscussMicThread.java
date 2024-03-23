@@ -1,6 +1,6 @@
 package com.example.service;
 
-import com.example.model.MicAndTranscriber;
+import com.example.model.MicTypeEnum;
 
 // DiscussMicThread 类,用于管理单个会议的麦克风线程
 class DiscussMicThread {
@@ -9,11 +9,11 @@ class DiscussMicThread {
     private MicThread wireMicThread;
     private MicThread virtualMicThread;
 
-    public DiscussMicThread(String discussId, MicAndTranscriber externMic, MicAndTranscriber wireMic, MicAndTranscriber virtualMic, MicTranscriberService micTranscriberService) {
+    public DiscussMicThread(String discussId) {
         this.discussId = discussId;
-        this.externMicThread = new MicThread(discussId, externMic, "externMic",micTranscriberService);
-        this.wireMicThread = new MicThread(discussId, wireMic, "wireMic",micTranscriberService);
-        this.virtualMicThread = new MicThread(discussId, virtualMic, "virtualMic",micTranscriberService);
+        this.externMicThread = new MicThread(discussId, MicTypeEnum.EXTERN);
+        this.wireMicThread = new MicThread(discussId, MicTypeEnum.WIRE);
+        this.virtualMicThread = new MicThread(discussId, MicTypeEnum.VIRTUAL);
     }
 
     public void start() {
@@ -22,9 +22,10 @@ class DiscussMicThread {
         virtualMicThread.start();
     }
 
-    public void closeMics() throws Exception {
-        externMicThread.closeMic();
-        wireMicThread.closeMic();
-        virtualMicThread.closeMic();
+    public void stop() {
+        System.out.println(111);
+        externMicThread.stopRunning(); // 设置 running 为 false,通知麦克风线程停止运行
+        wireMicThread.stopRunning();
+        virtualMicThread.stopRunning();
     }
 }

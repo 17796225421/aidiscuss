@@ -73,12 +73,11 @@ public class RedisService {
                 if (jedis.dbSize() == 0) {
                     jedis.set("discussId", discussInfo.getDiscussId());
                     jedis.set("discussName", discussInfo.getDiscussName());
-                    jedis.set("micSwitchInfo", new Gson().toJson(discussInfo.getMicSwitchInfo()));
                     jedis.set("externMicSentences", "");
                     jedis.set("wireMicSentences", "");
                     jedis.set("virtualMicSentences", "");
-                    jedis.set("startTimeList","");
-                    jedis.set("stopTimeList","");
+                    jedis.set("startTimeList", "");
+                    jedis.set("stopTimeList", "");
                     break;
                 }
             }
@@ -92,20 +91,20 @@ public class RedisService {
                 jedis.select(i);
                 if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
                     String discussName = jedis.get("discussName");
-                    String micSwitchInfo = jedis.get("micSwitchInfo");
                     DiscussInfo discussInfo = new DiscussInfo();
                     discussInfo.setDiscussId(discussId);
                     discussInfo.setDiscussName(discussName);
-                    discussInfo.setMicSwitchInfo(new Gson().fromJson(micSwitchInfo, MicSwitchInfo.class));
 
                     // 将startTimeList和stopTimeList从JSON字符串转换为List<String>
                     String startTimeListJson = jedis.get("startTimeList");
                     String stopTimeListJson = jedis.get("stopTimeList");
 
                     List<String> startTimeList = startTimeListJson == null || startTimeListJson.isEmpty() ?
-                            new ArrayList<>() : new Gson().fromJson(startTimeListJson, new TypeToken<List<String>>(){}.getType());
+                            new ArrayList<>() : new Gson().fromJson(startTimeListJson, new TypeToken<List<String>>() {
+                    }.getType());
                     List<String> stopTimeList = stopTimeListJson == null || stopTimeListJson.isEmpty() ?
-                            new ArrayList<>() : new Gson().fromJson(stopTimeListJson, new TypeToken<List<String>>(){}.getType());
+                            new ArrayList<>() : new Gson().fromJson(stopTimeListJson, new TypeToken<List<String>>() {
+                    }.getType());
 
                     // 设置DiscussInfo中的startTimeList和stopTimeList
                     discussInfo.setStartTimeList(startTimeList);
@@ -127,33 +126,6 @@ public class RedisService {
             return null;
         }
     }
-    public void updateMicSwitchInfo(String discussId, MicSwitchInfo micSwitchInfo) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    jedis.set("micSwitchInfo", new Gson().toJson(micSwitchInfo));
-                    break;
-                }
-            }
-        }
-    }
-
-    public void updateOtherMicSwitchInfoToFalse(String excludeDiscussId) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (!jedis.exists("discussId") || !jedis.get("discussId").equals(excludeDiscussId)) {
-                    if (jedis.exists("micSwitchInfo")) {
-                        MicSwitchInfo micSwitchInfo = new MicSwitchInfo();
-                        jedis.set("micSwitchInfo", new Gson().toJson(micSwitchInfo));
-                    }
-                }
-            }
-        }
-    }
 
     public void clearDiscuss(String discussId) {
         try (Jedis jedis = jedisPool.getResource()) {
@@ -168,29 +140,21 @@ public class RedisService {
         }
     }
 
-    public MicSwitchInfo getMicSwitchInfo(String discussId) {
+    public void AddMicSentence(String discussId, MicTypeEnum micTypeEnum, Sentence sentence) {
         try (Jedis jedis = jedisPool.getResource()) {
             int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
             for (int i = 0; i < dbCount; i++) {
                 jedis.select(i);
                 if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    if (jedis.exists("micSwitchInfo")) {
-                        MicSwitchInfo micSwitchInfo = new Gson().fromJson(jedis.get("micSwitchInfo"), MicSwitchInfo.class);
-                        return micSwitchInfo;
+                    String micName;
+                    if (micTypeEnum == MicTypeEnum.EXTERN) {
+                        micName = "extern";
+                    } else if (micTypeEnum == MicTypeEnum.WIRE) {
+                        micName = "wire";
+                    } else {
+                        micName = "virtual";
                     }
-                }
-            }
-        }
-        return null;
-    }
-
-    public void AddMicSentence(Sentence sentence, String micName, String discussId) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    String key = micName + "Sentences";
+                    String key = micName + "MicSentences";
                     Sentences sentences;
                     String sentencesJson = jedis.get(key);
                     if (sentencesJson != null && !sentencesJson.isEmpty()) {
@@ -207,6 +171,7 @@ public class RedisService {
             }
         }
     }
+
     public String getExternMicSentences(String discussId) {
         try (Jedis jedis = jedisPool.getResource()) {
             int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));

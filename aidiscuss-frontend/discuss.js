@@ -53,52 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('缺少discussId参数');
     }
 
-    const micOptions = document.getElementById('micOptions');
-    micOptions.addEventListener('change', function(event) {
-        handleMicChange(event, discussId);
-    });
 });
 
-// 处理麦克风选项变更
-function handleMicChange(event,discussId) {
-    const value = event.target.value;
-    let discussInfo = {
-        'discussId': discussId,
-        'micSwitchInfo': null
-    };
-    let micSwitchInfo = new MicSwitchInfo();
-
-    if (value === '外挂麦克风') {
-        micSwitchInfo['externMic'] = true;
-        micSwitchInfo['wireMic']=false;
-        micSwitchInfo['virtualMic']=false;
-    } else if (value === '有线耳机麦克风和虚拟麦克风') {
-        micSwitchInfo['externMic']=false;
-        micSwitchInfo['wireMic'] = true;
-        micSwitchInfo['virtualMic'] = true;
-    } else if (value === '关闭') {
-        micSwitchInfo['externMic']=false;
-        micSwitchInfo['wireMic']=false;
-        micSwitchInfo['virtualMic']=false;
-    }
-    discussInfo.micSwitchInfo=micSwitchInfo;
-
-    // 发送POST请求
-    fetch('http://127.0.0.1:10002/micSwitch', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(discussInfo),
-    })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Success:', data);
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
-}
 
 // 建立WebSocket连接,接收externMicSentences的推送
 function externMicSentencesConnection(discussId) {
