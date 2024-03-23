@@ -105,21 +105,28 @@ function externMicSentencesConnection(discussId) {
     const socket = new SockJS('https://s1.v100.vip:27443/ws');
     const stompClient = Stomp.over(socket); // 使用stomp协议
 
+    let isWaitingToSend = false; // 标记是否正在等待发送请求
+
     stompClient.connect({}, function (frame) {
         console.log('Connected: ' + frame);
-        stompClient.send(`/app/externMicSentencesConnection/${discussId}`, {}, JSON.stringify({/* 消息内容 */}));
+        sendRequest(); // 初始发送请求
+
         stompClient.subscribe(`/topic/externMicSentencesConnection/${discussId}`, function (message) {
             const externMicSentences = message.body;
             console.log('收到externMicSentences:', externMicSentences);
             // TODO: 在这里可以对收到的数据进行处理,例如在页面上显示出来
 
-            // 处理完毕，等待 1 秒钟后重新发送请求
-            setTimeout(function() {
-                stompClient.send(`/app/externMicSentencesConnection/${discussId}`, {}, JSON.stringify({/* 消息内容 */}));
-            }, 1000);
+            if (!isWaitingToSend) {
+                isWaitingToSend = true;
+                setTimeout(sendRequest, 1000); // 1秒后发送请求
+            }
         });
     });
 
+    function sendRequest() {
+        stompClient.send(`/app/externMicSentencesConnection/${discussId}`, {}, JSON.stringify({/* 消息内容 */}));
+        isWaitingToSend = false;
+    }
 }
 
 // 建立WebSocket连接,接收wireMicSentences的推送
@@ -127,21 +134,28 @@ function wireMicSentencesConnection(discussId) {
     const socket = new SockJS('https://s1.v100.vip:27443/ws');
     const stompClient = Stomp.over(socket); // 使用stomp协议
 
+    let isWaitingToSend = false; // 标记是否正在等待发送请求
+
     stompClient.connect({}, function (frame) {
         console.log('Connected: ' + frame);
-        stompClient.send(`/app/wireMicSentencesConnection/${discussId}`, {}, JSON.stringify({/* 消息内容 */}));
+        sendRequest(); // 初始发送请求
+
         stompClient.subscribe(`/topic/wireMicSentencesConnection/${discussId}`, function (message) {
             const wireMicSentences = message.body;
             console.log('收到wireMicSentences:', wireMicSentences);
             // TODO: 在这里可以对收到的数据进行处理,例如在页面上显示出来
 
-            // 处理完毕，等待 1 秒钟后重新发送请求
-            setTimeout(function() {
-                stompClient.send(`/app/wireMicSentencesConnection/${discussId}`, {}, JSON.stringify({/* 消息内容 */}));
-            }, 1000);
+            if (!isWaitingToSend) {
+                isWaitingToSend = true;
+                setTimeout(sendRequest, 1000); // 1秒后发送请求
+            }
         });
     });
 
+    function sendRequest() {
+        stompClient.send(`/app/wireMicSentencesConnection/${discussId}`, {}, JSON.stringify({/* 消息内容 */}));
+        isWaitingToSend = false;
+    }
 }
 
 // 建立WebSocket连接,接收virtualMicSentences的推送
@@ -149,19 +163,26 @@ function virtualMicSentencesConnection(discussId) {
     const socket = new SockJS('https://s1.v100.vip:27443/ws');
     const stompClient = Stomp.over(socket); // 使用stomp协议
 
+    let isWaitingToSend = false; // 标记是否正在等待发送请求
+
     stompClient.connect({}, function (frame) {
         console.log('Connected: ' + frame);
-        stompClient.send(`/app/virtualMicSentencesConnection/${discussId}`, {}, JSON.stringify({/* 消息内容 */}));
+        sendRequest(); // 初始发送请求
+
         stompClient.subscribe(`/topic/virtualMicSentencesConnection/${discussId}`, function (message) {
             const virtualMicSentences = message.body;
             console.log('收到virtualMicSentences:', virtualMicSentences);
             // TODO: 在这里可以对收到的数据进行处理,例如在页面上显示出来
 
-            // 处理完毕，等待 1 秒钟后重新发送请求
-            setTimeout(function() {
-                stompClient.send(`/app/virtualMicSentencesConnection/${discussId}`, {}, JSON.stringify({/* 消息内容 */}));
-            }, 1000);
+            if (!isWaitingToSend) {
+                isWaitingToSend = true;
+                setTimeout(sendRequest, 1000); // 1秒后发送请求
+            }
         });
     });
 
+    function sendRequest() {
+        stompClient.send(`/app/virtualMicSentencesConnection/${discussId}`, {}, JSON.stringify({/* 消息内容 */}));
+        isWaitingToSend = false;
+    }
 }
