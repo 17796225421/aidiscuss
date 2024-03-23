@@ -45,21 +45,18 @@ public class DiscussController {
     @MessageMapping("/externMicSentencesConnection/{discussId}")
     public void externMicSentencesConnection(@DestinationVariable String discussId) throws InterruptedException {
         String externMicSentences = discussService.getExternMicSentences(discussId);
-        System.out.println("discussId" + discussId + " getExternMicSentences " + externMicSentences);
         // 将externMicSentences传输到"/topic/externMicSentences/{discussId}"
         simpMessagingTemplate.convertAndSend("/topic/externMicSentencesConnection/" + discussId, externMicSentences);
     }
     @MessageMapping("/wireMicSentencesConnection/{discussId}")
     public void wireMicSentencesConnection(@DestinationVariable String discussId) throws InterruptedException {
         String wireMicSentences = discussService.getWireMicSentences(discussId);
-        System.out.println("discussId" + discussId + " getWireMicSentences " + wireMicSentences);
         // 将wireMicSentences传输到"/topic/wireMicSentences/{discussId}"
         simpMessagingTemplate.convertAndSend("/topic/wireMicSentencesConnection/" + discussId, wireMicSentences);
     }
     @MessageMapping("/virtualMicSentencesConnection/{discussId}")
     public void virtualMicSentencesConnection(@DestinationVariable String discussId) throws InterruptedException {
         String virtualMicSentences = discussService.getVirtualMicSentences(discussId);
-        System.out.println("discussId" + discussId + " getExternMicSentences " + virtualMicSentences);
         // 将virtualMicSentences传输到"/topic/virtualMicSentences/{discussId}"
         simpMessagingTemplate.convertAndSend("/topic/virtualMicSentencesConnection/" + discussId, virtualMicSentences);
     }

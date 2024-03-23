@@ -6,7 +6,7 @@ function getDiscussIdFromUrl() {
 
 // 发送GET请求获取讨论主题信息
 function fetchDiscussInfo(discussId) {
-    fetch(`https://s1.v100.vip:27443/getDiscuss/${discussId}`)
+    fetch(`http://127.0.0.1:10002/getDiscuss/${discussId}`)
         .then(response => response.json())
         .then(data => {
             // 修正：从data.micSwitchInfo中提取麦克风信息来创建MicSwitchInfo对象
@@ -84,7 +84,7 @@ function handleMicChange(event,discussId) {
     discussInfo.micSwitchInfo=micSwitchInfo;
 
     // 发送POST请求
-    fetch('https://s1.v100.vip:27443/micSwitch', {
+    fetch('http://127.0.0.1:10002/micSwitch', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -102,7 +102,7 @@ function handleMicChange(event,discussId) {
 
 // 建立WebSocket连接,接收externMicSentences的推送
 function externMicSentencesConnection(discussId) {
-    const socket = new SockJS('https://s1.v100.vip:27443/ws');
+    const socket = new SockJS('http://127.0.0.1:10002/ws');
     const stompClient = Stomp.over(socket); // 使用stomp协议
 
     let isWaitingToSend = false; // 标记是否正在等待发送请求
@@ -112,9 +112,21 @@ function externMicSentencesConnection(discussId) {
         sendRequest(); // 初始发送请求
 
         stompClient.subscribe(`/topic/externMicSentencesConnection/${discussId}`, function (message) {
-            const externMicSentences = message.body;
-            console.log('收到externMicSentences:', externMicSentences);
-            // TODO: 在这里可以对收到的数据进行处理,例如在页面上显示出来
+            console.log('收到externMicSentences:', message.body);
+
+            // 检查message.body是否为空或者空字符串
+            if (message.body && message.body.trim() !== '') {
+                // 如果message.body不为空，才执行以下逻辑
+
+                // 将收到的消息体转换为JSON对象
+                const externMicSentences = JSON.parse(message.body);
+
+                // 将数据处理成指定格式的字符串
+                const displayText = externMicSentences.queue.map(item => `${item.index}: ${item.text}`).join('\n');
+
+                // 将处理后的字符串显示在externMicSentencesDisplay区域
+                document.getElementById('externMicSentencesDisplay').textContent = displayText;
+            }
 
             if (!isWaitingToSend) {
                 isWaitingToSend = true;
@@ -122,6 +134,7 @@ function externMicSentencesConnection(discussId) {
             }
         });
     });
+
 
     function sendRequest() {
         stompClient.send(`/app/externMicSentencesConnection/${discussId}`, {}, JSON.stringify({/* 消息内容 */}));
@@ -131,7 +144,7 @@ function externMicSentencesConnection(discussId) {
 
 // 建立WebSocket连接,接收wireMicSentences的推送
 function wireMicSentencesConnection(discussId) {
-    const socket = new SockJS('https://s1.v100.vip:27443/ws');
+    const socket = new SockJS('http://127.0.0.1:10002/ws');
     const stompClient = Stomp.over(socket); // 使用stomp协议
 
     let isWaitingToSend = false; // 标记是否正在等待发送请求
@@ -141,9 +154,21 @@ function wireMicSentencesConnection(discussId) {
         sendRequest(); // 初始发送请求
 
         stompClient.subscribe(`/topic/wireMicSentencesConnection/${discussId}`, function (message) {
-            const wireMicSentences = message.body;
-            console.log('收到wireMicSentences:', wireMicSentences);
-            // TODO: 在这里可以对收到的数据进行处理,例如在页面上显示出来
+            console.log('wireMicSentences:', message.body);
+
+            // 检查message.body是否为空或者空字符串
+            if (message.body && message.body.trim() !== '') {
+                // 如果message.body不为空，才执行以下逻辑
+
+                // 将收到的消息体转换为JSON对象
+                const wireMicSentences = JSON.parse(message.body);
+
+                // 将数据处理成指定格式的字符串
+                const displayText = wireMicSentences.queue.map(item => `${item.index}: ${item.text}`).join('\n');
+
+                // 将处理后的字符串显示在wireMicSentencesDisplay区域
+                document.getElementById('wireMicSentencesDisplay').textContent = displayText;
+            }
 
             if (!isWaitingToSend) {
                 isWaitingToSend = true;
@@ -160,7 +185,7 @@ function wireMicSentencesConnection(discussId) {
 
 // 建立WebSocket连接,接收virtualMicSentences的推送
 function virtualMicSentencesConnection(discussId) {
-    const socket = new SockJS('https://s1.v100.vip:27443/ws');
+    const socket = new SockJS('http://127.0.0.1:10002/ws');
     const stompClient = Stomp.over(socket); // 使用stomp协议
 
     let isWaitingToSend = false; // 标记是否正在等待发送请求
@@ -170,9 +195,21 @@ function virtualMicSentencesConnection(discussId) {
         sendRequest(); // 初始发送请求
 
         stompClient.subscribe(`/topic/virtualMicSentencesConnection/${discussId}`, function (message) {
-            const virtualMicSentences = message.body;
-            console.log('收到virtualMicSentences:', virtualMicSentences);
-            // TODO: 在这里可以对收到的数据进行处理,例如在页面上显示出来
+            console.log('收到virtualMicSentences:', message.body);
+
+            // 检查message.body是否为空或者空字符串
+            if (message.body && message.body.trim() !== '') {
+                // 如果message.body不为空，才执行以下逻辑
+
+                // 将收到的消息体转换为JSON对象
+                const virtualMicSentences = JSON.parse(message.body);
+
+                // 将数据处理成指定格式的字符串
+                const displayText = virtualMicSentences.queue.map(item => `${item.index}: ${item.text}`).join('\n');
+
+                // 将处理后的字符串显示在virtualMicSentencesDisplay区域
+                document.getElementById('virtualMicSentencesDisplay').textContent = displayText;
+            }
 
             if (!isWaitingToSend) {
                 isWaitingToSend = true;

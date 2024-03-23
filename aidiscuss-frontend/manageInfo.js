@@ -12,7 +12,7 @@ window.onload = function () {
 // 获取管理信息
 function getManageInfo() {
     // 发送GET请求到指定的URL
-    fetch('https://s1.v100.vip:27443/getManageInfo')
+    fetch('http://127.0.0.1:10002/getManageInfo')
         .then(response => response.json()) // 将响应转换为JSON格式
         .then(data => {
             console.log(data);
@@ -38,7 +38,7 @@ function getManageInfo() {
 // 创建讨论区的函数
 function createDiscuss() {
     // 发送POST请求到指定的URL,不带discussName
-    fetch('https://s1.v100.vip:27443/createDiscuss', {
+    fetch('http://127.0.0.1:10002/createDiscuss', {
         method: 'POST', // 指定请求方法为POST
         headers: {
             'Content-Type': 'application/json'
@@ -70,7 +70,7 @@ function closeDiscuss() {
     // 从选项的value中获取discussId
     const discussId = selectedOption;
     // 发送POST请求到指定的URL以结束讨论区
-    fetch('https://s1.v100.vip:27443/closeDiscuss', {
+    fetch('http://127.0.0.1:10002/closeDiscuss', {
         method: 'POST', // 指定请求方法为POST
         headers: {
             'Content-Type': 'application/json'
