@@ -1,24 +1,12 @@
 package com.example.model;
 
 public class Sentence {
-    private int index;
     private String text;
-    private double beginTime;
-    private double totalTime;
+    private String beginTime;
 
-    public Sentence(int index, String text, double beginTime, double totalTime) {
-        this.index = index;
+    public Sentence(String text, String beginTime) {
         this.text = text;
         this.beginTime = beginTime;
-        this.totalTime = totalTime;
-    }
-
-    public int getIndex() {
-        return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
     }
 
     public String getText() {
@@ -29,19 +17,12 @@ public class Sentence {
         this.text = text;
     }
 
-    public double getBeginTime() {
+    public String getBeginTime() {
         return beginTime;
     }
 
-    public void setBeginTime(double beginTime) {
+    public void setBeginTime(String beginTime) {
         this.beginTime = beginTime;
     }
 
-    public double getTotalTime() {
-        return totalTime;
-    }
-
-    public void setTotalTime(double totalTime) {
-        this.totalTime = totalTime;
-    }
 }

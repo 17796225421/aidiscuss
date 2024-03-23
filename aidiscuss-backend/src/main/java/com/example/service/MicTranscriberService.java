@@ -16,6 +16,7 @@ import java.util.TimerTask;
 import com.example.model.MicAndTranscriber;
 import com.example.model.Sentence;
 import com.example.model.Sentences;
+import com.example.util.TimeUtils;
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class MicTranscriberService {
@@ -184,10 +185,8 @@ public class MicTranscriberService {
 
                 // 将识别结果封装为Sentence对象并插入队列
                 Sentence sentence = new Sentence(
-                        response.getTransSentenceIndex(),
                         response.getTransSentenceText(),
-                        response.getSentenceBeginTime() / 1000.0,
-                        response.getTransSentenceTime() / 1000.0
+                        TimeUtils.getCurrentFormattedTime() // 使用当前时间
                 );
                 sentences.addSentence(sentence);
             }

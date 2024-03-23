@@ -2,6 +2,7 @@ package com.example.service;
 
 import com.example.model.*;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -76,6 +77,8 @@ public class RedisService {
                     jedis.set("externMicSentences", "");
                     jedis.set("wireMicSentences", "");
                     jedis.set("virtualMicSentences", "");
+                    jedis.set("startTimeList","");
+                    jedis.set("stopTimeList","");
                     break;
                 }
             }
@@ -94,6 +97,21 @@ public class RedisService {
                     discussInfo.setDiscussId(discussId);
                     discussInfo.setDiscussName(discussName);
                     discussInfo.setMicSwitchInfo(new Gson().fromJson(micSwitchInfo, MicSwitchInfo.class));
+
+                    // 将startTimeList和stopTimeList从JSON字符串转换为List<String>
+                    String startTimeListJson = jedis.get("startTimeList");
+                    String stopTimeListJson = jedis.get("stopTimeList");
+
+                    List<String> startTimeList = startTimeListJson == null || startTimeListJson.isEmpty() ?
+                            new ArrayList<>() : new Gson().fromJson(startTimeListJson, new TypeToken<List<String>>(){}.getType());
+                    List<String> stopTimeList = stopTimeListJson == null || stopTimeListJson.isEmpty() ?
+                            new ArrayList<>() : new Gson().fromJson(stopTimeListJson, new TypeToken<List<String>>(){}.getType());
+
+                    // 设置DiscussInfo中的startTimeList和stopTimeList
+                    discussInfo.setStartTimeList(startTimeList);
+                    discussInfo.setStopTimeList(stopTimeList);
+
+                    // 处理其他相关信息
                     MicSentences micSentences = new MicSentences();
                     Sentences externMicSentences = new Gson().fromJson(jedis.get("externMicSentences"), Sentences.class);
                     Sentences wireMicSentences = new Gson().fromJson(jedis.get("wireMicSentences"), Sentences.class);
@@ -102,13 +120,13 @@ public class RedisService {
                     micSentences.setWireMicSentences(wireMicSentences);
                     micSentences.setVirtualMicSentences(virtualMicSentences);
                     discussInfo.setMicSentences(micSentences);
+
                     return discussInfo;
                 }
             }
             return null;
         }
     }
-
     public void updateMicSwitchInfo(String discussId, MicSwitchInfo micSwitchInfo) {
         try (Jedis jedis = jedisPool.getResource()) {
             int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
@@ -228,6 +246,39 @@ public class RedisService {
                 }
             }
             return "";
+        }
+    }
+
+
+    public void updateStartTimeList(String discussId, List<String> startTimeList) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    // 将startTimeList转换为JSON字符串
+                    String startTimeListJson = new Gson().toJson(startTimeList);
+                    // 更新Redis中的startTimeList
+                    jedis.set("startTimeList", startTimeListJson);
+                    break;
+                }
+            }
+        }
+    }
+
+    public void updateStopTimeList(String discussId, List<String> stopTimeList) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    // 将stopTimeList转换为JSON字符串
+                    String stopTimeListJson = new Gson().toJson(stopTimeList);
+                    // 更新Redis中的stopTimeList
+                    jedis.set("stopTimeList", stopTimeListJson);
+                    break;
+                }
+            }
         }
     }
 }

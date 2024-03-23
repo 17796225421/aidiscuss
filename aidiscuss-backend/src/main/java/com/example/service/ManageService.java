@@ -1,6 +1,7 @@
 package com.example.service;
 
 import com.example.model.*;
+import com.example.util.TimeUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.springframework.stereotype.Service;
@@ -10,10 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class ManageService {
@@ -48,8 +46,7 @@ public class ManageService {
     public DiscussBaseInfo createDiscuss() throws Exception {
         // 获取当前时间，并格式化为指定格式
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM_dd_HH_mm_ss");
-        String discussName = now.format(formatter);
+        String discussName = TimeUtils.getCurrentFormattedTime();
         String discussId = UUID.randomUUID().toString().replace("-", "");
 
         DiscussInfo discussInfo = new DiscussInfo();
@@ -66,8 +63,25 @@ public class ManageService {
     public void startDiscuss(String discussId) throws Exception {
         List<String> allDiscussId = redisService.getAllDiscussId();
         for (String id : allDiscussId) {
-            stopDiscuss(id);
+            if (!Objects.equals(id, discussId)) {
+                stopDiscuss(id);
+            }
         }
+
+        DiscussInfo discussInfo = redisService.getDiscussInfo(discussId);
+        // 记录开始时间
+        String startTime = TimeUtils.getCurrentFormattedTime();
+        discussInfo.getStartTimeList().add(startTime);
+
+        // 检查停止时间列表长度
+        List<String> stopTimeList = discussInfo.getStopTimeList();
+        List<String> startTimeList = discussInfo.getStartTimeList();
+        while (stopTimeList.size() < startTimeList.size() - 1) {
+            stopTimeList.add("-1");
+        }
+        redisService.updateStartTimeList(discussId, startTimeList);
+        redisService.updateStopTimeList(discussId, stopTimeList);
+
 
         // 调用 MicTranscriberService 的 openMic 方法,并创建对应的麦克风线程
         MicAndTranscriber externMic = micTranscriberService.openMic("M3");
@@ -75,7 +89,7 @@ public class ManageService {
         MicAndTranscriber virtualMic = micTranscriberService.openMic("B1");
 
         // 创建 DiscussMicThread 实例,并启动线程
-        DiscussMicThread discussMicThread = new DiscussMicThread(discussId, externMic, wireMic, virtualMic,micTranscriberService);
+        DiscussMicThread discussMicThread = new DiscussMicThread(discussId, externMic, wireMic, virtualMic, micTranscriberService);
         discussMicThread.start();
 
         // 将 discussId 和对应的 DiscussMicThread 实例保存到 HashMap 中
@@ -83,6 +97,16 @@ public class ManageService {
     }
 
     public void stopDiscuss(String discussId) {
+        DiscussInfo discussInfo = redisService.getDiscussInfo(discussId);
+        List<String> startTimeList = discussInfo.getStartTimeList();
+        List<String> stopTimeList = discussInfo.getStopTimeList();
+        if (stopTimeList.size() < startTimeList.size()) {
+            // 记录停止时间
+            String stopTime = TimeUtils.getCurrentFormattedTime();
+            stopTimeList.add(stopTime);
+            redisService.updateStopTimeList(discussId, stopTimeList);
+        }
+
         // 从 HashMap 中获取对应的 DiscussMicThread 实例,并关闭麦克风
         DiscussMicThread discussMicThread = discussMicThreadMap.get(discussId);
         if (discussMicThread != null) {

@@ -122,7 +122,7 @@ function externMicSentencesConnection(discussId) {
                 const externMicSentences = JSON.parse(message.body);
 
                 // 将数据处理成指定格式的字符串
-                const displayText = externMicSentences.queue.map(item => `${item.index}: ${item.text}`).join('\n');
+                  const displayText = externMicSentences.queue.map(item => item.text).join('\n');
 
                 // 将处理后的字符串显示在externMicSentencesDisplay区域
                 document.getElementById('externMicSentencesDisplay').textContent = displayText;
@@ -164,7 +164,7 @@ function wireMicSentencesConnection(discussId) {
                 const wireMicSentences = JSON.parse(message.body);
 
                 // 将数据处理成指定格式的字符串
-                const displayText = wireMicSentences.queue.map(item => `${item.index}: ${item.text}`).join('\n');
+                  const displayText = wireMicSentences.queue.map(item => item.text).join('\n');
 
                 // 将处理后的字符串显示在wireMicSentencesDisplay区域
                 document.getElementById('wireMicSentencesDisplay').textContent = displayText;
@@ -205,7 +205,7 @@ function virtualMicSentencesConnection(discussId) {
                 const virtualMicSentences = JSON.parse(message.body);
 
                 // 将数据处理成指定格式的字符串
-                const displayText = virtualMicSentences.queue.map(item => `${item.index}: ${item.text}`).join('\n');
+                  const displayText = virtualMicSentences.queue.map(item => item.text).join('\n');
 
                 // 将处理后的字符串显示在virtualMicSentencesDisplay区域
                 document.getElementById('virtualMicSentencesDisplay').textContent = displayText;
