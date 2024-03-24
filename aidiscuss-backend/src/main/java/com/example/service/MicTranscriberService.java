@@ -13,7 +13,7 @@ import java.io.IOException;
 
 import com.example.model.MicTypeEnum;
 import com.example.model.Sentence;
-import com.example.model.Sentences;
+import com.example.thread.MicThread;
 import com.example.util.TimeUtils;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.beans.factory.annotation.Autowired;

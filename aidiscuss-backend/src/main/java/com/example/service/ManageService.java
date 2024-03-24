@@ -1,6 +1,8 @@
 package com.example.service;
 
 import com.example.model.*;
+import com.example.thread.DiscussMicThread;
+import com.example.thread.DiscussSummaryThread;
 import com.example.util.TimeUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -10,7 +12,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -18,10 +19,12 @@ public class ManageService {
 
     private RedisService redisService;
     private Map<String, DiscussMicThread> discussMicThreadMap; // 用于保存 discussId 和对应的麦克风线程
+    private Map<String, DiscussSummaryThread> discussSummaryThreadMap;
 
     public ManageService() {
         redisService = RedisService.getInstance();
         discussMicThreadMap = new HashMap<>(); // 初始化 HashMap
+        discussSummaryThreadMap = new HashMap<>();
     }
 
     /**
@@ -80,9 +83,11 @@ public class ManageService {
         // 创建 DiscussMicThread 实例,并启动线程
         DiscussMicThread discussMicThread = new DiscussMicThread(discussId);
         discussMicThread.start();
-
-        // 将 discussId 和对应的 DiscussMicThread 实例保存到 HashMap 中
         discussMicThreadMap.put(discussId, discussMicThread);
+
+        DiscussSummaryThread discussSummaryThread = new DiscussSummaryThread(discussId);
+        discussSummaryThread.start();
+        discussSummaryThreadMap.put(discussId,discussSummaryThread);
     }
 
     public void stopDiscuss(String discussId) {
@@ -102,6 +107,12 @@ public class ManageService {
         if (discussMicThread != null) {
             discussMicThread.stop();
             discussMicThreadMap.remove(discussId); // 从 HashMap 中移除
+        }
+
+        DiscussSummaryThread discussSummaryThread = discussSummaryThreadMap.get(discussId);
+        if(discussSummaryThread!=null){
+            discussSummaryThread.stop();
+            discussSummaryThreadMap.remove(discussId);
         }
     }
 

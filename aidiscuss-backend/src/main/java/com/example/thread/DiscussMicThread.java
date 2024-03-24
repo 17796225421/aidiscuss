@@ -1,9 +1,9 @@
-package com.example.service;
+package com.example.thread;
 
 import com.example.model.MicTypeEnum;
 
 // DiscussMicThread 类,用于管理单个会议的麦克风线程
-class DiscussMicThread {
+public class DiscussMicThread {
     private MicThread externMicThread;
     private MicThread wireMicThread;
     private MicThread virtualMicThread;

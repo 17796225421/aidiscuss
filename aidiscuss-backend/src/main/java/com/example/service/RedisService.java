@@ -74,12 +74,18 @@ public class RedisService {
                 if (jedis.dbSize() == 0) {
                     jedis.set("discussId", discussInfo.getDiscussId());
                     jedis.set("discussName", discussInfo.getDiscussName());
-                    jedis.set("externMicSentences", "");
-                    jedis.set("wireMicSentences", "");
-                    jedis.set("virtualMicSentences", "");
+                    String sentences = new Gson().toJson(new Sentences());
+                    jedis.set("externMicSentences", sentences);
+                    jedis.set("wireMicSentences", sentences);
+                    jedis.set("virtualMicSentences", sentences);
                     jedis.set("startTimeList", "");
                     jedis.set("stopTimeList", "");
                     jedis.set("discussStatus", String.valueOf(DiscussStatusEnum.CREATED.getValue()));
+                    jedis.set("externCursor", "0");
+                    jedis.set("wireCursor", "0");
+                    jedis.set("virtualCursor", "0");
+                    jedis.set("segmentSummaryList", "[]");
+                    jedis.set("timeSlicedSummaryList", "[]");
                     break;
                 }
             }
@@ -122,10 +128,21 @@ public class RedisService {
                     micSentences.setVirtualMicSentences(virtualMicSentences);
                     discussInfo.setMicSentences(micSentences);
                     String discussStatus = jedis.get("discussStatus");
-                    if(discussStatus!=null){
+                    if (discussStatus != null) {
                         discussInfo.setDiscussStatus(Integer.parseInt(discussStatus));
 
                     }
+                    String externCursor = jedis.get("externCursor");
+                    String wireCursor = jedis.get("wireCursor");
+                    String virtualCursor = jedis.get("virtualCursor");
+                    discussInfo.setExternCursor(Integer.parseInt(externCursor));
+                    discussInfo.setWireCursor(Integer.parseInt(wireCursor));
+                    discussInfo.setVirtualCursor(Integer.parseInt(virtualCursor));
+
+                    String segmentSummaryListJson = jedis.get("segmentSummaryList");
+                    List<String> segmentSummaryList = new Gson().fromJson(segmentSummaryListJson, new TypeToken<List<String>>(){}.getType());
+                    discussInfo.setSegmentSummaryList(segmentSummaryList);
+
                     return discussInfo;
                 }
             }
@@ -260,6 +277,150 @@ public class RedisService {
                 jedis.select(i);
                 if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
                     jedis.set("discussStatus", String.valueOf(discussStatusEnum.getValue()));
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * 获取externCursor的值
+     *
+     * @param discussId 会议ID
+     * @return externCursor的值
+     */
+    public int getExternCursor(String discussId) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    String externCursor = jedis.get("externCursor");
+                    return externCursor != null ? Integer.parseInt(externCursor) : 0;
+                }
+            }
+            return 0;
+        }
+    }
+
+    /**
+     * 获取wireCursor的值
+     *
+     * @param discussId 会议ID
+     * @return wireCursor的值
+     */
+    public int getWireCursor(String discussId) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    String wireCursor = jedis.get("wireCursor");
+                    return wireCursor != null ? Integer.parseInt(wireCursor) : 0;
+                }
+            }
+            return 0;
+        }
+    }
+
+    /**
+     * 获取virtualCursor的值
+     *
+     * @param discussId 会议ID
+     * @return virtualCursor的值
+     */
+    public int getVirtualCursor(String discussId) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    String virtualCursor = jedis.get("virtualCursor");
+                    return virtualCursor != null ? Integer.parseInt(virtualCursor) : 0;
+                }
+            }
+            return 0;
+        }
+    }
+
+    /**
+     * 设置externCursor的值
+     *
+     * @param discussId    会议ID
+     * @param externCursor externCursor的值
+     */
+    public void setExternCursor(String discussId, int externCursor) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    jedis.set("externCursor", String.valueOf(externCursor));
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * 设置wireCursor的值
+     *
+     * @param discussId  会议ID
+     * @param wireCursor wireCursor的值
+     */
+    public void setWireCursor(String discussId, int wireCursor) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    jedis.set("wireCursor", String.valueOf(wireCursor));
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * 设置virtualCursor的值
+     *
+     * @param discussId     会议ID
+     * @param virtualCursor virtualCursor的值
+     */
+    public void setVirtualCursor(String discussId, int virtualCursor) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    jedis.set("virtualCursor", String.valueOf(virtualCursor));
+                    break;
+                }
+            }
+        }
+    }
+
+    public void addSegmentSummary(String discussId, String segmentSummary) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    // 获取 segmentSummaryList 的 JSON 字符串
+                    String segmentSummaryListJson = jedis.get("segmentSummaryList");
+
+                    // 将 JSON 字符串转换为 List<String>
+                    List<String> segmentSummaryList = new Gson().fromJson(segmentSummaryListJson, new TypeToken<List<String>>(){}.getType());
+
+                    // 将新的 segmentSummary 添加到 List 的末尾
+                    segmentSummaryList.add(segmentSummary);
+
+                    // 将更新后的 List 转换为 JSON 字符串
+                    String updatedSegmentSummaryListJson = new Gson().toJson(segmentSummaryList);
+
+                    // 更新 Redis 中的 segmentSummaryList
+                    jedis.set("segmentSummaryList", updatedSegmentSummaryListJson);
+
                     break;
                 }
             }

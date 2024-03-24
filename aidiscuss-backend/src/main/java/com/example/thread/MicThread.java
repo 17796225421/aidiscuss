@@ -1,9 +1,10 @@
-package com.example.service;
+package com.example.thread;
 
 import com.example.model.MicTypeEnum;
+import com.example.service.MicTranscriberService;
 
 // MicThread 类,代表单个麦克风的控制线程
-class MicThread extends Thread {
+public class MicThread extends Thread {
     private String discussId;
     private MicTypeEnum micTypeEnum;
     private MicTranscriberService micTranscriberService = new MicTranscriberService();

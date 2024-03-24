@@ -10,11 +10,17 @@ public class DiscussInfo {
     private List<String> startTimeList;
     private List<String> stopTimeList;
     int discussStatus;
+    int externCursor;
+    int wireCursor;
+    int virtualCursor;
+    private List<String> segmentSummaryList;
 
     public DiscussInfo() {
         startTimeList = new ArrayList<>();
         stopTimeList = new ArrayList<>();
+        segmentSummaryList=new ArrayList<>();
     }
+
     public String getDiscussId() {
         return discussId;
     }
@@ -61,5 +67,37 @@ public class DiscussInfo {
 
     public void setDiscussStatus(int discussStatus) {
         this.discussStatus = discussStatus;
+    }
+
+    public int getExternCursor() {
+        return externCursor;
+    }
+
+    public void setExternCursor(int externCursor) {
+        this.externCursor = externCursor;
+    }
+
+    public int getWireCursor() {
+        return wireCursor;
+    }
+
+    public void setWireCursor(int wireCursor) {
+        this.wireCursor = wireCursor;
+    }
+
+    public int getVirtualCursor() {
+        return virtualCursor;
+    }
+
+    public void setVirtualCursor(int virtualCursor) {
+        this.virtualCursor = virtualCursor;
+    }
+
+    public List<String> getSegmentSummaryList() {
+        return segmentSummaryList;
+    }
+
+    public void setSegmentSummaryList(List<String> segmentSummaryList) {
+        this.segmentSummaryList = segmentSummaryList;
     }
 }
