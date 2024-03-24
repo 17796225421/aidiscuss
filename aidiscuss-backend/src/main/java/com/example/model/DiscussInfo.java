@@ -10,8 +10,10 @@ public class DiscussInfo {
     private List<String> startTimeList;
     private List<String> stopTimeList;
     int discussStatus;
-    private Cursor SegmentSummaryCursor;
+    private Cursor segmentSummaryCursor;
+    private Cursor timeSlicedSummaryCursor;
     private List<String> segmentSummaryList;
+    private List<String> timeSlicedSummaryList;
 
     public DiscussInfo() {
         startTimeList = new ArrayList<>();
@@ -68,11 +70,19 @@ public class DiscussInfo {
     }
 
     public Cursor getSegmentSummaryCursor() {
-        return SegmentSummaryCursor;
+        return segmentSummaryCursor;
     }
 
     public void setSegmentSummaryCursor(Cursor segmentSummaryCursor) {
-        SegmentSummaryCursor = segmentSummaryCursor;
+        this.segmentSummaryCursor = segmentSummaryCursor;
+    }
+
+    public Cursor getTimeSlicedSummaryCursor() {
+        return timeSlicedSummaryCursor;
+    }
+
+    public void setTimeSlicedSummaryCursor(Cursor timeSlicedSummaryCursor) {
+        this.timeSlicedSummaryCursor = timeSlicedSummaryCursor;
     }
 
     public List<String> getSegmentSummaryList() {
@@ -81,5 +91,13 @@ public class DiscussInfo {
 
     public void setSegmentSummaryList(List<String> segmentSummaryList) {
         this.segmentSummaryList = segmentSummaryList;
+    }
+
+    public List<String> getTimeSlicedSummaryList() {
+        return timeSlicedSummaryList;
+    }
+
+    public void setTimeSlicedSummaryList(List<String> timeSlicedSummaryList) {
+        this.timeSlicedSummaryList = timeSlicedSummaryList;
     }
 }

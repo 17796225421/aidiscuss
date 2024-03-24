@@ -8,9 +8,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -43,7 +40,6 @@ public class SegmentSummaryThread extends Thread {
 
 
                 Cursor segmentSummaryCursor = redisService.getSegmentSummaryCursor(discussId);
-                int virtualCursor = segmentSummaryCursor.getVirtualCursor();
 
                 // 初始化未处理文本的StringBuilder
                 StringBuilder unprocessedText = new StringBuilder();

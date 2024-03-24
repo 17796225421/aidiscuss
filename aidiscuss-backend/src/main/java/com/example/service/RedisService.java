@@ -84,6 +84,7 @@ public class RedisService {
                     String summaryCursor = new Gson().toJson(new Cursor());
                     jedis.set("segmentSummaryCursor", summaryCursor);
                     jedis.set("segmentSummaryList", "[]");
+                    jedis.set("timeSlicedSummaryCursor", summaryCursor);
                     jedis.set("timeSlicedSummaryList", "[]");
                     break;
                 }
@@ -138,6 +139,13 @@ public class RedisService {
                     List<String> segmentSummaryList = new Gson().fromJson(jedis.get("segmentSummaryList"), new TypeToken<List<String>>() {
                     }.getType());
                     discussInfo.setSegmentSummaryList(segmentSummaryList);
+
+                    Cursor timeSlicedSummaryCursor = new Gson().fromJson(jedis.get("timeSlicedSummaryCursor"), Cursor.class);
+                    discussInfo.setTimeSlicedSummaryCursor(timeSlicedSummaryCursor);
+
+                    List<String> timeSlicedSummaryList = new Gson().fromJson(jedis.get("timeSlicedSummaryList"), new TypeToken<List<String>>() {
+                    }.getType());
+                    discussInfo.setTimeSlicedSummaryList(timeSlicedSummaryList);
 
                     return discussInfo;
                 }
@@ -285,73 +293,26 @@ public class RedisService {
             for (int i = 0; i < dbCount; i++) {
                 jedis.select(i);
                 if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    Cursor segmentSummaryCursor = new Gson().fromJson(jedis.get("segmentSummaryCursor"), Cursor.class);
-                    return segmentSummaryCursor;
+                    return new Gson().fromJson(jedis.get("segmentSummaryCursor"), Cursor.class);
                 }
             }
             return null;
         }
     }
 
-    /**
-     * 获取externCursor的值
-     *
-     * @param discussId 会议ID
-     * @return externCursor的值
-     */
-    public int getExternCursor(String discussId) {
+    public Cursor getTimeSlicedSummaryCursor(String discussId) {
         try (Jedis jedis = jedisPool.getResource()) {
             int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
             for (int i = 0; i < dbCount; i++) {
                 jedis.select(i);
                 if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    String externCursor = jedis.get("externCursor");
-                    return externCursor != null ? Integer.parseInt(externCursor) : 0;
+                    return new Gson().fromJson(jedis.get("timeSlicedSummaryCursor"), Cursor.class);
                 }
             }
-            return 0;
+            return null;
         }
     }
 
-    /**
-     * 获取wireCursor的值
-     *
-     * @param discussId 会议ID
-     * @return wireCursor的值
-     */
-    public int getWireCursor(String discussId) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    String wireCursor = jedis.get("wireCursor");
-                    return wireCursor != null ? Integer.parseInt(wireCursor) : 0;
-                }
-            }
-            return 0;
-        }
-    }
-
-    /**
-     * 获取virtualCursor的值
-     *
-     * @param discussId 会议ID
-     * @return virtualCursor的值
-     */
-    public int getVirtualCursor(String discussId) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    String virtualCursor = jedis.get("virtualCursor");
-                    return virtualCursor != null ? Integer.parseInt(virtualCursor) : 0;
-                }
-            }
-            return 0;
-        }
-    }
 
     public void setSegmentSummaryCursor(String discussId, Cursor segmentSummaryCursor) {
         try (Jedis jedis = jedisPool.getResource()) {
@@ -365,57 +326,14 @@ public class RedisService {
             }
         }
     }
-    /**
-     * 设置externCursor的值
-     *
-     * @param discussId    会议ID
-     * @param externCursor externCursor的值
-     */
-    public void setExternCursor(String discussId, int externCursor) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    jedis.set("externCursor", String.valueOf(externCursor));
-                    break;
-                }
-            }
-        }
-    }
 
-    /**
-     * 设置wireCursor的值
-     *
-     * @param discussId  会议ID
-     * @param wireCursor wireCursor的值
-     */
-    public void setWireCursor(String discussId, int wireCursor) {
+    public void setTimeSlicedSummaryCursor(String discussId, Cursor timeSlicedSummaryCursor) {
         try (Jedis jedis = jedisPool.getResource()) {
             int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
             for (int i = 0; i < dbCount; i++) {
                 jedis.select(i);
                 if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    jedis.set("wireCursor", String.valueOf(wireCursor));
-                    break;
-                }
-            }
-        }
-    }
-
-    /**
-     * 设置virtualCursor的值
-     *
-     * @param discussId     会议ID
-     * @param virtualCursor virtualCursor的值
-     */
-    public void setVirtualCursor(String discussId, int virtualCursor) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    jedis.set("virtualCursor", String.valueOf(virtualCursor));
+                    jedis.set("timeSlicedSummaryCursor", new Gson().toJson(timeSlicedSummaryCursor));
                     break;
                 }
             }
@@ -429,24 +347,36 @@ public class RedisService {
                 jedis.select(i);
                 if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
                     // 获取 segmentSummaryList 的 JSON 字符串
-                    String segmentSummaryListJson = jedis.get("segmentSummaryList");
-
-                    // 将 JSON 字符串转换为 List<String>
-                    List<String> segmentSummaryList = new Gson().fromJson(segmentSummaryListJson, new TypeToken<List<String>>() {
+                    List<String> segmentSummaryList = new Gson().fromJson(jedis.get("segmentSummaryList"), new TypeToken<List<String>>() {
                     }.getType());
 
-                    // 将新的 segmentSummary 添加到 List 的末尾
                     segmentSummaryList.add(segmentSummary);
 
-                    // 将更新后的 List 转换为 JSON 字符串
-                    String updatedSegmentSummaryListJson = new Gson().toJson(segmentSummaryList);
-
-                    // 更新 Redis 中的 segmentSummaryList
-                    jedis.set("segmentSummaryList", updatedSegmentSummaryListJson);
+                    jedis.set("segmentSummaryList", new Gson().toJson(segmentSummaryList));
 
                     break;
                 }
             }
         }
     }
+
+    public void addTimeSlicedSummary(String discussId, String timeSlicedSummary) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    List<String> timeSlicedSummaryList = new Gson().fromJson(jedis.get("timeSlicedSummaryList"), new TypeToken<List<String>>() {
+                    }.getType());
+
+                    timeSlicedSummaryList.add(timeSlicedSummary);
+
+                    jedis.set("timeSlicedSummaryList", new Gson().toJson(timeSlicedSummaryList));
+
+                    break;
+                }
+            }
+        }
+    }
+
 }
