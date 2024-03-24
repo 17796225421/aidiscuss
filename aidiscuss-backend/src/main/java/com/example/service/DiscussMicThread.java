@@ -4,13 +4,11 @@ import com.example.model.MicTypeEnum;
 
 // DiscussMicThread 类,用于管理单个会议的麦克风线程
 class DiscussMicThread {
-    private String discussId;
     private MicThread externMicThread;
     private MicThread wireMicThread;
     private MicThread virtualMicThread;
 
     public DiscussMicThread(String discussId) {
-        this.discussId = discussId;
         this.externMicThread = new MicThread(discussId, MicTypeEnum.EXTERN);
         this.wireMicThread = new MicThread(discussId, MicTypeEnum.WIRE);
         this.virtualMicThread = new MicThread(discussId, MicTypeEnum.VIRTUAL);

@@ -100,11 +100,7 @@ public class ManageService {
         // 从 HashMap 中获取对应的 DiscussMicThread 实例,并关闭麦克风
         DiscussMicThread discussMicThread = discussMicThreadMap.get(discussId);
         if (discussMicThread != null) {
-            try {
-                discussMicThread.stop();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            discussMicThread.stop();
             discussMicThreadMap.remove(discussId); // 从 HashMap 中移除
         }
     }
