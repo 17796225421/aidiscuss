@@ -14,11 +14,16 @@ public class DiscussInfo {
     private Cursor timeSlicedSummaryCursor;
     private List<String> segmentSummaryList;
     private List<String> timeSlicedSummaryList;
+    private List<String> keyWordList;
+    private List<String> keySentenceList;
 
     public DiscussInfo() {
         startTimeList = new ArrayList<>();
         stopTimeList = new ArrayList<>();
-        segmentSummaryList=new ArrayList<>();
+        segmentSummaryList = new ArrayList<>();
+        timeSlicedSummaryList = new ArrayList<>();
+        keyWordList = new ArrayList<>();
+        keySentenceList = new ArrayList<>();
     }
 
     public String getDiscussId() {
@@ -99,5 +104,21 @@ public class DiscussInfo {
 
     public void setTimeSlicedSummaryList(List<String> timeSlicedSummaryList) {
         this.timeSlicedSummaryList = timeSlicedSummaryList;
+    }
+
+    public List<String> getKeyWordList() {
+        return keyWordList;
+    }
+
+    public void setKeyWordList(List<String> keyWordList) {
+        this.keyWordList = keyWordList;
+    }
+
+    public List<String> getKeySentenceList() {
+        return keySentenceList;
+    }
+
+    public void setKeySentenceList(List<String> keySentenceList) {
+        this.keySentenceList = keySentenceList;
     }
 }

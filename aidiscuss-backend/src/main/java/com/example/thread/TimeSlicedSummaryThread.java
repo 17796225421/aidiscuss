@@ -87,7 +87,7 @@ public class TimeSlicedSummaryThread extends Thread {
                     String text = unprocessedText.toString();
                     String segmentSummary = gptService.requestGpt3("gpt-3.5-turbo-0125", "你是一个有帮助的助手", text);
                     System.out.println("segmentSummary" + segmentSummary);
-                    redisService.addSegmentSummary(discussId, segmentSummary);
+                    redisService.addTimeSlicedSummary(discussId, segmentSummary);
 
                     // 将更新后的游标位置保存到Redis中
                     redisService.setTimeSlicedSummaryCursor(discussId, timeSlicedSummaryCursor);

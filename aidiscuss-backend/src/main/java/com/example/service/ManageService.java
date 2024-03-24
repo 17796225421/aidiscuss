@@ -1,8 +1,7 @@
 package com.example.service;
 
 import com.example.model.*;
-import com.example.thread.DiscussMicThread;
-import com.example.thread.DiscussSummaryThread;
+import com.example.thread.DiscussThread;
 import com.example.util.TimeUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -18,13 +17,11 @@ import java.util.*;
 public class ManageService {
 
     private RedisService redisService;
-    private Map<String, DiscussMicThread> discussMicThreadMap; // 用于保存 discussId 和对应的麦克风线程
-    private Map<String, DiscussSummaryThread> discussSummaryThreadMap;
+    private Map<String, DiscussThread> discussThreadMap;
 
     public ManageService() {
         redisService = RedisService.getInstance();
-        discussMicThreadMap = new HashMap<>(); // 初始化 HashMap
-        discussSummaryThreadMap = new HashMap<>();
+        discussThreadMap = new HashMap<>(); // 初始化 HashMap
     }
 
     /**
@@ -80,14 +77,9 @@ public class ManageService {
         redisService.updateStopTimeList(discussId, stopTimeList);
         redisService.updateDiscussStatus(discussId, DiscussStatusEnum.STARTED);
 
-        // 创建 DiscussMicThread 实例,并启动线程
-        DiscussMicThread discussMicThread = new DiscussMicThread(discussId);
-        discussMicThread.start();
-        discussMicThreadMap.put(discussId, discussMicThread);
-
-        DiscussSummaryThread discussSummaryThread = new DiscussSummaryThread(discussId);
-        discussSummaryThread.start();
-        discussSummaryThreadMap.put(discussId,discussSummaryThread);
+        DiscussThread discussThread = new DiscussThread(discussId);
+        discussThread.start();
+        discussThreadMap.put(discussId,discussThread);
     }
 
     public void stopDiscuss(String discussId) {
@@ -102,17 +94,10 @@ public class ManageService {
         }
         redisService.updateDiscussStatus(discussId, DiscussStatusEnum.STOPED);
 
-        // 从 HashMap 中获取对应的 DiscussMicThread 实例,并关闭麦克风
-        DiscussMicThread discussMicThread = discussMicThreadMap.get(discussId);
-        if (discussMicThread != null) {
-            discussMicThread.stop();
-            discussMicThreadMap.remove(discussId); // 从 HashMap 中移除
-        }
-
-        DiscussSummaryThread discussSummaryThread = discussSummaryThreadMap.get(discussId);
-        if(discussSummaryThread!=null){
-            discussSummaryThread.stop();
-            discussSummaryThreadMap.remove(discussId);
+        DiscussThread discussThread = discussThreadMap.get(discussId);
+        if(discussThread!=null){
+            discussThread.stop();
+            discussThreadMap.remove(discussId);
         }
     }
 
