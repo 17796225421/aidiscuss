@@ -57,7 +57,8 @@ public class RedisService {
                 if (jedis.exists("discussName")) {
                     String discussName = jedis.get("discussName");
                     String discussId = jedis.get("discussId");
-                    DiscussBaseInfo discussBaseInfo = new DiscussBaseInfo(discussId, discussName);
+                    String discussStatus = jedis.get("discussStatus");
+                    DiscussBaseInfo discussBaseInfo = new DiscussBaseInfo(discussId, discussName, Integer.parseInt(discussStatus));
                     discussBaseInfoList.add(discussBaseInfo);
                 }
             }

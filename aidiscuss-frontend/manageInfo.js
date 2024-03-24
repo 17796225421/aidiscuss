@@ -26,10 +26,25 @@ function getManageInfo() {
             // 获取下拉列表元素
             const discussList = document.getElementById('discussList');
 
+            // 清空原有的选项
+            discussList.innerHTML = '';
+
             // 遍历discusses数组,为每个元素创建一个下拉选项
             discusses.forEach(discuss => {
+                const discussStatus = discuss.discussStatus;
+
+                console.log(discussStatus);
+                let discussStatusText = "";
+                if (discussStatus === 0) {
+                    discussStatusText = "已创建";
+                } else if (discussStatus === 1) {
+                    discussStatusText = "已开启";
+                } else if (discussStatus === 2) {
+                    discussStatusText = "已停止";
+                }
+
                 const option = document.createElement('option');
-                option.text = discuss.discussName; // 设置选项的显示文本为discussName
+                option.text = discuss.discussName + " " + discussStatusText; // 设置选项的显示文本为discussName
                 option.value = discuss.discussId; // 设置选项的value属性为discussId
                 discussList.appendChild(option);
             });
@@ -51,6 +66,7 @@ function createDiscuss() {
     })
         .then(response => {
             console.log('讨论区创建成功');
+            getManageInfo();
         })
         .catch(error => {
             console.error('创建讨论区失败:', error);
@@ -73,6 +89,7 @@ function startDiscuss() {
     })
         .then(response => {
             console.log('开始讨论区成功');
+            getManageInfo();
         })
         .catch(error => {
             console.error('开始讨论区失败:', error);
@@ -95,6 +112,7 @@ function stopDiscuss() {
     })
         .then(response => {
             console.log('停止讨论区成功');
+            getManageInfo();
         })
         .catch(error => {
             console.error('停止讨论区失败:', error);
@@ -127,6 +145,7 @@ function closeDiscuss() {
     })
         .then(response => {
             console.log('讨论区已结束'); // 可选的成功提示，实际中不需要处理响应
+            getManageInfo();
         })
         .catch(error => {
             console.error('结束讨论区失败:', error); // 可选的错误处理

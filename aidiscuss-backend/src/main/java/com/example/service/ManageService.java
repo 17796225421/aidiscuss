@@ -53,7 +53,7 @@ public class ManageService {
         // 创建新的Redis库，并添加discussName作为key，当前时间作为value
         redisService.createDiscuss(discussInfo);
 
-        return new DiscussBaseInfo(discussId, discussName);
+        return new DiscussBaseInfo(discussId, discussName, DiscussStatusEnum.STARTED.getValue());
     }
 
     public void startDiscuss(String discussId) {
