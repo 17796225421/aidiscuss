@@ -14,6 +14,8 @@ public class DiscussInfo {
     private Cursor timeSlicedSummaryCursor;
     private List<String> segmentSummaryList;
     private List<String> timeSlicedSummaryList;
+    private Cursor keyWordCursor;
+    private Cursor keySentenceCursor;
     private List<String> keyWordList;
     private List<String> keySentenceList;
 
@@ -120,5 +122,21 @@ public class DiscussInfo {
 
     public void setKeySentenceList(List<String> keySentenceList) {
         this.keySentenceList = keySentenceList;
+    }
+
+    public Cursor getKeyWordCursor() {
+        return keyWordCursor;
+    }
+
+    public void setKeyWordCursor(Cursor keyWordCursor) {
+        this.keyWordCursor = keyWordCursor;
+    }
+
+    public Cursor getKeySentenceCursor() {
+        return keySentenceCursor;
+    }
+
+    public void setKeySentenceCursor(Cursor keySentenceCursor) {
+        this.keySentenceCursor = keySentenceCursor;
     }
 }

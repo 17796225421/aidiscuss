@@ -81,11 +81,15 @@ public class RedisService {
                     jedis.set("startTimeList", "");
                     jedis.set("stopTimeList", "");
                     jedis.set("discussStatus", String.valueOf(DiscussStatusEnum.CREATED.getValue()));
-                    String summaryCursor = new Gson().toJson(new Cursor());
-                    jedis.set("segmentSummaryCursor", summaryCursor);
+                    String cursor = new Gson().toJson(new Cursor());
+                    jedis.set("segmentSummaryCursor", cursor);
                     jedis.set("segmentSummaryList", "[]");
-                    jedis.set("timeSlicedSummaryCursor", summaryCursor);
+                    jedis.set("timeSlicedSummaryCursor", cursor);
                     jedis.set("timeSlicedSummaryList", "[]");
+                    jedis.set("keyWordCursor", cursor);
+                    jedis.set("keyWordList", "[]");
+                    jedis.set("keySentenceCursor", cursor);
+                    jedis.set("keySentenceList", "[]");
                     break;
                 }
             }
@@ -146,6 +150,18 @@ public class RedisService {
                     List<String> timeSlicedSummaryList = new Gson().fromJson(jedis.get("timeSlicedSummaryList"), new TypeToken<List<String>>() {
                     }.getType());
                     discussInfo.setTimeSlicedSummaryList(timeSlicedSummaryList);
+
+                    Cursor keyWordCursor = new Gson().fromJson(jedis.get("keyWordCursor"), Cursor.class);
+                    discussInfo.setKeyWordCursor(keyWordCursor);
+                    List<String> keyWordList = new Gson().fromJson(jedis.get("keyWordList"), new TypeToken<List<String>>() {
+                    }.getType());
+                    discussInfo.setKeyWordList(keyWordList);
+
+                    Cursor keySentenceCursor = new Gson().fromJson(jedis.get("keySentenceCursor"), Cursor.class);
+                    discussInfo.setKeySentenceCursor(keySentenceCursor);
+                    List<String> keySentenceList = new Gson().fromJson(jedis.get("keySentenceList"), new TypeToken<List<String>>() {
+                    }.getType());
+                    discussInfo.setKeySentenceList(keySentenceList);
 
                     return discussInfo;
                 }
@@ -379,4 +395,89 @@ public class RedisService {
         }
     }
 
+    public Cursor getKeyWordCursor(String discussId) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    return new Gson().fromJson(jedis.get("keyWordCursor"), Cursor.class);
+                }
+            }
+            return null;
+        }
+    }
+
+    public Cursor getKeySentenceCursor(String discussId) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    return new Gson().fromJson(jedis.get("keySentenceCursor"), Cursor.class);
+                }
+            }
+            return null;
+        }
+    }
+
+    public void setKeyWordCursor(String discussId, Cursor keyWordCursor) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    jedis.set("keyWordCursor", new Gson().toJson(keyWordCursor));
+                    break;
+                }
+            }
+        }
+    }
+
+    public void setKeySentenceCursor(String discussId, Cursor keySentenceCursor) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    jedis.set("keySentenceCursor", new Gson().toJson(keySentenceCursor));
+                    break;
+                }
+            }
+        }
+    }
+
+    public void addKeyWordList(String discussId, List<String> newKeyWordList) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    List<String> keyWordList = new Gson().fromJson(jedis.get("keyWordList"), new TypeToken<List<String>>() {
+                    }.getType());
+
+                    keyWordList.addAll(newKeyWordList);
+                    jedis.set("keyWordList", new Gson().toJson(keyWordList));
+                    break;
+                }
+            }
+        }
+    }
+
+    public void addKeySentenceList(String discussId, List<String> newKeySentenceList) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    List<String> keySentenceList = new Gson().fromJson(jedis.get("keySentenceList"), new TypeToken<List<String>>() {
+                    }.getType());
+
+                    keySentenceList.addAll(newKeySentenceList);
+                    jedis.set("keySentenceList", new Gson().toJson(keySentenceList));
+                    break;
+                }
+            }
+        }
+    }
 }
