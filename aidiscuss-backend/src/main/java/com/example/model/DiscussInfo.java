@@ -9,6 +9,7 @@ public class DiscussInfo {
     MicSentences micSentences;
     private List<String> startTimeList;
     private List<String> stopTimeList;
+    int discussStatus;
 
     public DiscussInfo() {
         startTimeList = new ArrayList<>();
@@ -52,5 +53,13 @@ public class DiscussInfo {
 
     public void setStopTimeList(List<String> stopTimeList) {
         this.stopTimeList = stopTimeList;
+    }
+
+    public int getDiscussStatus() {
+        return discussStatus;
+    }
+
+    public void setDiscussStatus(int discussStatus) {
+        this.discussStatus = discussStatus;
     }
 }

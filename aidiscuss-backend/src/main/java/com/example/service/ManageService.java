@@ -75,6 +75,7 @@ public class ManageService {
         }
         redisService.updateStartTimeList(discussId, startTimeList);
         redisService.updateStopTimeList(discussId, stopTimeList);
+        redisService.updateDiscussStatus(discussId, DiscussStatusEnum.STARTED);
 
         // 创建 DiscussMicThread 实例,并启动线程
         DiscussMicThread discussMicThread = new DiscussMicThread(discussId);
@@ -94,6 +95,7 @@ public class ManageService {
             stopTimeList.add(stopTime);
             redisService.updateStopTimeList(discussId, stopTimeList);
         }
+        redisService.updateDiscussStatus(discussId, DiscussStatusEnum.STOPED);
 
         // 从 HashMap 中获取对应的 DiscussMicThread 实例,并关闭麦克风
         DiscussMicThread discussMicThread = discussMicThreadMap.get(discussId);
@@ -109,6 +111,7 @@ public class ManageService {
 
     public void closeDiscuss(String discussId) {
         stopDiscuss(discussId);
+        redisService.updateDiscussStatus(discussId, DiscussStatusEnum.CLOSED);
         // 先从RedisService找到discussId对应的库,读取所有的信息,构造DiscussInfo
         DiscussInfo discussInfo = redisService.getDiscussInfo(discussId);
         if (discussInfo != null) {

@@ -78,6 +78,7 @@ public class RedisService {
                     jedis.set("virtualMicSentences", "");
                     jedis.set("startTimeList", "");
                     jedis.set("stopTimeList", "");
+                    jedis.set("discussStatus", String.valueOf(DiscussStatusEnum.CREATED.getValue()));
                     break;
                 }
             }
@@ -119,7 +120,11 @@ public class RedisService {
                     micSentences.setWireMicSentences(wireMicSentences);
                     micSentences.setVirtualMicSentences(virtualMicSentences);
                     discussInfo.setMicSentences(micSentences);
+                    String discussStatus = jedis.get("discussStatus");
+                    if(discussStatus!=null){
+                        discussInfo.setDiscussStatus(Integer.parseInt(discussStatus));
 
+                    }
                     return discussInfo;
                 }
             }
@@ -241,6 +246,19 @@ public class RedisService {
                     String stopTimeListJson = new Gson().toJson(stopTimeList);
                     // 更新Redis中的stopTimeList
                     jedis.set("stopTimeList", stopTimeListJson);
+                    break;
+                }
+            }
+        }
+    }
+
+    public void updateDiscussStatus(String discussId, DiscussStatusEnum discussStatusEnum) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    jedis.set("discussStatus", String.valueOf(discussStatusEnum.getValue()));
                     break;
                 }
             }
