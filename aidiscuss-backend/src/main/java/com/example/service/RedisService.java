@@ -81,9 +81,8 @@ public class RedisService {
                     jedis.set("startTimeList", "");
                     jedis.set("stopTimeList", "");
                     jedis.set("discussStatus", String.valueOf(DiscussStatusEnum.CREATED.getValue()));
-                    jedis.set("externCursor", "0");
-                    jedis.set("wireCursor", "0");
-                    jedis.set("virtualCursor", "0");
+                    String summaryCursor = new Gson().toJson(new Cursor());
+                    jedis.set("segmentSummaryCursor", summaryCursor);
                     jedis.set("segmentSummaryList", "[]");
                     jedis.set("timeSlicedSummaryList", "[]");
                     break;
@@ -132,15 +131,12 @@ public class RedisService {
                         discussInfo.setDiscussStatus(Integer.parseInt(discussStatus));
 
                     }
-                    String externCursor = jedis.get("externCursor");
-                    String wireCursor = jedis.get("wireCursor");
-                    String virtualCursor = jedis.get("virtualCursor");
-                    discussInfo.setExternCursor(Integer.parseInt(externCursor));
-                    discussInfo.setWireCursor(Integer.parseInt(wireCursor));
-                    discussInfo.setVirtualCursor(Integer.parseInt(virtualCursor));
 
-                    String segmentSummaryListJson = jedis.get("segmentSummaryList");
-                    List<String> segmentSummaryList = new Gson().fromJson(segmentSummaryListJson, new TypeToken<List<String>>(){}.getType());
+                    Cursor segmentSummaryCursor = new Gson().fromJson(jedis.get("segmentSummaryCursor"), Cursor.class);
+                    discussInfo.setSegmentSummaryCursor(segmentSummaryCursor);
+
+                    List<String> segmentSummaryList = new Gson().fromJson(jedis.get("segmentSummaryList"), new TypeToken<List<String>>() {
+                    }.getType());
                     discussInfo.setSegmentSummaryList(segmentSummaryList);
 
                     return discussInfo;
@@ -283,6 +279,20 @@ public class RedisService {
         }
     }
 
+    public Cursor getSegmentSummaryCursor(String discussId) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    Cursor segmentSummaryCursor = new Gson().fromJson(jedis.get("segmentSummaryCursor"), Cursor.class);
+                    return segmentSummaryCursor;
+                }
+            }
+            return null;
+        }
+    }
+
     /**
      * 获取externCursor的值
      *
@@ -343,6 +353,18 @@ public class RedisService {
         }
     }
 
+    public void setSegmentSummaryCursor(String discussId, Cursor segmentSummaryCursor) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    jedis.set("segmentSummaryCursor", new Gson().toJson(segmentSummaryCursor));
+                    break;
+                }
+            }
+        }
+    }
     /**
      * 设置externCursor的值
      *
@@ -410,7 +432,8 @@ public class RedisService {
                     String segmentSummaryListJson = jedis.get("segmentSummaryList");
 
                     // 将 JSON 字符串转换为 List<String>
-                    List<String> segmentSummaryList = new Gson().fromJson(segmentSummaryListJson, new TypeToken<List<String>>(){}.getType());
+                    List<String> segmentSummaryList = new Gson().fromJson(segmentSummaryListJson, new TypeToken<List<String>>() {
+                    }.getType());
 
                     // 将新的 segmentSummary 添加到 List 的末尾
                     segmentSummaryList.add(segmentSummary);

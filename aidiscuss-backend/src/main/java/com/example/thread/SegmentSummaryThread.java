@@ -1,5 +1,6 @@
 package com.example.thread;
 
+import com.example.model.Cursor;
 import com.example.model.Sentence;
 import com.example.service.GptService;
 import com.example.service.RedisService;
@@ -41,30 +42,26 @@ public class SegmentSummaryThread extends Thread {
                 List<Sentence> virtualMicSentences = parseSentencesFromQueue(virtualMicSentencesJson);
 
 
-                // 从Redis中获取三个游标
-                int externCursor = redisService.getExternCursor(discussId);
-                int wireCursor = redisService.getWireCursor(discussId);
-                int virtualCursor = redisService.getVirtualCursor(discussId);
+                Cursor segmentSummaryCursor = redisService.getSegmentSummaryCursor(discussId);
+                int virtualCursor = segmentSummaryCursor.getVirtualCursor();
 
                 // 初始化未处理文本的StringBuilder
                 StringBuilder unprocessedText = new StringBuilder();
 
                 // 遍历三个列表，从游标开始积累unprocessedText
-                while (externCursor < externMicSentences.size() ||
-                        wireCursor < wireMicSentences.size() ||
-                        virtualCursor < virtualMicSentences.size()) {
+                while (segmentSummaryCursor.getExternCursor() < externMicSentences.size() || segmentSummaryCursor.getWireCursor() < wireMicSentences.size() || segmentSummaryCursor.getVirtualCursor() < virtualMicSentences.size()) {
 
                     // 创建一个临时列表存放当前游标指向的句子
                     List<Sentence> currentSentences = new ArrayList<>();
 
-                    if (externCursor < externMicSentences.size()) {
-                        currentSentences.add(externMicSentences.get(externCursor));
+                    if (segmentSummaryCursor.getExternCursor() < externMicSentences.size()) {
+                        currentSentences.add(externMicSentences.get(segmentSummaryCursor.getExternCursor()));
                     }
-                    if (wireCursor < wireMicSentences.size()) {
-                        currentSentences.add(wireMicSentences.get(wireCursor));
+                    if (segmentSummaryCursor.getWireCursor() < wireMicSentences.size()) {
+                        currentSentences.add(wireMicSentences.get(segmentSummaryCursor.getWireCursor()));
                     }
-                    if (virtualCursor < virtualMicSentences.size()) {
-                        currentSentences.add(virtualMicSentences.get(virtualCursor));
+                    if (segmentSummaryCursor.getVirtualCursor() < virtualMicSentences.size()) {
+                        currentSentences.add(virtualMicSentences.get(segmentSummaryCursor.getVirtualCursor()));
                     }
 
                     // 根据句子的开始时间排序，取出时间最小的句子
@@ -75,12 +72,12 @@ public class SegmentSummaryThread extends Thread {
                     unprocessedText.append(earliestSentence.getText());
 
                     // 更新对应游标的位置
-                    if (externCursor < externMicSentences.size() && earliestSentence == externMicSentences.get(externCursor)) {
-                        externCursor++;
-                    } else if (wireCursor < wireMicSentences.size() && earliestSentence == wireMicSentences.get(wireCursor)) {
-                        wireCursor++;
-                    } else if (virtualCursor < virtualMicSentences.size() && earliestSentence == virtualMicSentences.get(virtualCursor)) {
-                        virtualCursor++;
+                    if (segmentSummaryCursor.getExternCursor() < externMicSentences.size() && earliestSentence == externMicSentences.get(segmentSummaryCursor.getExternCursor())) {
+                        segmentSummaryCursor.setExternCursor(segmentSummaryCursor.getExternCursor() + 1);
+                    } else if (segmentSummaryCursor.getWireCursor() < wireMicSentences.size() && earliestSentence == wireMicSentences.get(segmentSummaryCursor.getWireCursor())) {
+                        segmentSummaryCursor.setWireCursor(segmentSummaryCursor.getWireCursor() + 1);
+                    } else if (segmentSummaryCursor.getVirtualCursor() < virtualMicSentences.size() && earliestSentence == virtualMicSentences.get(segmentSummaryCursor.getVirtualCursor())) {
+                        segmentSummaryCursor.setVirtualCursor(segmentSummaryCursor.getVirtualCursor() + 1);
                     }
                 }
 
@@ -89,12 +86,10 @@ public class SegmentSummaryThread extends Thread {
                     String text = unprocessedText.toString();
                     String segmentSummary = gptService.requestGpt3("gpt-3.5-turbo-0125", "你是一个有帮助的助手", text);
                     System.out.println("segmentSummary" + segmentSummary);
-                    redisService.addSegmentSummary(discussId,segmentSummary);
+                    redisService.addSegmentSummary(discussId, segmentSummary);
 
                     // 将更新后的游标位置保存到Redis中
-                    redisService.setExternCursor(discussId, externCursor);
-                    redisService.setWireCursor(discussId, wireCursor);
-                    redisService.setVirtualCursor(discussId, virtualCursor);
+                    redisService.setSegmentSummaryCursor(discussId, segmentSummaryCursor);
                 }
 
                 // 休眠一段时间,避免过于频繁的轮询
