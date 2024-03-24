@@ -1,8 +1,8 @@
 // 定义DiscussInfo结构
 class DiscussInfo {
-    constructor(discussId, discussName, micSwitchInfo) {
+    constructor(discussId, discussName, discussStatus) {
         this.discussId = discussId;
         this.discussName = discussName;
-        this.micSwitchInfo = micSwitchInfo;
+        this.discussStatus=discussStatus;
     }
 }

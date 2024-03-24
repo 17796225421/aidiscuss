@@ -9,37 +9,19 @@ function fetchDiscussInfo(discussId) {
     fetch(`http://127.0.0.1:10002/getDiscuss/${discussId}`)
         .then(response => response.json())
         .then(data => {
-            // 修正：从data.micSwitchInfo中提取麦克风信息来创建MicSwitchInfo对象
-            const micSwitchInfo = new MicSwitchInfo(
-                data.micSwitchInfo.externMic,
-                data.micSwitchInfo.wireMic,
-                data.micSwitchInfo.virtualMic);
 
             // 创建DiscussInfo对象
-            const discussInfo = new DiscussInfo(data.discussId, data.discussName, micSwitchInfo);
+            const discussInfo = new DiscussInfo(data.discussId, data.discussName,data.discussStatus );
 
             // 设置discussTitle为discussName
             document.getElementById('discussTitle').textContent = discussInfo.discussName;
 
-            // 根据MicSwitchInfo设置micOptions的选中项
-            setMicOptions(micSwitchInfo);
         })
         .catch(error => {
             console.error('获取讨论主题信息失败:', error);
         });
 }
 
-// 根据MicSwitchInfo设置micOptions的选中项
-function setMicOptions(micSwitchInfo) {
-    const micOptions = document.getElementById('micOptions');
-    if (micSwitchInfo.externMic) {
-        micOptions.value = '外挂麦克风';
-    } else if (micSwitchInfo.wireMic && micSwitchInfo.virtualMic) {
-        micOptions.value = '有线耳机麦克风和虚拟麦克风';
-    } else {
-        micOptions.value = '关闭';
-    }
-}
 
 // 添加选择条的事件监听
 document.addEventListener('DOMContentLoaded', () => {
