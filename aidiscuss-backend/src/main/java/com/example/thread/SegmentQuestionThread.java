@@ -1,7 +1,7 @@
 package com.example.thread;
 
 import com.example.model.Cursor;
-import com.example.model.Sentence;
+import com.example.model.Sentencetmp;
 import com.example.service.GptService;
 import com.example.service.RedisService;
 import com.google.gson.Gson;
@@ -34,9 +34,9 @@ public class SegmentQuestionThread extends Thread {
                 String virtualMicSentencesJson = redisService.getVirtualMicSentences(discussId);
 
                 // 解析JSON字符串中的queue数组
-                List<Sentence> externMicSentences = parseSentencesFromQueue(externMicSentencesJson);
-                List<Sentence> wireMicSentences = parseSentencesFromQueue(wireMicSentencesJson);
-                List<Sentence> virtualMicSentences = parseSentencesFromQueue(virtualMicSentencesJson);
+                List<Sentencetmp> externMicSentencetmps = parseSentencesFromQueue(externMicSentencesJson);
+                List<Sentencetmp> wireMicSentencetmps = parseSentencesFromQueue(wireMicSentencesJson);
+                List<Sentencetmp> virtualMicSentencetmps = parseSentencesFromQueue(virtualMicSentencesJson);
 
 
                 Cursor segmentQuestionCursor = redisService.getSegmentQuestionCursor(discussId);
@@ -45,34 +45,34 @@ public class SegmentQuestionThread extends Thread {
                 StringBuilder unprocessedText = new StringBuilder();
 
                 // 遍历三个列表，从游标开始积累unprocessedText
-                while (segmentQuestionCursor.getExternCursor() < externMicSentences.size() || segmentQuestionCursor.getWireCursor() < wireMicSentences.size() || segmentQuestionCursor.getVirtualCursor() < virtualMicSentences.size()) {
+                while (segmentQuestionCursor.getExternCursor() < externMicSentencetmps.size() || segmentQuestionCursor.getWireCursor() < wireMicSentencetmps.size() || segmentQuestionCursor.getVirtualCursor() < virtualMicSentencetmps.size()) {
 
                     // 创建一个临时列表存放当前游标指向的句子
-                    List<Sentence> currentSentences = new ArrayList<>();
+                    List<Sentencetmp> currentSentencetmps = new ArrayList<>();
 
-                    if (segmentQuestionCursor.getExternCursor() < externMicSentences.size()) {
-                        currentSentences.add(externMicSentences.get(segmentQuestionCursor.getExternCursor()));
+                    if (segmentQuestionCursor.getExternCursor() < externMicSentencetmps.size()) {
+                        currentSentencetmps.add(externMicSentencetmps.get(segmentQuestionCursor.getExternCursor()));
                     }
-                    if (segmentQuestionCursor.getWireCursor() < wireMicSentences.size()) {
-                        currentSentences.add(wireMicSentences.get(segmentQuestionCursor.getWireCursor()));
+                    if (segmentQuestionCursor.getWireCursor() < wireMicSentencetmps.size()) {
+                        currentSentencetmps.add(wireMicSentencetmps.get(segmentQuestionCursor.getWireCursor()));
                     }
-                    if (segmentQuestionCursor.getVirtualCursor() < virtualMicSentences.size()) {
-                        currentSentences.add(virtualMicSentences.get(segmentQuestionCursor.getVirtualCursor()));
+                    if (segmentQuestionCursor.getVirtualCursor() < virtualMicSentencetmps.size()) {
+                        currentSentencetmps.add(virtualMicSentencetmps.get(segmentQuestionCursor.getVirtualCursor()));
                     }
 
                     // 根据句子的开始时间排序，取出时间最小的句子
-                    Collections.sort(currentSentences, Comparator.comparing(Sentence::getBeginTime));
-                    Sentence earliestSentence = currentSentences.get(0);
+                    Collections.sort(currentSentencetmps, Comparator.comparing(Sentencetmp::getBeginTime));
+                    Sentencetmp earliestSentencetmp = currentSentencetmps.get(0);
 
                     // 将时间最小的句子的文本添加到unprocessedText
-                    unprocessedText.append(earliestSentence.getText());
+                    unprocessedText.append(earliestSentencetmp.getText());
 
                     // 更新对应游标的位置
-                    if (segmentQuestionCursor.getExternCursor() < externMicSentences.size() && earliestSentence == externMicSentences.get(segmentQuestionCursor.getExternCursor())) {
+                    if (segmentQuestionCursor.getExternCursor() < externMicSentencetmps.size() && earliestSentencetmp == externMicSentencetmps.get(segmentQuestionCursor.getExternCursor())) {
                         segmentQuestionCursor.setExternCursor(segmentQuestionCursor.getExternCursor() + 1);
-                    } else if (segmentQuestionCursor.getWireCursor() < wireMicSentences.size() && earliestSentence == wireMicSentences.get(segmentQuestionCursor.getWireCursor())) {
+                    } else if (segmentQuestionCursor.getWireCursor() < wireMicSentencetmps.size() && earliestSentencetmp == wireMicSentencetmps.get(segmentQuestionCursor.getWireCursor())) {
                         segmentQuestionCursor.setWireCursor(segmentQuestionCursor.getWireCursor() + 1);
-                    } else if (segmentQuestionCursor.getVirtualCursor() < virtualMicSentences.size() && earliestSentence == virtualMicSentences.get(segmentQuestionCursor.getVirtualCursor())) {
+                    } else if (segmentQuestionCursor.getVirtualCursor() < virtualMicSentencetmps.size() && earliestSentencetmp == virtualMicSentencetmps.get(segmentQuestionCursor.getVirtualCursor())) {
                         segmentQuestionCursor.setVirtualCursor(segmentQuestionCursor.getVirtualCursor() + 1);
                     }
                 }
@@ -110,14 +110,14 @@ public class SegmentQuestionThread extends Thread {
      * @param json JSON字符串
      * @return Sentence列表
      */
-    private List<Sentence> parseSentencesFromQueue(String json) {
+    private List<Sentencetmp> parseSentencesFromQueue(String json) {
         // 使用Gson库解析JSON字符串
         Gson gson = new Gson();
         JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
         // 从JsonObject中获取名为queue的JsonArray
         String queueJson = jsonObject.getAsJsonArray("queue").toString();
         // 将JsonArray字符串转换为Sentence列表
-        return gson.fromJson(queueJson, new TypeToken<List<Sentence>>() {
+        return gson.fromJson(queueJson, new TypeToken<List<Sentencetmp>>() {
         }.getType());
     }
 }

@@ -74,7 +74,7 @@ public class RedisService {
                 if (jedis.dbSize() == 0) {
                     jedis.set("discussId", discussInfo.getDiscussId());
                     jedis.set("discussName", discussInfo.getDiscussName());
-                    String sentences = new Gson().toJson(new Sentences());
+                    String sentences = new Gson().toJson(new Sentencestmp());
                     jedis.set("externMicSentences", sentences);
                     jedis.set("wireMicSentences", sentences);
                     jedis.set("virtualMicSentences", sentences);
@@ -129,14 +129,14 @@ public class RedisService {
                     discussInfo.setStopTimeList(stopTimeList);
 
                     // 处理其他相关信息
-                    MicSentences micSentences = new MicSentences();
-                    Sentences externMicSentences = new Gson().fromJson(jedis.get("externMicSentences"), Sentences.class);
-                    Sentences wireMicSentences = new Gson().fromJson(jedis.get("wireMicSentences"), Sentences.class);
-                    Sentences virtualMicSentences = new Gson().fromJson(jedis.get("virtualMicSentences"), Sentences.class);
-                    micSentences.setExternMicSentences(externMicSentences);
-                    micSentences.setWireMicSentences(wireMicSentences);
-                    micSentences.setVirtualMicSentences(virtualMicSentences);
-                    discussInfo.setMicSentences(micSentences);
+                    MicSentencestmp micSentencestmp = new MicSentencestmp();
+                    Sentencestmp externMicSentencestmp = new Gson().fromJson(jedis.get("externMicSentencestmp"), Sentencestmp.class);
+                    Sentencestmp wireMicSentencestmp = new Gson().fromJson(jedis.get("wireMicSentencestmp"), Sentencestmp.class);
+                    Sentencestmp virtualMicSentencestmp = new Gson().fromJson(jedis.get("virtualMicSentencestmp"), Sentencestmp.class);
+                    micSentencestmp.setExternMicSentences(externMicSentencestmp);
+                    micSentencestmp.setWireMicSentences(wireMicSentencestmp);
+                    micSentencestmp.setVirtualMicSentences(virtualMicSentencestmp);
+                    discussInfo.setMicSentences(micSentencestmp);
                     String discussStatus = jedis.get("discussStatus");
                     if (discussStatus != null) {
                         discussInfo.setDiscussStatus(Integer.parseInt(discussStatus));
@@ -209,7 +209,7 @@ public class RedisService {
         }
     }
 
-    public void AddMicSentence(String discussId, MicTypeEnum micTypeEnum, Sentence sentence) {
+    public void AddMicSentence(String discussId, MicTypeEnum micTypeEnum, Sentencetmp sentencetmp) {
         try (Jedis jedis = jedisPool.getResource()) {
             int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
             for (int i = 0; i < dbCount; i++) {
@@ -223,18 +223,18 @@ public class RedisService {
                     } else {
                         micName = "virtual";
                     }
-                    String key = micName + "MicSentences";
-                    Sentences sentences;
+                    String key = micName + "MicSentencestmp";
+                    Sentencestmp sentencestmp;
                     String sentencesJson = jedis.get(key);
                     if (sentencesJson != null && !sentencesJson.isEmpty()) {
-                        // 如果 sentencesJson 不为 null,则解析为 Sentences 对象
-                        sentences = new Gson().fromJson(sentencesJson, Sentences.class);
+                        // 如果 sentencesJson 不为 null,则解析为 Sentencestmp 对象
+                        sentencestmp = new Gson().fromJson(sentencesJson, Sentencestmp.class);
                     } else {
-                        // 如果 sentencesJson 为 null,则创建一个新的 Sentences 对象
-                        sentences = new Sentences();
+                        // 如果 sentencesJson 为 null,则创建一个新的 Sentencestmp 对象
+                        sentencestmp = new Sentencestmp();
                     }
-                    sentences.addSentence(sentence);
-                    jedis.set(key, new Gson().toJson(sentences));
+                    sentencestmp.addSentence(sentencetmp);
+                    jedis.set(key, new Gson().toJson(sentencestmp));
                     break;
                 }
             }
@@ -542,9 +542,9 @@ public class RedisService {
      * 将指定类型的Sentences对象序列化为JSON字符串并存储到Redis中
      * @param discussId 讨论ID
      * @param micType 麦克风类型
-     * @param sentences Sentences对象
+     * @param sentencestmp Sentences对象
      */
-    public void setMicSentences(String discussId, MicTypeEnum micType, Sentences sentences) {
+    public void setMicSentences(String discussId, MicTypeEnum micType, Sentencestmp sentencestmp) {
         try (Jedis jedis = jedisPool.getResource()) {
             int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
             for (int i = 0; i < dbCount; i++) {
@@ -564,7 +564,7 @@ public class RedisService {
                         default:
                             throw new IllegalArgumentException("未知的麦克风类型: " + micType);
                     }
-                    jedis.set(key, new Gson().toJson(sentences));
+                    jedis.set(key, new Gson().toJson(sentencestmp));
                     break;
                 }
             }

@@ -1,7 +1,7 @@
 package com.example.thread;
 
 import com.example.model.Cursor;
-import com.example.model.Sentence;
+import com.example.model.Sentencetmp;
 import com.example.service.GptService;
 import com.example.service.RedisService;
 import com.google.gson.Gson;
@@ -31,9 +31,9 @@ public class KeySentenceThread extends Thread {
                 String virtualMicSentencesJson = redisService.getVirtualMicSentences(discussId);
 
                 // 解析JSON字符串中的queue数组
-                List<Sentence> externMicSentences = parseSentencesFromQueue(externMicSentencesJson);
-                List<Sentence> wireMicSentences = parseSentencesFromQueue(wireMicSentencesJson);
-                List<Sentence> virtualMicSentences = parseSentencesFromQueue(virtualMicSentencesJson);
+                List<Sentencetmp> externMicSentencetmps = parseSentencesFromQueue(externMicSentencesJson);
+                List<Sentencetmp> wireMicSentencetmps = parseSentencesFromQueue(wireMicSentencesJson);
+                List<Sentencetmp> virtualMicSentencetmps = parseSentencesFromQueue(virtualMicSentencesJson);
 
 
                 Cursor keySentenceCursor = redisService.getKeySentenceCursor(discussId);
@@ -42,34 +42,34 @@ public class KeySentenceThread extends Thread {
                 StringBuilder unprocessedText = new StringBuilder();
 
                 // 遍历三个列表，从游标开始积累unprocessedText
-                while (keySentenceCursor.getExternCursor() < externMicSentences.size() || keySentenceCursor.getWireCursor() < wireMicSentences.size() || keySentenceCursor.getVirtualCursor() < virtualMicSentences.size()) {
+                while (keySentenceCursor.getExternCursor() < externMicSentencetmps.size() || keySentenceCursor.getWireCursor() < wireMicSentencetmps.size() || keySentenceCursor.getVirtualCursor() < virtualMicSentencetmps.size()) {
 
                     // 创建一个临时列表存放当前游标指向的句子
-                    List<Sentence> currentSentences = new ArrayList<>();
+                    List<Sentencetmp> currentSentencetmps = new ArrayList<>();
 
-                    if (keySentenceCursor.getExternCursor() < externMicSentences.size()) {
-                        currentSentences.add(externMicSentences.get(keySentenceCursor.getExternCursor()));
+                    if (keySentenceCursor.getExternCursor() < externMicSentencetmps.size()) {
+                        currentSentencetmps.add(externMicSentencetmps.get(keySentenceCursor.getExternCursor()));
                     }
-                    if (keySentenceCursor.getWireCursor() < wireMicSentences.size()) {
-                        currentSentences.add(wireMicSentences.get(keySentenceCursor.getWireCursor()));
+                    if (keySentenceCursor.getWireCursor() < wireMicSentencetmps.size()) {
+                        currentSentencetmps.add(wireMicSentencetmps.get(keySentenceCursor.getWireCursor()));
                     }
-                    if (keySentenceCursor.getVirtualCursor() < virtualMicSentences.size()) {
-                        currentSentences.add(virtualMicSentences.get(keySentenceCursor.getVirtualCursor()));
+                    if (keySentenceCursor.getVirtualCursor() < virtualMicSentencetmps.size()) {
+                        currentSentencetmps.add(virtualMicSentencetmps.get(keySentenceCursor.getVirtualCursor()));
                     }
 
                     // 根据句子的开始时间排序，取出时间最小的句子
-                    Collections.sort(currentSentences, Comparator.comparing(Sentence::getBeginTime));
-                    Sentence earliestSentence = currentSentences.get(0);
+                    Collections.sort(currentSentencetmps, Comparator.comparing(Sentencetmp::getBeginTime));
+                    Sentencetmp earliestSentencetmp = currentSentencetmps.get(0);
 
                     // 将时间最小的句子的文本添加到unprocessedText
-                    unprocessedText.append(earliestSentence.getText());
+                    unprocessedText.append(earliestSentencetmp.getText());
 
                     // 更新对应游标的位置
-                    if (keySentenceCursor.getExternCursor() < externMicSentences.size() && earliestSentence == externMicSentences.get(keySentenceCursor.getExternCursor())) {
+                    if (keySentenceCursor.getExternCursor() < externMicSentencetmps.size() && earliestSentencetmp == externMicSentencetmps.get(keySentenceCursor.getExternCursor())) {
                         keySentenceCursor.setExternCursor(keySentenceCursor.getExternCursor() + 1);
-                    } else if (keySentenceCursor.getWireCursor() < wireMicSentences.size() && earliestSentence == wireMicSentences.get(keySentenceCursor.getWireCursor())) {
+                    } else if (keySentenceCursor.getWireCursor() < wireMicSentencetmps.size() && earliestSentencetmp == wireMicSentencetmps.get(keySentenceCursor.getWireCursor())) {
                         keySentenceCursor.setWireCursor(keySentenceCursor.getWireCursor() + 1);
-                    } else if (keySentenceCursor.getVirtualCursor() < virtualMicSentences.size() && earliestSentence == virtualMicSentences.get(keySentenceCursor.getVirtualCursor())) {
+                    } else if (keySentenceCursor.getVirtualCursor() < virtualMicSentencetmps.size() && earliestSentencetmp == virtualMicSentencetmps.get(keySentenceCursor.getVirtualCursor())) {
                         keySentenceCursor.setVirtualCursor(keySentenceCursor.getVirtualCursor() + 1);
                     }
                 }
@@ -108,14 +108,14 @@ public class KeySentenceThread extends Thread {
      * @param json JSON字符串
      * @return Sentence列表
      */
-    private List<Sentence> parseSentencesFromQueue(String json) {
+    private List<Sentencetmp> parseSentencesFromQueue(String json) {
         // 使用Gson库解析JSON字符串
         Gson gson = new Gson();
         JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
         // 从JsonObject中获取名为queue的JsonArray
         String queueJson = jsonObject.getAsJsonArray("queue").toString();
         // 将JsonArray字符串转换为Sentence列表
-        return gson.fromJson(queueJson, new TypeToken<List<Sentence>>() {
+        return gson.fromJson(queueJson, new TypeToken<List<Sentencetmp>>() {
         }.getType());
     }
 }

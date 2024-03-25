@@ -1,11 +1,11 @@
 package com.example.model;
 
-public class Sentence {
+public class Sentencetmp {
     private String text;
     private String beginTime;
     private String summary;
 
-    public Sentence(String text, String beginTime) {
+    public Sentencetmp(String text, String beginTime) {
         this.text = text;
         this.beginTime = beginTime;
         this.summary = "";

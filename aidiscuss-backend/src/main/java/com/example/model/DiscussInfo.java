@@ -6,7 +6,7 @@ import java.util.List;
 public class DiscussInfo {
     String discussId;
     String discussName;
-    MicSentences micSentences;
+    MicSentencestmp micSentencestmp;
     private List<String> startTimeList;
     private List<String> stopTimeList;
     int discussStatus;
@@ -54,12 +54,12 @@ public class DiscussInfo {
         this.discussName = discussName;
     }
 
-    public MicSentences getMicSentences() {
-        return micSentences;
+    public MicSentencestmp getMicSentences() {
+        return micSentencestmp;
     }
 
-    public void setMicSentences(MicSentences micSentences) {
-        this.micSentences = micSentences;
+    public void setMicSentences(MicSentencestmp micSentencestmp) {
+        this.micSentencestmp = micSentencestmp;
     }
 
     public List<String> getStartTimeList() {

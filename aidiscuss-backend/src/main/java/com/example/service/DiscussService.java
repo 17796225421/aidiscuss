@@ -51,20 +51,20 @@ public class DiscussService {
         String virtualMicSentencesJson = redisService.getVirtualMicSentences(discussId);
 
         // 解析JSON字符串中的queue数组
-        List<Sentence> externMicSentences = parseSentencesFromQueue(externMicSentencesJson);
-        List<Sentence> wireMicSentences = parseSentencesFromQueue(wireMicSentencesJson);
-        List<Sentence> virtualMicSentences = parseSentencesFromQueue(virtualMicSentencesJson);
+        List<Sentencetmp> externMicSentencetmps = parseSentencesFromQueue(externMicSentencesJson);
+        List<Sentencetmp> wireMicSentencetmps = parseSentencesFromQueue(wireMicSentencesJson);
+        List<Sentencetmp> virtualMicSentencetmps = parseSentencesFromQueue(virtualMicSentencesJson);
 
-        List<Sentence>allMicSentences=new ArrayList<>();
-        allMicSentences.addAll(externMicSentences);
-        allMicSentences.addAll(wireMicSentences);
-        allMicSentences.addAll(virtualMicSentences);
+        List<Sentencetmp> allMicSentencetmps =new ArrayList<>();
+        allMicSentencetmps.addAll(externMicSentencetmps);
+        allMicSentencetmps.addAll(wireMicSentencetmps);
+        allMicSentencetmps.addAll(virtualMicSentencetmps);
         // 将所有句子按照开始时间排序
-        Collections.sort(allMicSentences, Comparator.comparing(Sentence::getBeginTime));
+        Collections.sort(allMicSentencetmps, Comparator.comparing(Sentencetmp::getBeginTime));
         // 使用StringBuilder拼接所有句子的文本，并用换行符隔开
         StringBuilder allMicSentencesTextBuilder = new StringBuilder();
-        for (Sentence sentence : allMicSentences) {
-            allMicSentencesTextBuilder.append(sentence.getText()).append("\n");
+        for (Sentencetmp sentencetmp : allMicSentencetmps) {
+            allMicSentencesTextBuilder.append(sentencetmp.getText()).append("\n");
         }
         // 去掉最后一个多余的换行符
         if (allMicSentencesTextBuilder.length() > 0) {
@@ -97,14 +97,14 @@ public class DiscussService {
      * @param json JSON字符串
      * @return Sentence列表
      */
-    private List<Sentence> parseSentencesFromQueue(String json) {
+    private List<Sentencetmp> parseSentencesFromQueue(String json) {
         // 使用Gson库解析JSON字符串
         Gson gson = new Gson();
         JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
         // 从JsonObject中获取名为queue的JsonArray
         String queueJson = jsonObject.getAsJsonArray("queue").toString();
         // 将JsonArray字符串转换为Sentence列表
-        return gson.fromJson(queueJson, new TypeToken<List<Sentence>>() {
+        return gson.fromJson(queueJson, new TypeToken<List<Sentencetmp>>() {
         }.getType());
     }
 

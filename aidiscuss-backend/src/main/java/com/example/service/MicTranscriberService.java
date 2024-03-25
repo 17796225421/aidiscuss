@@ -12,7 +12,7 @@ import javax.sound.sampled.*;
 import java.io.IOException;
 
 import com.example.model.MicTypeEnum;
-import com.example.model.Sentence;
+import com.example.model.Sentencetmp;
 import com.example.thread.MicThread;
 import com.example.util.TimeUtils;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -130,11 +130,11 @@ public class MicTranscriberService {
                 ));
 
                 // 将识别结果封装为Sentence对象并插入队列
-                Sentence sentence = new Sentence(
+                Sentencetmp sentencetmp = new Sentencetmp(
                         response.getTransSentenceText(),
                         TimeUtils.getCurrentFormattedTime() // 使用当前时间
                 );
-                redisService.AddMicSentence(discussId, micTypeEnum,sentence);
+                redisService.AddMicSentence(discussId, micTypeEnum, sentencetmp);
             }
 
             //识别完毕

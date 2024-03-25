@@ -1,13 +1,11 @@
 package com.example.thread;
 
 import com.example.model.MicTypeEnum;
-import com.example.model.Sentence;
-import com.example.model.Sentences;
+import com.example.model.Sentencetmp;
+import com.example.model.Sentencestmp;
 import com.example.service.GptService;
 import com.example.service.RedisService;
 import com.google.gson.Gson;
-
-import static com.example.model.MicTypeEnum.*;
 
 public class SentenceSummaryThread extends Thread {
     private String discussId;
@@ -29,18 +27,18 @@ public class SentenceSummaryThread extends Thread {
                 String virtualMicSentencesJson = redisService.getVirtualMicSentences(discussId);
 
                 Gson gson = new Gson();
-                Sentences externMicSentences = gson.fromJson(externMicSentencesJson, Sentences.class);
-                Sentences wireMicSentences = gson.fromJson(wireMicSentencesJson, Sentences.class);
-                Sentences virtualMicSentences = gson.fromJson(virtualMicSentencesJson, Sentences.class);
+                Sentencestmp externMicSentencestmp = gson.fromJson(externMicSentencesJson, Sentencestmp.class);
+                Sentencestmp wireMicSentencestmp = gson.fromJson(wireMicSentencesJson, Sentencestmp.class);
+                Sentencestmp virtualMicSentencestmp = gson.fromJson(virtualMicSentencesJson, Sentencestmp.class);
 
                 // 处理externMicSentences
-                processSentences(externMicSentences, MicTypeEnum.EXTERN);
+                processSentences(externMicSentencestmp, MicTypeEnum.EXTERN);
 
                 // 处理wireMicSentences
-                processSentences(wireMicSentences, MicTypeEnum.WIRE);
+                processSentences(wireMicSentencestmp, MicTypeEnum.WIRE);
 
                 // 处理virtualMicSentences
-                processSentences(virtualMicSentences, MicTypeEnum.VIRTUAL);
+                processSentences(virtualMicSentencestmp, MicTypeEnum.VIRTUAL);
 
                 // 休眠一段时间,避免过于频繁的轮询
                 Thread.sleep(1000);
@@ -50,17 +48,17 @@ public class SentenceSummaryThread extends Thread {
         }
     }
 
-    private void processSentences(Sentences sentences, MicTypeEnum micType) throws Exception {
-        for (Sentence sentence : sentences.getQueue()) {
-            if (sentence.getSummary().isEmpty()) {
+    private void processSentences(Sentencestmp sentencestmp, MicTypeEnum micType) throws Exception {
+        for (Sentencetmp sentencetmp : sentencestmp.getQueue()) {
+            if (sentencetmp.getSummary().isEmpty()) {
                 // 调用GPT-3生成摘要
-                String summary = gptService.requestGpt3("gpt-3.5-turbo", "请为以下句子生成一个简短的中文摘要:", sentence.getText());
+                String summary = gptService.requestGpt3("gpt-3.5-turbo", "请为以下句子生成一个简短的中文摘要:", sentencetmp.getText());
                 System.out.println(111 + summary);
-                sentence.setSummary(summary);
+                sentencetmp.setSummary(summary);
             }
         }
         // 更新到redis中
-        redisService.setMicSentences(discussId, micType, sentences);
+        redisService.setMicSentences(discussId, micType, sentencestmp);
     }
 
     public void stopRunning() {
