@@ -12,7 +12,9 @@ public class DiscussInfo {
     int discussStatus;
     private Cursor segmentSummaryCursor;
     private Cursor timeSlicedSummaryCursor;
+    private Cursor segmentQuestionCursor;
     private List<String> segmentSummaryList;
+    private List<String> segmentQuestionList;
     private List<String> timeSlicedSummaryList;
     private Cursor keyWordCursor;
     private Cursor keySentenceCursor;
@@ -25,6 +27,7 @@ public class DiscussInfo {
         startTimeList = new ArrayList<>();
         stopTimeList = new ArrayList<>();
         segmentSummaryList = new ArrayList<>();
+        segmentQuestionList=new ArrayList<>();
         timeSlicedSummaryList = new ArrayList<>();
         keyWordList = new ArrayList<>();
         keySentenceList = new ArrayList<>();
@@ -158,5 +161,21 @@ public class DiscussInfo {
 
     public void setBackgroundList(List<String> backgroundList) {
         this.backgroundList = backgroundList;
+    }
+
+    public Cursor getSegmentQuestionCursor() {
+        return segmentQuestionCursor;
+    }
+
+    public void setSegmentQuestionCursor(Cursor segmentQuestionCursor) {
+        this.segmentQuestionCursor = segmentQuestionCursor;
+    }
+
+    public List<String> getSegmentQuestionList() {
+        return segmentQuestionList;
+    }
+
+    public void setSegmentQuestionList(List<String> segmentQuestionList) {
+        this.segmentQuestionList = segmentQuestionList;
     }
 }

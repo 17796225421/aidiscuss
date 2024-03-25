@@ -84,6 +84,8 @@ public class RedisService {
                     String cursor = new Gson().toJson(new Cursor());
                     jedis.set("segmentSummaryCursor", cursor);
                     jedis.set("segmentSummaryList", "[]");
+                    jedis.set("segmentQuestionCursor", cursor);
+                    jedis.set("segmentQuestionList", "[]");
                     jedis.set("timeSlicedSummaryCursor", cursor);
                     jedis.set("timeSlicedSummaryList", "[]");
                     jedis.set("keyWordCursor", cursor);
@@ -145,6 +147,13 @@ public class RedisService {
                     List<String> segmentSummaryList = new Gson().fromJson(jedis.get("segmentSummaryList"), new TypeToken<List<String>>() {
                     }.getType());
                     discussInfo.setSegmentSummaryList(segmentSummaryList);
+
+                    Cursor segmentQuestionCursor = new Gson().fromJson(jedis.get("segmentQuestionCursor"), Cursor.class);
+                    discussInfo.setSegmentQuestionCursor(segmentQuestionCursor);
+
+                    List<String> segmentQuestionList = new Gson().fromJson(jedis.get("segmentQuestionList"), new TypeToken<List<String>>() {
+                    }.getType());
+                    discussInfo.setSegmentQuestionList(segmentQuestionList);
 
                     Cursor timeSlicedSummaryCursor = new Gson().fromJson(jedis.get("timeSlicedSummaryCursor"), Cursor.class);
                     discussInfo.setTimeSlicedSummaryCursor(timeSlicedSummaryCursor);
@@ -578,6 +587,51 @@ public class RedisService {
                     // 将backgroundList转换为JSON字符串,并保存到Redis中
                     String backgroundListJson = new Gson().toJson(backgroundList);
                     jedis.set("backgroundList", backgroundListJson);
+                    break;
+                }
+            }
+        }
+    }
+
+    public Cursor getSegmentQuestionCursor(String discussId) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    return new Gson().fromJson(jedis.get("segmentQuestionCursor"), Cursor.class);
+                }
+            }
+            return null;
+        }
+    }
+
+    public void addSegmentQuestion(String discussId, String segmentQuestion) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    List<String> segmentQuestionList = new Gson().fromJson(jedis.get("segmentQuestionList"), new TypeToken<List<String>>() {
+                    }.getType());
+
+                    segmentQuestionList.add(segmentQuestion);
+
+                    jedis.set("segmentQuestionList", new Gson().toJson(segmentQuestionList));
+
+                    break;
+                }
+            }
+        }
+    }
+
+    public void setSegmentQuestionCursor(String discussId, Cursor segmentQuestionCursor) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    jedis.set("segmentQuestionCursor", new Gson().toJson(segmentQuestionCursor));
                     break;
                 }
             }
