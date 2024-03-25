@@ -18,6 +18,7 @@ public class DiscussInfo {
     private Cursor keySentenceCursor;
     private List<String> keyWordList;
     private List<String> keySentenceList;
+    private List<QuestionAnswer>questionAnswerList;
 
     public DiscussInfo() {
         startTimeList = new ArrayList<>();
@@ -26,6 +27,7 @@ public class DiscussInfo {
         timeSlicedSummaryList = new ArrayList<>();
         keyWordList = new ArrayList<>();
         keySentenceList = new ArrayList<>();
+        questionAnswerList=new ArrayList<>();
     }
 
     public String getDiscussId() {
@@ -138,5 +140,13 @@ public class DiscussInfo {
 
     public void setKeySentenceCursor(Cursor keySentenceCursor) {
         this.keySentenceCursor = keySentenceCursor;
+    }
+
+    public List<QuestionAnswer> getQuestionAnswerList() {
+        return questionAnswerList;
+    }
+
+    public void setQuestionAnswerList(List<QuestionAnswer> questionAnswerList) {
+        this.questionAnswerList = questionAnswerList;
     }
 }

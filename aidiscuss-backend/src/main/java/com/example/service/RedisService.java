@@ -90,6 +90,7 @@ public class RedisService {
                     jedis.set("keyWordList", "[]");
                     jedis.set("keySentenceCursor", cursor);
                     jedis.set("keySentenceList", "[]");
+                    jedis.set("questionAnswerList","[]");
                     break;
                 }
             }
@@ -163,6 +164,9 @@ public class RedisService {
                     }.getType());
                     discussInfo.setKeySentenceList(keySentenceList);
 
+                    List<QuestionAnswer> questionAnswerList = new Gson().fromJson(jedis.get("questionAnswerList"), new TypeToken<List<QuestionAnswer>>() {
+                    }.getType());
+                    discussInfo.setQuestionAnswerList(questionAnswerList);
                     return discussInfo;
                 }
             }
@@ -475,6 +479,37 @@ public class RedisService {
 
                     keySentenceList.addAll(newKeySentenceList);
                     jedis.set("keySentenceList", new Gson().toJson(keySentenceList));
+                    break;
+                }
+            }
+        }
+    }
+
+    public List<QuestionAnswer> getQuestionAnswerList(String discussId) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    return new Gson().fromJson(jedis.get("questionAnswerList"), new TypeToken<List<QuestionAnswer>>() {
+                    }.getType());
+                }
+            }
+            return null;
+        }
+    }
+
+    public void addQuestionAnswer(String discussId, QuestionAnswer questionAnswer) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    List<QuestionAnswer> questionAnswerList = new Gson().fromJson(jedis.get("questionAnswerList"), new TypeToken<List<QuestionAnswer>>() {
+                    }.getType());
+
+                    questionAnswerList.add(questionAnswer);
+                    jedis.set("questionAnswerList", new Gson().toJson(questionAnswerList));
                     break;
                 }
             }

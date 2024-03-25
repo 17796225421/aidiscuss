@@ -1,6 +1,8 @@
 package com.example.controller;
 
 import com.example.model.DiscussInfo;
+import com.example.model.QuestionAnswer;
+import com.example.model.QuestionRequest;
 import com.example.service.DiscussService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +10,8 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RestController
 public class DiscussController {
@@ -44,5 +48,11 @@ public class DiscussController {
         String virtualMicSentences = discussService.getVirtualMicSentences(discussId);
         // 将virtualMicSentences传输到"/topic/virtualMicSentences/{discussId}"
         simpMessagingTemplate.convertAndSend("/topic/virtualMicSentencesConnection/" + discussId, virtualMicSentences);
+    }
+
+    @PostMapping("/askQuestion")
+    public ResponseEntity<Void> askQuestion(@RequestBody QuestionRequest questionRequest) throws IOException {
+        discussService.askQuestion(questionRequest);
+        return ResponseEntity.ok().build();
     }
 }
