@@ -1,9 +1,6 @@
 package com.example.service;
 
-import com.example.model.DiscussInfo;
-import com.example.model.QuestionAnswer;
-import com.example.model.QuestionRequest;
-import com.example.model.Sentence;
+import com.example.model.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -109,5 +106,61 @@ public class DiscussService {
         // 将JsonArray字符串转换为Sentence列表
         return gson.fromJson(queueJson, new TypeToken<List<Sentence>>() {
         }.getType());
+    }
+
+    public void updateBackground(BackgroundRequest backgroundRequest) {
+        String discussId = backgroundRequest.getDiscussId();
+        int index = backgroundRequest.getIndex();
+        String background = backgroundRequest.getBackground();
+
+        // 从Redis中获取背景列表
+        List<String> backgroundList = redisService.getBackground(discussId);
+
+        // 检查索引是否在有效范围内
+        if (index >= 0 && index < backgroundList.size()) {
+            // 更新指定索引位置的背景
+            backgroundList.set(index, background);
+            // 将更新后的背景列表保存到Redis中
+            redisService.setBackground(discussId, backgroundList);
+        } else {
+            throw new IndexOutOfBoundsException("背景索引超出范围");
+        }
+    }
+
+    public void addBackground(BackgroundRequest backgroundRequest) {
+        String discussId = backgroundRequest.getDiscussId();
+        String background = backgroundRequest.getBackground();
+
+        // 从Redis中获取背景列表
+        List<String> backgroundList = redisService.getBackground(discussId);
+
+        // 将新的背景添加到列表末尾
+        backgroundList.add(background);
+
+        // 将更新后的背景列表保存到Redis中
+        redisService.setBackground(discussId, backgroundList);
+    }
+
+    public void deleteBackground(BackgroundRequest backgroundRequest) {
+        String discussId = backgroundRequest.getDiscussId();
+        int index = backgroundRequest.getIndex();
+
+        // 从Redis中获取背景列表
+        List<String> backgroundList = redisService.getBackground(discussId);
+
+        // 检查索引是否在有效范围内
+        if (index >= 0 && index < backgroundList.size()) {
+            // 删除指定索引位置的背景
+            backgroundList.remove(index);
+            // 将更新后的背景列表保存到Redis中
+            redisService.setBackground(discussId, backgroundList);
+        } else {
+            throw new IndexOutOfBoundsException("背景索引超出范围");
+        }
+    }
+
+    public List<String> getBackground(String discussId) {
+        // 直接从Redis中获取背景列表并返回
+        return redisService.getBackground(discussId);
     }
 }

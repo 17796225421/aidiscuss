@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.model.BackgroundRequest;
 import com.example.model.DiscussInfo;
 import com.example.model.QuestionAnswer;
 import com.example.model.QuestionRequest;
@@ -12,6 +13,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 public class DiscussController {
@@ -54,5 +56,29 @@ public class DiscussController {
     public ResponseEntity<Void> askQuestion(@RequestBody QuestionRequest questionRequest) throws IOException {
         discussService.askQuestion(questionRequest);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/updateBackground")
+    public ResponseEntity<Void> updateBackground(@RequestBody BackgroundRequest backgroundRequest) throws IOException {
+        discussService.updateBackground(backgroundRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/addBackground")
+    public ResponseEntity<Void> addBackground(@RequestBody BackgroundRequest backgroundRequest) throws IOException {
+        discussService.addBackground(backgroundRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/deleteBackground")
+    public ResponseEntity<Void> deleteBackground(@RequestBody BackgroundRequest backgroundRequest) throws IOException {
+        discussService.deleteBackground(backgroundRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("getBackground/{discussId}")
+    public ResponseEntity<List<String>> getBackground(@PathVariable String discussId) {
+        List<String> backgroundList = discussService.getBackground(discussId);
+        return ResponseEntity.ok(backgroundList);
     }
 }

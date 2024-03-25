@@ -91,6 +91,7 @@ public class RedisService {
                     jedis.set("keySentenceCursor", cursor);
                     jedis.set("keySentenceList", "[]");
                     jedis.set("questionAnswerList", "[]");
+                    jedis.set("backgroundList","[]");
                     break;
                 }
             }
@@ -167,6 +168,9 @@ public class RedisService {
                     List<QuestionAnswer> questionAnswerList = new Gson().fromJson(jedis.get("questionAnswerList"), new TypeToken<List<QuestionAnswer>>() {
                     }.getType());
                     discussInfo.setQuestionAnswerList(questionAnswerList);
+
+                    String backgroundListJson = jedis.get("backgroundList");
+                    discussInfo.setBackgroundList(new Gson().fromJson(backgroundListJson, new TypeToken<List<String>>(){}.getType()));
                     return discussInfo;
                 }
             }
@@ -543,6 +547,37 @@ public class RedisService {
                             throw new IllegalArgumentException("未知的麦克风类型: " + micType);
                     }
                     jedis.set(key, new Gson().toJson(sentences));
+                    break;
+                }
+            }
+        }
+    }
+
+    public List<String> getBackground(String discussId) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    // 从Redis中获取backgroundList,并转换为List<String>返回
+                    String backgroundListJson = jedis.get("backgroundList");
+                    return new Gson().fromJson(backgroundListJson, new TypeToken<List<String>>(){}.getType());
+                }
+            }
+            // 如果没有找到对应的discussId,返回一个空列表
+            return new ArrayList<>();
+        }
+    }
+
+    public void setBackground(String discussId, List<String> backgroundList) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    // 将backgroundList转换为JSON字符串,并保存到Redis中
+                    String backgroundListJson = new Gson().toJson(backgroundList);
+                    jedis.set("backgroundList", backgroundListJson);
                     break;
                 }
             }

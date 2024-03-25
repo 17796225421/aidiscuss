@@ -18,7 +18,8 @@ public class DiscussInfo {
     private Cursor keySentenceCursor;
     private List<String> keyWordList;
     private List<String> keySentenceList;
-    private List<QuestionAnswer>questionAnswerList;
+    private List<QuestionAnswer> questionAnswerList;
+    private List<String> backgroundList;
 
     public DiscussInfo() {
         startTimeList = new ArrayList<>();
@@ -27,7 +28,8 @@ public class DiscussInfo {
         timeSlicedSummaryList = new ArrayList<>();
         keyWordList = new ArrayList<>();
         keySentenceList = new ArrayList<>();
-        questionAnswerList=new ArrayList<>();
+        questionAnswerList = new ArrayList<>();
+        backgroundList = new ArrayList<>();
     }
 
     public String getDiscussId() {
@@ -148,5 +150,13 @@ public class DiscussInfo {
 
     public void setQuestionAnswerList(List<QuestionAnswer> questionAnswerList) {
         this.questionAnswerList = questionAnswerList;
+    }
+
+    public List<String> getBackgroundList() {
+        return backgroundList;
+    }
+
+    public void setBackgroundList(List<String> backgroundList) {
+        this.backgroundList = backgroundList;
     }
 }
