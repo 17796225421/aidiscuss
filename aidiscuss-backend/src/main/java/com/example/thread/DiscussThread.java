@@ -8,6 +8,7 @@ public class DiscussThread {
     private MicThread virtualMicThread;
     private SegmentSummaryThread segmentSummaryThread;
     private SegmentQuestionThread segmentQuestionThread;
+    private SegmentUnderstandThread segmentUnderstandThread;
     private TimeSlicedSummaryThread timeSlicedSummaryThread;
     private KeyWordThread keyWordThread;
     private KeySentenceThread keySentenceThread;
@@ -19,6 +20,7 @@ public class DiscussThread {
         this.virtualMicThread = new MicThread(discussId, MicTypeEnum.VIRTUAL);
         this.segmentSummaryThread = new SegmentSummaryThread(discussId);
         this.segmentQuestionThread = new SegmentQuestionThread(discussId);
+        this.segmentUnderstandThread = new SegmentUnderstandThread(discussId);
         this.timeSlicedSummaryThread = new TimeSlicedSummaryThread(discussId);
         this.keyWordThread=new KeyWordThread(discussId);
         this.keySentenceThread=new KeySentenceThread(discussId);
@@ -32,6 +34,7 @@ public class DiscussThread {
         virtualMicThread.start();
         segmentSummaryThread.start();
         segmentQuestionThread.start();
+        segmentUnderstandThread.start();
         timeSlicedSummaryThread.start();
         keyWordThread.start();
         keySentenceThread.start();
@@ -44,6 +47,7 @@ public class DiscussThread {
         virtualMicThread.stopRunning();
         segmentSummaryThread.stopRunning();
         segmentQuestionThread.stopRunning();
+        segmentUnderstandThread.stopRunning();
         timeSlicedSummaryThread.stopRunning();
         keyWordThread.stopRunning();
         keySentenceThread.stopRunning();
