@@ -10,6 +10,7 @@ public class DiscussThread {
     private TimeSlicedSummaryThread timeSlicedSummaryThread;
     private KeyWordThread keyWordThread;
     private KeySentenceThread keySentenceThread;
+    private SentenceSummaryThread sentenceSummaryThread;
 
     public DiscussThread(String discussId) {
         this.externMicThread = new MicThread(discussId, MicTypeEnum.EXTERN);
@@ -19,6 +20,7 @@ public class DiscussThread {
         this.timeSlicedSummaryThread = new TimeSlicedSummaryThread(discussId);
         this.keyWordThread=new KeyWordThread(discussId);
         this.keySentenceThread=new KeySentenceThread(discussId);
+        this.sentenceSummaryThread=new SentenceSummaryThread(discussId);
     }
 
 
@@ -30,6 +32,7 @@ public class DiscussThread {
         timeSlicedSummaryThread.start();
         keyWordThread.start();
         keySentenceThread.start();
+        sentenceSummaryThread.start();
     }
 
     public void stop() {
@@ -40,5 +43,6 @@ public class DiscussThread {
         timeSlicedSummaryThread.stopRunning();
         keyWordThread.stopRunning();
         keySentenceThread.stopRunning();
+        sentenceSummaryThread.stopRunning();
     }
 }

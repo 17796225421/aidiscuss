@@ -3,10 +3,12 @@ package com.example.model;
 public class Sentence {
     private String text;
     private String beginTime;
+    private String summary;
 
     public Sentence(String text, String beginTime) {
         this.text = text;
         this.beginTime = beginTime;
+        this.summary = "";
     }
 
     public String getText() {
@@ -25,4 +27,11 @@ public class Sentence {
         this.beginTime = beginTime;
     }
 
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
 }

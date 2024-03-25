@@ -90,7 +90,7 @@ public class RedisService {
                     jedis.set("keyWordList", "[]");
                     jedis.set("keySentenceCursor", cursor);
                     jedis.set("keySentenceList", "[]");
-                    jedis.set("questionAnswerList","[]");
+                    jedis.set("questionAnswerList", "[]");
                     break;
                 }
             }
@@ -510,6 +510,39 @@ public class RedisService {
 
                     questionAnswerList.add(questionAnswer);
                     jedis.set("questionAnswerList", new Gson().toJson(questionAnswerList));
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * 将指定类型的Sentences对象序列化为JSON字符串并存储到Redis中
+     * @param discussId 讨论ID
+     * @param micType 麦克风类型
+     * @param sentences Sentences对象
+     */
+    public void setMicSentences(String discussId, MicTypeEnum micType, Sentences sentences) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    String key;
+                    switch (micType) {
+                        case EXTERN:
+                            key = "externMicSentences";
+                            break;
+                        case WIRE:
+                            key = "wireMicSentences";
+                            break;
+                        case VIRTUAL:
+                            key = "virtualMicSentences";
+                            break;
+                        default:
+                            throw new IllegalArgumentException("未知的麦克风类型: " + micType);
+                    }
+                    jedis.set(key, new Gson().toJson(sentences));
                     break;
                 }
             }
