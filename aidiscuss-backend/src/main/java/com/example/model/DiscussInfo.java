@@ -21,6 +21,7 @@ public class DiscussInfo {
     // 片段理解列表
     private List<String> segmentUnderstandList;
     private List<String> segmentRemarkList;
+    private List<String> segmentRestateList;
     // 时间切片总结列表
     private List<String> timeSlicedSummaryList;
     // 关键词列表
@@ -42,6 +43,7 @@ public class DiscussInfo {
     // 片段理解游标
     private int segmentUnderstandCursor;
     private int segmentRemarkCursor;
+    private int segmentRestateCursor;
     // 时间切片总结游标
     private int timeSlicedSummaryCursor;
     // 关键词游标
@@ -57,6 +59,7 @@ public class DiscussInfo {
         segmentQuestionList = new ArrayList<>();
         segmentUnderstandList = new ArrayList<>();
         segmentRemarkList = new ArrayList<>();
+        segmentRestateList = new ArrayList<>();
         timeSlicedSummaryList = new ArrayList<>();
         keyWordList = new ArrayList<>();
         keySentenceList = new ArrayList<>();
@@ -254,5 +257,21 @@ public class DiscussInfo {
 
     public void setSegmentRemarkCursor(int segmentRemarkCursor) {
         this.segmentRemarkCursor = segmentRemarkCursor;
+    }
+
+    public List<String> getSegmentRestateList() {
+        return segmentRestateList;
+    }
+
+    public void setSegmentRestateList(List<String> segmentRestateList) {
+        this.segmentRestateList = segmentRestateList;
+    }
+
+    public int getSegmentRestateCursor() {
+        return segmentRestateCursor;
+    }
+
+    public void setSegmentRestateCursor(int segmentRestateCursor) {
+        this.segmentRestateCursor = segmentRestateCursor;
     }
 }

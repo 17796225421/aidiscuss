@@ -23,33 +23,34 @@ public class GptService {
 
 
     public String requestGpt3(String model, String system, String user) throws IOException {
-        // 构建JSON请求体
-        JsonObject jsonObject = buildJsonRequestBody(model, system, user, false);
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
-
-        // 构建请求
-        Request request = new Request.Builder()
-                .url(gpt3Url)
-                .addHeader("Authorization", "Bearer " + gpt3Key)
-                .addHeader("Content-Type", "application/json")
-                .post(requestBody)
-                .build();
-
-        // 发送请求并获取响应
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                throw new IOException("Unexpected code " + response);
-            }
-
-            // 解析响应体
-            String responseBody = response.body().string();
-            JSONObject responseJson = new JSONObject(responseBody);
-
-            // 获取GPT文本
-            String gptContent = responseJson.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content");
-
-            return gptContent;
-        }
+        return "gpt3";
+//        // 构建JSON请求体
+//        JsonObject jsonObject = buildJsonRequestBody(model, system, user, false);
+//        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
+//
+//        // 构建请求
+//        Request request = new Request.Builder()
+//                .url(gpt3Url)
+//                .addHeader("Authorization", "Bearer " + gpt3Key)
+//                .addHeader("Content-Type", "application/json")
+//                .post(requestBody)
+//                .build();
+//
+//        // 发送请求并获取响应
+//        try (Response response = client.newCall(request).execute()) {
+//            if (!response.isSuccessful()) {
+//                throw new IOException("Unexpected code " + response);
+//            }
+//
+//            // 解析响应体
+//            String responseBody = response.body().string();
+//            JSONObject responseJson = new JSONObject(responseBody);
+//
+//            // 获取GPT文本
+//            String gptContent = responseJson.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content");
+//
+//            return gptContent;
+//        }
     }
 
     public String requestGpt4(String model, String system, String user) throws IOException {
