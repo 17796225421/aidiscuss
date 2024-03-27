@@ -1,15 +1,10 @@
 package com.example.model;
 
-public class Sentencetmp {
-    private String text;
-    private String beginTime;
-    private String summary;
-
-    public Sentencetmp(String text, String beginTime) {
-        this.text = text;
-        this.beginTime = beginTime;
-        this.summary = "";
-    }
+public class Sentence {
+    String text;
+    String beginTime;
+    MicTypeEnum micTypeEnum;
+    String summary;
 
     public String getText() {
         return text;
@@ -25,6 +20,14 @@ public class Sentencetmp {
 
     public void setBeginTime(String beginTime) {
         this.beginTime = beginTime;
+    }
+
+    public MicTypeEnum getMicTypeEnum() {
+        return micTypeEnum;
+    }
+
+    public void setMicTypeEnum(MicTypeEnum micTypeEnum) {
+        this.micTypeEnum = micTypeEnum;
     }
 
     public String getSummary() {

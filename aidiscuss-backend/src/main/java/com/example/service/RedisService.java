@@ -8,29 +8,33 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RedisService {
-    // 使用volatile保证多线程环境下的可见性
-    private static volatile RedisService instance;
     private JedisPool jedisPool;
 
-    private RedisService() {
+    public RedisService() {
         // 这里需要根据实际情况初始化jedisPool
         jedisPool = new JedisPool("localhost", 6379);
     }
 
-    // 使用双重检查锁优化getInstance()方法
-    public static RedisService getInstance() {
-        if (instance == null) {
-            synchronized (RedisService.class) {
-                if (instance == null) {
-                    instance = new RedisService();
+    private Jedis findDiscussDatabase(String discussId) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            List<String> configGetResult = jedis.configGet("databases");
+            int dbCount = Integer.parseInt(configGetResult.get(1));
+            for (int i = 0; i < dbCount; i++) {
+                jedis.select(i);
+                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
+                    return jedis;
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return instance;
+        return null;
     }
 
     public List<String> getAllDiscussId() {
@@ -74,28 +78,28 @@ public class RedisService {
                 if (jedis.dbSize() == 0) {
                     jedis.set("discussId", discussInfo.getDiscussId());
                     jedis.set("discussName", discussInfo.getDiscussName());
-                    String sentences = new Gson().toJson(new Sentencestmp());
-                    jedis.set("externMicSentences", sentences);
-                    jedis.set("wireMicSentences", sentences);
-                    jedis.set("virtualMicSentences", sentences);
-                    jedis.set("startTimeList", "");
-                    jedis.set("stopTimeList", "");
-                    jedis.set("discussStatus", String.valueOf(DiscussStatusEnum.CREATED.getValue()));
-                    String cursor = new Gson().toJson(new Cursor());
-                    jedis.set("segmentSummaryCursor", cursor);
-                    jedis.set("segmentSummaryList", "[]");
-                    jedis.set("segmentQuestionCursor", cursor);
-                    jedis.set("segmentQuestionList", "[]");
-                    jedis.set("segmentUnderstandCursor", cursor);
-                    jedis.set("segmentUnderstandList", "[]");
-                    jedis.set("timeSlicedSummaryCursor", cursor);
-                    jedis.set("timeSlicedSummaryList", "[]");
-                    jedis.set("keyWordCursor", cursor);
-                    jedis.set("keyWordList", "[]");
-                    jedis.set("keySentenceCursor", cursor);
-                    jedis.set("keySentenceList", "[]");
-                    jedis.set("questionAnswerList", "[]");
-                    jedis.set("backgroundList","[]");
+                    jedis.set("discussStatus", String.valueOf(discussInfo.getDiscussStatus()));
+
+                    jedis.del("sentenceList");
+                    jedis.del("startTimeList");
+                    jedis.del("stopTimeList");
+                    jedis.del("segmentSummaryList");
+                    jedis.del("segmentQuestionList");
+                    jedis.del("segmentUnderstandList");
+                    jedis.del("timeSlicedSummaryList");
+                    jedis.del("keyWordList");
+                    jedis.del("keySentenceList");
+                    jedis.del("backgroundList");
+                    jedis.del("questionAnswerList"); // 删除原来可能存在的数据
+
+                    jedis.set("segmentSummaryCursor", "0");
+                    jedis.set("segmentCorrectCursor", "0");
+                    jedis.set("sentenceSummaryCursor", "0");
+                    jedis.set("segmentQuestionCursor", "0");
+                    jedis.set("segmentUnderstandCursor", "0");
+                    jedis.set("timeSlicedSummaryCursor", "0");
+                    jedis.set("keyWordCursor", "0");
+                    jedis.set("keySentenceCursor", "0");
                     break;
                 }
             }
@@ -103,592 +107,290 @@ public class RedisService {
     }
 
     public DiscussInfo getDiscussInfo(String discussId) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    String discussName = jedis.get("discussName");
-                    DiscussInfo discussInfo = new DiscussInfo();
-                    discussInfo.setDiscussId(discussId);
-                    discussInfo.setDiscussName(discussName);
+        Jedis jedis = findDiscussDatabase(discussId);
+        DiscussInfo discussInfo = new DiscussInfo();
 
-                    // 将startTimeList和stopTimeList从JSON字符串转换为List<String>
-                    String startTimeListJson = jedis.get("startTimeList");
-                    String stopTimeListJson = jedis.get("stopTimeList");
+        discussInfo.setDiscussId(jedis.get("discussId"));
+        discussInfo.setDiscussName(jedis.get("discussName"));
+        discussInfo.setDiscussStatus(Integer.parseInt(jedis.get("discussStatus")));
 
-                    List<String> startTimeList = startTimeListJson == null || startTimeListJson.isEmpty() ?
-                            new ArrayList<>() : new Gson().fromJson(startTimeListJson, new TypeToken<List<String>>() {
-                    }.getType());
-                    List<String> stopTimeList = stopTimeListJson == null || stopTimeListJson.isEmpty() ?
-                            new ArrayList<>() : new Gson().fromJson(stopTimeListJson, new TypeToken<List<String>>() {
-                    }.getType());
+        List<String> sentenceJsonList = jedis.lrange("sentenceList", 0, -1);
+        List<Sentence> sentenceList = sentenceJsonList.stream()
+                .map(json -> new Gson().fromJson(json, Sentence.class))
+                .collect(Collectors.toList());
+        discussInfo.setSentenceList(sentenceList);
+        discussInfo.setStartTimeList(jedis.lrange("startTimeList", 0, -1));
+        discussInfo.setStopTimeList(jedis.lrange("stopTimeList", 0, -1));
+        discussInfo.setSegmentSummaryList(jedis.lrange("segmentSummaryList", 0, -1));
+        discussInfo.setSegmentQuestionList(jedis.lrange("segmentQuestionList", 0, -1));
+        discussInfo.setSegmentUnderstandList(jedis.lrange("segmentUnderstandList", 0, -1));
+        discussInfo.setTimeSlicedSummaryList(jedis.lrange("timeSlicedSummaryList", 0, -1));
+        discussInfo.setKeyWordList(jedis.lrange("keyWordList", 0, -1));
+        discussInfo.setKeySentenceList(jedis.lrange("keySentenceList", 0, -1));
+        discussInfo.setBackgroundList(jedis.lrange("backgroundList", 0, -1));
+        List<String> questionAnswerJsonList = jedis.lrange("questionAnswerList", 0, -1);
+        List<QuestionAnswer> questionAnswerList = questionAnswerJsonList.stream()
+                .map(json -> new Gson().fromJson(json, QuestionAnswer.class))
+                .collect(Collectors.toList());
+        discussInfo.setQuestionAnswerList(questionAnswerList);
 
-                    // 设置DiscussInfo中的startTimeList和stopTimeList
-                    discussInfo.setStartTimeList(startTimeList);
-                    discussInfo.setStopTimeList(stopTimeList);
+        discussInfo.setSegmentSummaryCursor(Integer.parseInt(jedis.get("segmentSummaryCursor")));
+        discussInfo.setSegmentCorrectCursor(Integer.parseInt(jedis.get("segmentCorrectCursor")));
+        discussInfo.setSentenceSummaryCursor(Integer.parseInt(jedis.get("sentenceSummaryCursor")));
+        discussInfo.setSegmentQuestionCursor(Integer.parseInt(jedis.get("segmentQuestionCursor")));
+        discussInfo.setSegmentUnderstandCursor(Integer.parseInt(jedis.get("segmentUnderstandCursor")));
+        discussInfo.setTimeSlicedSummaryCursor(Integer.parseInt(jedis.get("timeSlicedSummaryCursor")));
+        discussInfo.setKeyWordCursor(Integer.parseInt(jedis.get("keyWordCursor")));
+        discussInfo.setKeySentenceCursor(Integer.parseInt(jedis.get("keySentenceCursor")));
 
-                    // 处理其他相关信息
-                    MicSentencestmp micSentencestmp = new MicSentencestmp();
-                    Sentencestmp externMicSentencestmp = new Gson().fromJson(jedis.get("externMicSentencestmp"), Sentencestmp.class);
-                    Sentencestmp wireMicSentencestmp = new Gson().fromJson(jedis.get("wireMicSentencestmp"), Sentencestmp.class);
-                    Sentencestmp virtualMicSentencestmp = new Gson().fromJson(jedis.get("virtualMicSentencestmp"), Sentencestmp.class);
-                    micSentencestmp.setExternMicSentences(externMicSentencestmp);
-                    micSentencestmp.setWireMicSentences(wireMicSentencestmp);
-                    micSentencestmp.setVirtualMicSentences(virtualMicSentencestmp);
-                    discussInfo.setMicSentences(micSentencestmp);
-                    String discussStatus = jedis.get("discussStatus");
-                    if (discussStatus != null) {
-                        discussInfo.setDiscussStatus(Integer.parseInt(discussStatus));
-
-                    }
-
-                    Cursor segmentSummaryCursor = new Gson().fromJson(jedis.get("segmentSummaryCursor"), Cursor.class);
-                    discussInfo.setSegmentSummaryCursor(segmentSummaryCursor);
-
-                    List<String> segmentSummaryList = new Gson().fromJson(jedis.get("segmentSummaryList"), new TypeToken<List<String>>() {
-                    }.getType());
-                    discussInfo.setSegmentSummaryList(segmentSummaryList);
-
-                    Cursor segmentQuestionCursor = new Gson().fromJson(jedis.get("segmentQuestionCursor"), Cursor.class);
-                    discussInfo.setSegmentQuestionCursor(segmentQuestionCursor);
-
-                    List<String> segmentQuestionList = new Gson().fromJson(jedis.get("segmentQuestionList"), new TypeToken<List<String>>() {
-                    }.getType());
-                    discussInfo.setSegmentQuestionList(segmentQuestionList);
-
-                    Cursor segmentUnderstandCursor = new Gson().fromJson(jedis.get("segmentUnderstandCursor"), Cursor.class);
-                    discussInfo.setSegmentUnderstandCursor(segmentUnderstandCursor);
-
-                    List<String> segmentUnderstandList = new Gson().fromJson(jedis.get("segmentUnderstandList"), new TypeToken<List<String>>() {
-                    }.getType());
-                    discussInfo.setSegmentUnderstandList(segmentUnderstandList);
-
-                    Cursor timeSlicedSummaryCursor = new Gson().fromJson(jedis.get("timeSlicedSummaryCursor"), Cursor.class);
-                    discussInfo.setTimeSlicedSummaryCursor(timeSlicedSummaryCursor);
-
-                    List<String> timeSlicedSummaryList = new Gson().fromJson(jedis.get("timeSlicedSummaryList"), new TypeToken<List<String>>() {
-                    }.getType());
-                    discussInfo.setTimeSlicedSummaryList(timeSlicedSummaryList);
-
-                    Cursor keyWordCursor = new Gson().fromJson(jedis.get("keyWordCursor"), Cursor.class);
-                    discussInfo.setKeyWordCursor(keyWordCursor);
-                    List<String> keyWordList = new Gson().fromJson(jedis.get("keyWordList"), new TypeToken<List<String>>() {
-                    }.getType());
-                    discussInfo.setKeyWordList(keyWordList);
-
-                    Cursor keySentenceCursor = new Gson().fromJson(jedis.get("keySentenceCursor"), Cursor.class);
-                    discussInfo.setKeySentenceCursor(keySentenceCursor);
-                    List<String> keySentenceList = new Gson().fromJson(jedis.get("keySentenceList"), new TypeToken<List<String>>() {
-                    }.getType());
-                    discussInfo.setKeySentenceList(keySentenceList);
-
-                    List<QuestionAnswer> questionAnswerList = new Gson().fromJson(jedis.get("questionAnswerList"), new TypeToken<List<QuestionAnswer>>() {
-                    }.getType());
-                    discussInfo.setQuestionAnswerList(questionAnswerList);
-
-                    String backgroundListJson = jedis.get("backgroundList");
-                    discussInfo.setBackgroundList(new Gson().fromJson(backgroundListJson, new TypeToken<List<String>>(){}.getType()));
-                    return discussInfo;
-                }
-            }
-            return null;
-        }
+        return discussInfo;
     }
 
     public void clearDiscuss(String discussId) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    jedis.flushDB();
-                    break;
-                }
-            }
-        }
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.flushDB();
     }
 
-    public void AddMicSentence(String discussId, MicTypeEnum micTypeEnum, Sentencetmp sentencetmp) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    String micName;
-                    if (micTypeEnum == MicTypeEnum.EXTERN) {
-                        micName = "extern";
-                    } else if (micTypeEnum == MicTypeEnum.WIRE) {
-                        micName = "wire";
-                    } else {
-                        micName = "virtual";
-                    }
-                    String key = micName + "MicSentencestmp";
-                    Sentencestmp sentencestmp;
-                    String sentencesJson = jedis.get(key);
-                    if (sentencesJson != null && !sentencesJson.isEmpty()) {
-                        // 如果 sentencesJson 不为 null,则解析为 Sentencestmp 对象
-                        sentencestmp = new Gson().fromJson(sentencesJson, Sentencestmp.class);
-                    } else {
-                        // 如果 sentencesJson 为 null,则创建一个新的 Sentencestmp 对象
-                        sentencestmp = new Sentencestmp();
-                    }
-                    sentencestmp.addSentence(sentencetmp);
-                    jedis.set(key, new Gson().toJson(sentencestmp));
-                    break;
-                }
-            }
-        }
+    public void addSentence(String discussId, Sentence sentence) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        String sentenceJson = new Gson().toJson(sentence);
+        jedis.rpush("sentenceList", sentenceJson);
     }
 
-    public String getExternMicSentences(String discussId) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    // 直接返回对应的字符串数据
-                    return jedis.get("externMicSentences");
-                }
-            }
-            return "";
+    public List<Sentence> getSentences(String discussId) {
+        List<Sentence> sentenceList = new ArrayList<>();
+        Jedis jedis = findDiscussDatabase(discussId);
+        List<String> sentenceJsonList = jedis.lrange("sentenceList", 0, -1);
+        for (String sentenceJson : sentenceJsonList) {
+            Sentence sentence = new Gson().fromJson(sentenceJson, Sentence.class);
+            sentenceList.add(sentence);
         }
+        return sentenceList;
     }
 
-    public String getWireMicSentences(String discussId) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    // 直接返回对应的字符串数据
-                    return jedis.get("wireMicSentences");
-                }
-            }
-            return "";
-        }
+    public void addStartTime(String discussId, String startTime) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.rpush("startTimeList", startTime);
     }
 
-    public String getVirtualMicSentences(String discussId) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    // 直接返回对应的字符串数据
-                    return jedis.get("virtualMicSentences");
-                }
-            }
-            return "";
-        }
-    }
-
-
-    public void updateStartTimeList(String discussId, List<String> startTimeList) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    // 将startTimeList转换为JSON字符串
-                    String startTimeListJson = new Gson().toJson(startTimeList);
-                    // 更新Redis中的startTimeList
-                    jedis.set("startTimeList", startTimeListJson);
-                    break;
-                }
-            }
-        }
-    }
-
-    public void updateStopTimeList(String discussId, List<String> stopTimeList) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    // 将stopTimeList转换为JSON字符串
-                    String stopTimeListJson = new Gson().toJson(stopTimeList);
-                    // 更新Redis中的stopTimeList
-                    jedis.set("stopTimeList", stopTimeListJson);
-                    break;
-                }
-            }
-        }
+    public void addStopTime(String discussId, String stopTime) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.rpush("stopTimeList", stopTime);
     }
 
     public void updateDiscussStatus(String discussId, DiscussStatusEnum discussStatusEnum) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    jedis.set("discussStatus", String.valueOf(discussStatusEnum.getValue()));
-                    break;
-                }
-            }
-        }
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.set("discussStatus", String.valueOf(discussStatusEnum.getValue()));
     }
 
-    public Cursor getSegmentSummaryCursor(String discussId) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    return new Gson().fromJson(jedis.get("segmentSummaryCursor"), Cursor.class);
-                }
-            }
-            return null;
-        }
+    public int getSegmentSummaryCursor(String discussId) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        return Integer.parseInt(jedis.get("segmentSummaryCursor"));
     }
 
-    public Cursor getTimeSlicedSummaryCursor(String discussId) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    return new Gson().fromJson(jedis.get("timeSlicedSummaryCursor"), Cursor.class);
-                }
-            }
-            return null;
-        }
+    public int getTimeSlicedSummaryCursor(String discussId) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        return Integer.parseInt(jedis.get("timeSlicedSummaryCursor"));
     }
 
-
-    public void setSegmentSummaryCursor(String discussId, Cursor segmentSummaryCursor) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    jedis.set("segmentSummaryCursor", new Gson().toJson(segmentSummaryCursor));
-                    break;
-                }
-            }
-        }
+    public void setSegmentSummaryCursor(String discussId, int segmentSummaryCursor) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.set("segmentSummaryCursor", String.valueOf(segmentSummaryCursor));
     }
 
-    public void setTimeSlicedSummaryCursor(String discussId, Cursor timeSlicedSummaryCursor) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    jedis.set("timeSlicedSummaryCursor", new Gson().toJson(timeSlicedSummaryCursor));
-                    break;
-                }
-            }
-        }
+    public void setTimeSlicedSummaryCursor(String discussId, int timeSlicedSummaryCursor) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.set("timeSlicedSummaryCursor", String.valueOf(timeSlicedSummaryCursor));
     }
 
     public void addSegmentSummary(String discussId, String segmentSummary) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    // 获取 segmentSummaryList 的 JSON 字符串
-                    List<String> segmentSummaryList = new Gson().fromJson(jedis.get("segmentSummaryList"), new TypeToken<List<String>>() {
-                    }.getType());
-
-                    segmentSummaryList.add(segmentSummary);
-
-                    jedis.set("segmentSummaryList", new Gson().toJson(segmentSummaryList));
-
-                    break;
-                }
-            }
-        }
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.rpush("segmentSummaryList", segmentSummary);
     }
 
     public void addTimeSlicedSummary(String discussId, String timeSlicedSummary) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    List<String> timeSlicedSummaryList = new Gson().fromJson(jedis.get("timeSlicedSummaryList"), new TypeToken<List<String>>() {
-                    }.getType());
-
-                    timeSlicedSummaryList.add(timeSlicedSummary);
-
-                    jedis.set("timeSlicedSummaryList", new Gson().toJson(timeSlicedSummaryList));
-
-                    break;
-                }
-            }
-        }
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.rpush("timeSlicedSummaryList", timeSlicedSummary);
     }
 
-    public Cursor getKeyWordCursor(String discussId) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    return new Gson().fromJson(jedis.get("keyWordCursor"), Cursor.class);
-                }
-            }
-            return null;
+    public int getKeyWordCursor(String discussId) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        if (jedis != null) {
+            String cursor = jedis.get("keyWordCursor");
+            return Integer.parseInt(cursor);
         }
+        return 0;
     }
 
-    public Cursor getKeySentenceCursor(String discussId) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    return new Gson().fromJson(jedis.get("keySentenceCursor"), Cursor.class);
-                }
-            }
-            return null;
+    public int getKeySentenceCursor(String discussId) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        if (jedis != null) {
+            String cursor = jedis.get("keySentenceCursor");
+            return Integer.parseInt(cursor);
         }
+        return 0;
     }
 
-    public void setKeyWordCursor(String discussId, Cursor keyWordCursor) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    jedis.set("keyWordCursor", new Gson().toJson(keyWordCursor));
-                    break;
-                }
-            }
-        }
+    public void setKeyWordCursor(String discussId, int keyWordCursor) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.set("keyWordCursor", String.valueOf(keyWordCursor));
     }
 
-    public void setKeySentenceCursor(String discussId, Cursor keySentenceCursor) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    jedis.set("keySentenceCursor", new Gson().toJson(keySentenceCursor));
-                    break;
-                }
-            }
-        }
+    public void setKeySentenceCursor(String discussId, int keySentenceCursor) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.set("keySentenceCursor", String.valueOf(keySentenceCursor));
     }
 
     public void addKeyWordList(String discussId, List<String> newKeyWordList) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    List<String> keyWordList = new Gson().fromJson(jedis.get("keyWordList"), new TypeToken<List<String>>() {
-                    }.getType());
-
-                    keyWordList.addAll(newKeyWordList);
-                    jedis.set("keyWordList", new Gson().toJson(keyWordList));
-                    break;
-                }
-            }
+        Jedis jedis = findDiscussDatabase(discussId);
+        for (String newKeyWord : newKeyWordList) {
+            jedis.rpush("keyWordList", newKeyWord);
         }
     }
 
     public void addKeySentenceList(String discussId, List<String> newKeySentenceList) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    List<String> keySentenceList = new Gson().fromJson(jedis.get("keySentenceList"), new TypeToken<List<String>>() {
-                    }.getType());
-
-                    keySentenceList.addAll(newKeySentenceList);
-                    jedis.set("keySentenceList", new Gson().toJson(keySentenceList));
-                    break;
-                }
-            }
+        Jedis jedis = findDiscussDatabase(discussId);
+        for (String newKeySentence : newKeySentenceList) {
+            jedis.rpush("keySentenceList", newKeySentence);
         }
     }
 
     public List<QuestionAnswer> getQuestionAnswerList(String discussId) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    return new Gson().fromJson(jedis.get("questionAnswerList"), new TypeToken<List<QuestionAnswer>>() {
-                    }.getType());
-                }
-            }
-            return null;
+        List<QuestionAnswer> questionAnswerList = new ArrayList<>();
+        Jedis jedis = findDiscussDatabase(discussId);
+        List<String> questionAnswerJsonList = jedis.lrange("questionAnswerList", 0, -1);
+        for (String questionAnswerJson : questionAnswerJsonList) {
+            QuestionAnswer questionAnswer = new Gson().fromJson(questionAnswerJson, QuestionAnswer.class);
+            questionAnswerList.add(questionAnswer);
         }
+        return questionAnswerList;
     }
 
     public void addQuestionAnswer(String discussId, QuestionAnswer questionAnswer) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    List<QuestionAnswer> questionAnswerList = new Gson().fromJson(jedis.get("questionAnswerList"), new TypeToken<List<QuestionAnswer>>() {
-                    }.getType());
-
-                    questionAnswerList.add(questionAnswer);
-                    jedis.set("questionAnswerList", new Gson().toJson(questionAnswerList));
-                    break;
-                }
-            }
-        }
+        Jedis jedis = findDiscussDatabase(discussId);
+        String questionAnswerJson = new Gson().toJson(questionAnswer);
+        jedis.rpush("questionAnswerList", questionAnswerJson);
     }
 
-    /**
-     * 将指定类型的Sentences对象序列化为JSON字符串并存储到Redis中
-     * @param discussId 讨论ID
-     * @param micType 麦克风类型
-     * @param sentencestmp Sentences对象
-     */
-    public void setMicSentences(String discussId, MicTypeEnum micType, Sentencestmp sentencestmp) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    String key;
-                    switch (micType) {
-                        case EXTERN:
-                            key = "externMicSentences";
-                            break;
-                        case WIRE:
-                            key = "wireMicSentences";
-                            break;
-                        case VIRTUAL:
-                            key = "virtualMicSentences";
-                            break;
-                        default:
-                            throw new IllegalArgumentException("未知的麦克风类型: " + micType);
-                    }
-                    jedis.set(key, new Gson().toJson(sentencestmp));
-                    break;
-                }
-            }
-        }
+    public List<String> getBackgroundList(String discussId) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        return jedis.lrange("backgroundList", 0, -1);
     }
 
-    public List<String> getBackground(String discussId) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    // 从Redis中获取backgroundList,并转换为List<String>返回
-                    String backgroundListJson = jedis.get("backgroundList");
-                    return new Gson().fromJson(backgroundListJson, new TypeToken<List<String>>(){}.getType());
-                }
-            }
-            // 如果没有找到对应的discussId,返回一个空列表
-            return new ArrayList<>();
-        }
+    public void addBackground(String discussId, String background) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.rpush("backgroundList", background);
     }
 
-    public void setBackground(String discussId, List<String> backgroundList) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    // 将backgroundList转换为JSON字符串,并保存到Redis中
-                    String backgroundListJson = new Gson().toJson(backgroundList);
-                    jedis.set("backgroundList", backgroundListJson);
-                    break;
-                }
-            }
+    public void setBackground(String discussId, int index, String background) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        long backgroundListLen = jedis.llen("backgroundList");
+        if (index < 0 || index >= backgroundListLen) {
+            return;
         }
+        jedis.lset("backgroundList", index, background);
+    }
+    public void deleteBackground(String discussId, int index) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        long backgroundListLen = jedis.llen("backgroundList");
+        if (index < 0 || index >= backgroundListLen) {
+            return;
+        }
+        String elementToRemove = jedis.lindex("backgroundList", index);
+        jedis.lrem("backgroundList", 0, elementToRemove);
     }
 
-    public Cursor getSegmentQuestionCursor(String discussId) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    return new Gson().fromJson(jedis.get("segmentQuestionCursor"), Cursor.class);
-                }
-            }
-            return null;
-        }
+    public int getSegmentQuestionCursor(String discussId) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        return Integer.parseInt(jedis.get("segmentQuestionCursor"));
     }
 
     public void addSegmentQuestion(String discussId, String segmentQuestion) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    List<String> segmentQuestionList = new Gson().fromJson(jedis.get("segmentQuestionList"), new TypeToken<List<String>>() {
-                    }.getType());
-
-                    segmentQuestionList.add(segmentQuestion);
-
-                    jedis.set("segmentQuestionList", new Gson().toJson(segmentQuestionList));
-
-                    break;
-                }
-            }
-        }
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.rpush("segmentQuestionList", segmentQuestion);
     }
 
-    public void setSegmentQuestionCursor(String discussId, Cursor segmentQuestionCursor) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    jedis.set("segmentQuestionCursor", new Gson().toJson(segmentQuestionCursor));
-                    break;
-                }
-            }
-        }
+    public void setSegmentQuestionCursor(String discussId, int segmentQuestionCursor) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.set("segmentQuestionCursor", String.valueOf(segmentQuestionCursor));
     }
 
-    public Cursor getSegmentUnderstandCursor(String discussId) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    return new Gson().fromJson(jedis.get("segmentQuestionCursor"), Cursor.class);
-                }
-            }
-            return null;
-        }
+    public int getSegmentUnderstandCursor(String discussId) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        return Integer.parseInt(jedis.get("segmentQuestionCursor"));
     }
 
     public void addSegmentUnderstand(String discussId, String segmentUnderstand) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    List<String> segmentUnderstandList = new Gson().fromJson(jedis.get("segmentUnderstandList"), new TypeToken<List<String>>() {
-                    }.getType());
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.rpush("segmentUnderstandList", segmentUnderstand);
+    }
 
-                    segmentUnderstandList.add(segmentUnderstand);
+    public void setSegmentUnderstandCursor(String discussId, int segmentUnderstandCursor) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.set("segmentUnderstandCursor", String.valueOf(segmentUnderstandCursor));
+    }
 
-                    jedis.set("segmentUnderstandList", new Gson().toJson(segmentUnderstandList));
+    public List<String> getStopTimeList(String discussId) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        return jedis.lrange("stopTimeList", 0, -1);
+    }
 
-                    break;
-                }
-            }
+    public List<String> getStartTimeList(String discussId) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        return jedis.lrange("startTimeList", 0, -1);
+    }
+
+    public int getSentenceSummaryCursor(String discussId) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        return Integer.parseInt(jedis.get("sentenceSummaryCursor"));
+    }
+
+    public void setSentenceSummary(String discussId, int sentenceSummaryCursor, String summary) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        List<String> sentenceJsonList = jedis.lrange("sentenceList", 0, -1);
+        List<Sentence> sentenceList = sentenceJsonList.stream()
+                .map(json -> new Gson().fromJson(json, Sentence.class))
+                .collect(Collectors.toList());
+
+        if (sentenceSummaryCursor >= 0 && sentenceSummaryCursor < sentenceList.size()) {
+            Sentence sentence = sentenceList.get(sentenceSummaryCursor);
+            sentence.setSummary(summary);
+            String updatedJson = new Gson().toJson(sentence);
+            jedis.lset("sentenceList", sentenceSummaryCursor, updatedJson);
         }
     }
 
-    public void setSegmentUnderstandCursor(String discussId, Cursor segmentUnderstandCursor) {
-        try (Jedis jedis = jedisPool.getResource()) {
-            int dbCount = Integer.parseInt(jedis.configGet("databases").get(1));
-            for (int i = 0; i < dbCount; i++) {
-                jedis.select(i);
-                if (jedis.exists("discussId") && jedis.get("discussId").equals(discussId)) {
-                    jedis.set("segmentUnderstandCursor", new Gson().toJson(segmentUnderstandCursor));
-                    break;
-                }
-            }
+    public void setSentenceSummaryCursor(String discussId, int sentenceSummaryCursor) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.set("sentenceSummaryCursor", String.valueOf(sentenceSummaryCursor));
+    }
+
+    public int getSegmentCorrectCursor(String discussId) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        if (jedis != null) {
+            String cursor = jedis.get("segmentCorrectCursor");
+            return Integer.parseInt(cursor);
         }
+        return 0;
+    }
+
+    public void updateSentenceText(String discussId, int index, String sentenceText) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        List<String> sentenceJsonList = jedis.lrange("sentenceList", 0, -1);
+        List<Sentence> sentenceList = sentenceJsonList.stream()
+                .map(json -> new Gson().fromJson(json, Sentence.class))
+                .collect(Collectors.toList());
+
+        if (index >= 0 && index < sentenceList.size()) {
+            Sentence sentence = sentenceList.get(index);
+            sentence.setText(sentenceText);
+            String updatedJson = new Gson().toJson(sentence);
+            jedis.lset("sentenceList", index, updatedJson);
+        }
+    }
+
+    public void setSegmentCorrectCursor(String discussId, int segmentCorrectCursor) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.set("segmentCorrectCursor", String.valueOf(segmentCorrectCursor));
     }
 }

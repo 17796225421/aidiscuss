@@ -2,8 +2,8 @@ package com.example.controller;
 
 import com.example.model.BackgroundRequest;
 import com.example.model.DiscussInfo;
-import com.example.model.QuestionAnswer;
 import com.example.model.QuestionRequest;
+import com.example.model.Sentence;
 import com.example.service.DiscussService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -33,23 +33,10 @@ public class DiscussController {
         return ResponseEntity.ok(discussInfo);
     }
 
-    @MessageMapping("/externMicSentencesConnection/{discussId}")
-    public void externMicSentencesConnection(@DestinationVariable String discussId) throws InterruptedException {
-        String externMicSentences = discussService.getExternMicSentences(discussId);
-        // 将externMicSentences传输到"/topic/externMicSentences/{discussId}"
-        simpMessagingTemplate.convertAndSend("/topic/externMicSentencesConnection/" + discussId, externMicSentences);
-    }
-    @MessageMapping("/wireMicSentencesConnection/{discussId}")
-    public void wireMicSentencesConnection(@DestinationVariable String discussId) throws InterruptedException {
-        String wireMicSentences = discussService.getWireMicSentences(discussId);
-        // 将wireMicSentences传输到"/topic/wireMicSentences/{discussId}"
-        simpMessagingTemplate.convertAndSend("/topic/wireMicSentencesConnection/" + discussId, wireMicSentences);
-    }
-    @MessageMapping("/virtualMicSentencesConnection/{discussId}")
-    public void virtualMicSentencesConnection(@DestinationVariable String discussId) throws InterruptedException {
-        String virtualMicSentences = discussService.getVirtualMicSentences(discussId);
-        // 将virtualMicSentences传输到"/topic/virtualMicSentences/{discussId}"
-        simpMessagingTemplate.convertAndSend("/topic/virtualMicSentencesConnection/" + discussId, virtualMicSentences);
+    @MessageMapping("/sentenceListConnection/{discussId}")
+    public void sentenceListConnection(@DestinationVariable String discussId) {
+        List<Sentence> sentenceList= discussService.getSentences(discussId);
+        simpMessagingTemplate.convertAndSend("/topic/sentenceListConnection/" + discussId, sentenceList);
     }
 
     @PostMapping("/askQuestion")

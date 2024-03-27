@@ -13,6 +13,7 @@ public class DiscussThread {
     private KeyWordThread keyWordThread;
     private KeySentenceThread keySentenceThread;
     private SentenceSummaryThread sentenceSummaryThread;
+    private SegmentCorrectThread segmentCorrectThread;
 
     public DiscussThread(String discussId) {
         this.externMicThread = new MicThread(discussId, MicTypeEnum.EXTERN);
@@ -25,6 +26,7 @@ public class DiscussThread {
         this.keyWordThread=new KeyWordThread(discussId);
         this.keySentenceThread=new KeySentenceThread(discussId);
         this.sentenceSummaryThread=new SentenceSummaryThread(discussId);
+        this.segmentCorrectThread=new SegmentCorrectThread(discussId);
     }
 
 
@@ -39,6 +41,7 @@ public class DiscussThread {
         keyWordThread.start();
         keySentenceThread.start();
         sentenceSummaryThread.start();
+        segmentCorrectThread.start();
     }
 
     public void stop() {
@@ -52,5 +55,6 @@ public class DiscussThread {
         keyWordThread.stopRunning();
         keySentenceThread.stopRunning();
         sentenceSummaryThread.stopRunning();
+        segmentCorrectThread.stopRunning();
     }
 }

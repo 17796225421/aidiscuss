@@ -4,38 +4,61 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DiscussInfo {
+    // 讨论ID
     String discussId;
+    // 讨论名称
     String discussName;
-    MicSentencestmp micSentencestmp;
+    // 句子列表
+    List<Sentence> sentenceList;
+    // 开始时间列表
     private List<String> startTimeList;
+    // 结束时间列表
     private List<String> stopTimeList;
-    int discussStatus;
-    private Cursor segmentSummaryCursor;
-    private Cursor timeSlicedSummaryCursor;
-    private Cursor segmentQuestionCursor;
-    private Cursor segmentUnderstandCursor;
+    // 片段总结列表
     private List<String> segmentSummaryList;
+    // 片段问题列表
     private List<String> segmentQuestionList;
+    // 片段理解列表
     private List<String> segmentUnderstandList;
+    // 时间切片总结列表
     private List<String> timeSlicedSummaryList;
-    private Cursor keyWordCursor;
-    private Cursor keySentenceCursor;
+    // 关键词列表
     private List<String> keyWordList;
+    // 关键句列表
     private List<String> keySentenceList;
-    private List<QuestionAnswer> questionAnswerList;
+    // 背景列表
     private List<String> backgroundList;
+    // 问答列表
+    private List<QuestionAnswer> questionAnswerList;
+    // 讨论状态
+    int discussStatus;
+    // 片段总结游标
+    private int segmentSummaryCursor;
+    private int segmentCorrectCursor;
+    private int sentenceSummaryCursor;
+    // 片段问题游标
+    private int segmentQuestionCursor;
+    // 片段理解游标
+    private int segmentUnderstandCursor;
+    // 时间切片总结游标
+    private int timeSlicedSummaryCursor;
+    // 关键词游标
+    private int keyWordCursor;
+    // 关键句游标
+    private int keySentenceCursor;
 
     public DiscussInfo() {
+        sentenceList = new ArrayList<>();
         startTimeList = new ArrayList<>();
         stopTimeList = new ArrayList<>();
         segmentSummaryList = new ArrayList<>();
-        segmentQuestionList=new ArrayList<>();
-        segmentUnderstandList=new ArrayList<>();
+        segmentQuestionList = new ArrayList<>();
+        segmentUnderstandList = new ArrayList<>();
         timeSlicedSummaryList = new ArrayList<>();
         keyWordList = new ArrayList<>();
         keySentenceList = new ArrayList<>();
-        questionAnswerList = new ArrayList<>();
         backgroundList = new ArrayList<>();
+        questionAnswerList = new ArrayList<>();
     }
 
     public String getDiscussId() {
@@ -54,14 +77,6 @@ public class DiscussInfo {
         this.discussName = discussName;
     }
 
-    public MicSentencestmp getMicSentences() {
-        return micSentencestmp;
-    }
-
-    public void setMicSentences(MicSentencestmp micSentencestmp) {
-        this.micSentencestmp = micSentencestmp;
-    }
-
     public List<String> getStartTimeList() {
         return startTimeList;
     }
@@ -78,36 +93,28 @@ public class DiscussInfo {
         this.stopTimeList = stopTimeList;
     }
 
-    public int getDiscussStatus() {
-        return discussStatus;
-    }
-
-    public void setDiscussStatus(int discussStatus) {
-        this.discussStatus = discussStatus;
-    }
-
-    public Cursor getSegmentSummaryCursor() {
-        return segmentSummaryCursor;
-    }
-
-    public void setSegmentSummaryCursor(Cursor segmentSummaryCursor) {
-        this.segmentSummaryCursor = segmentSummaryCursor;
-    }
-
-    public Cursor getTimeSlicedSummaryCursor() {
-        return timeSlicedSummaryCursor;
-    }
-
-    public void setTimeSlicedSummaryCursor(Cursor timeSlicedSummaryCursor) {
-        this.timeSlicedSummaryCursor = timeSlicedSummaryCursor;
-    }
-
     public List<String> getSegmentSummaryList() {
         return segmentSummaryList;
     }
 
     public void setSegmentSummaryList(List<String> segmentSummaryList) {
         this.segmentSummaryList = segmentSummaryList;
+    }
+
+    public List<String> getSegmentQuestionList() {
+        return segmentQuestionList;
+    }
+
+    public void setSegmentQuestionList(List<String> segmentQuestionList) {
+        this.segmentQuestionList = segmentQuestionList;
+    }
+
+    public List<String> getSegmentUnderstandList() {
+        return segmentUnderstandList;
+    }
+
+    public void setSegmentUnderstandList(List<String> segmentUnderstandList) {
+        this.segmentUnderstandList = segmentUnderstandList;
     }
 
     public List<String> getTimeSlicedSummaryList() {
@@ -134,20 +141,12 @@ public class DiscussInfo {
         this.keySentenceList = keySentenceList;
     }
 
-    public Cursor getKeyWordCursor() {
-        return keyWordCursor;
+    public List<String> getBackgroundList() {
+        return backgroundList;
     }
 
-    public void setKeyWordCursor(Cursor keyWordCursor) {
-        this.keyWordCursor = keyWordCursor;
-    }
-
-    public Cursor getKeySentenceCursor() {
-        return keySentenceCursor;
-    }
-
-    public void setKeySentenceCursor(Cursor keySentenceCursor) {
-        this.keySentenceCursor = keySentenceCursor;
+    public void setBackgroundList(List<String> backgroundList) {
+        this.backgroundList = backgroundList;
     }
 
     public List<QuestionAnswer> getQuestionAnswerList() {
@@ -158,43 +157,83 @@ public class DiscussInfo {
         this.questionAnswerList = questionAnswerList;
     }
 
-    public List<String> getBackgroundList() {
-        return backgroundList;
+    public int getDiscussStatus() {
+        return discussStatus;
     }
 
-    public void setBackgroundList(List<String> backgroundList) {
-        this.backgroundList = backgroundList;
+    public void setDiscussStatus(int discussStatus) {
+        this.discussStatus = discussStatus;
     }
 
-    public Cursor getSegmentQuestionCursor() {
+    public int getSegmentSummaryCursor() {
+        return segmentSummaryCursor;
+    }
+
+    public void setSegmentSummaryCursor(int segmentSummaryCursor) {
+        this.segmentSummaryCursor = segmentSummaryCursor;
+    }
+
+    public int getSegmentQuestionCursor() {
         return segmentQuestionCursor;
     }
 
-    public void setSegmentQuestionCursor(Cursor segmentQuestionCursor) {
+    public void setSegmentQuestionCursor(int segmentQuestionCursor) {
         this.segmentQuestionCursor = segmentQuestionCursor;
     }
 
-    public List<String> getSegmentQuestionList() {
-        return segmentQuestionList;
-    }
-
-    public void setSegmentQuestionList(List<String> segmentQuestionList) {
-        this.segmentQuestionList = segmentQuestionList;
-    }
-
-    public Cursor getSegmentUnderstandCursor() {
+    public int getSegmentUnderstandCursor() {
         return segmentUnderstandCursor;
     }
 
-    public void setSegmentUnderstandCursor(Cursor segmentUnderstandCursor) {
+    public void setSegmentUnderstandCursor(int segmentUnderstandCursor) {
         this.segmentUnderstandCursor = segmentUnderstandCursor;
     }
 
-    public List<String> getSegmentUnderstandList() {
-        return segmentUnderstandList;
+    public int getTimeSlicedSummaryCursor() {
+        return timeSlicedSummaryCursor;
     }
 
-    public void setSegmentUnderstandList(List<String> segmentUnderstandList) {
-        this.segmentUnderstandList = segmentUnderstandList;
+    public void setTimeSlicedSummaryCursor(int timeSlicedSummaryCursor) {
+        this.timeSlicedSummaryCursor = timeSlicedSummaryCursor;
+    }
+
+    public int getKeyWordCursor() {
+        return keyWordCursor;
+    }
+
+    public void setKeyWordCursor(int keyWordCursor) {
+        this.keyWordCursor = keyWordCursor;
+    }
+
+    public int getKeySentenceCursor() {
+        return keySentenceCursor;
+    }
+
+    public void setKeySentenceCursor(int keySentenceCursor) {
+        this.keySentenceCursor = keySentenceCursor;
+    }
+
+    public List<Sentence> getSentenceList() {
+        return sentenceList;
+    }
+
+    public void setSentenceList(List<Sentence> sentenceList) {
+        this.sentenceList = sentenceList;
+    }
+
+    public int getSentenceSummaryCursor() {
+        return sentenceSummaryCursor;
+    }
+
+    public void setSentenceSummaryCursor(int sentenceSummaryCursor) {
+        this.sentenceSummaryCursor = sentenceSummaryCursor;
+    }
+
+    public int getSegmentCorrectCursor() {
+        return segmentCorrectCursor;
+    }
+
+    public void setSegmentCorrectCursor(int segmentCorrectCursor) {
+        this.segmentCorrectCursor = segmentCorrectCursor;
     }
 }

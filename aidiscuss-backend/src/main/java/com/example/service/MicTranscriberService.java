@@ -12,7 +12,7 @@ import javax.sound.sampled.*;
 import java.io.IOException;
 
 import com.example.model.MicTypeEnum;
-import com.example.model.Sentencetmp;
+import com.example.model.Sentence;
 import com.example.thread.MicThread;
 import com.example.util.TimeUtils;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -36,7 +36,7 @@ public class MicTranscriberService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        redisService = RedisService.getInstance();
+        redisService = new RedisService();
     }
 
 
@@ -129,12 +129,12 @@ public class MicTranscriberService {
                         response.getTransSentenceTime() / 1000.0        //当前已处理的音频时长,单位是秒
                 ));
 
-                // 将识别结果封装为Sentence对象并插入队列
-                Sentencetmp sentencetmp = new Sentencetmp(
-                        response.getTransSentenceText(),
-                        TimeUtils.getCurrentFormattedTime() // 使用当前时间
-                );
-                redisService.AddMicSentence(discussId, micTypeEnum, sentencetmp);
+                Sentence sentence = new Sentence();
+                sentence.setText(response.getTransSentenceText());
+                sentence.setBeginTime(TimeUtils.getCurrentFormattedTime());
+                sentence.setMicTypeEnum(micTypeEnum);
+
+                redisService.addSentence(discussId, sentence);
             }
 
             //识别完毕

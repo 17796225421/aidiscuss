@@ -20,7 +20,7 @@ public class ManageService {
     private Map<String, DiscussThread> discussThreadMap;
 
     public ManageService() {
-        redisService = RedisService.getInstance();
+        redisService = new RedisService();
         discussThreadMap = new HashMap<>(); // 初始化 HashMap
     }
 
@@ -50,7 +50,7 @@ public class ManageService {
         DiscussInfo discussInfo = new DiscussInfo();
         discussInfo.setDiscussId(discussId);
         discussInfo.setDiscussName(discussName);
-        // 创建新的Redis库，并添加discussName作为key，当前时间作为value
+        discussInfo.setDiscussStatus(DiscussStatusEnum.CREATED.getValue());
         redisService.createDiscuss(discussInfo);
 
         return new DiscussBaseInfo(discussId, discussName, DiscussStatusEnum.STARTED.getValue());
@@ -62,40 +62,25 @@ public class ManageService {
             stopDiscuss(id);
         }
 
-        DiscussInfo discussInfo = redisService.getDiscussInfo(discussId);
-        // 记录开始时间
-        String startTime = TimeUtils.getCurrentFormattedTime();
-        discussInfo.getStartTimeList().add(startTime);
-
-        // 检查停止时间列表长度
-        List<String> stopTimeList = discussInfo.getStopTimeList();
-        List<String> startTimeList = discussInfo.getStartTimeList();
-        while (stopTimeList.size() < startTimeList.size() - 1) {
-            stopTimeList.add("-1");
+        while (redisService.getStopTimeList(discussId).size() + 1 < redisService.getStartTimeList(discussId).size()) {
+            redisService.addStopTime(discussId, "-1");
         }
-        redisService.updateStartTimeList(discussId, startTimeList);
-        redisService.updateStopTimeList(discussId, stopTimeList);
-        redisService.updateDiscussStatus(discussId, DiscussStatusEnum.STARTED);
+        redisService.addStartTime(discussId, TimeUtils.getCurrentFormattedTime());
+        redisService.updateDiscussStatus(discussId,DiscussStatusEnum.STARTED);
 
         DiscussThread discussThread = new DiscussThread(discussId);
         discussThread.start();
-        discussThreadMap.put(discussId,discussThread);
+        discussThreadMap.put(discussId, discussThread);
     }
 
     public void stopDiscuss(String discussId) {
-        DiscussInfo discussInfo = redisService.getDiscussInfo(discussId);
-        List<String> startTimeList = discussInfo.getStartTimeList();
-        List<String> stopTimeList = discussInfo.getStopTimeList();
-        if (stopTimeList.size() < startTimeList.size()) {
-            // 记录停止时间
-            String stopTime = TimeUtils.getCurrentFormattedTime();
-            stopTimeList.add(stopTime);
-            redisService.updateStopTimeList(discussId, stopTimeList);
+        if (redisService.getStopTimeList(discussId).size() < redisService.getStartTimeList(discussId).size()) {
+            redisService.addStopTime(discussId, TimeUtils.getCurrentFormattedTime());
         }
         redisService.updateDiscussStatus(discussId, DiscussStatusEnum.STOPED);
 
         DiscussThread discussThread = discussThreadMap.get(discussId);
-        if(discussThread!=null){
+        if (discussThread != null) {
             discussThread.stop();
             discussThreadMap.remove(discussId);
         }
@@ -104,7 +89,6 @@ public class ManageService {
     public void closeDiscuss(String discussId) {
         stopDiscuss(discussId);
         redisService.updateDiscussStatus(discussId, DiscussStatusEnum.CLOSED);
-        // 先从RedisService找到discussId对应的库,读取所有的信息,构造DiscussInfo
         DiscussInfo discussInfo = redisService.getDiscussInfo(discussId);
         if (discussInfo != null) {
             // 将这个库清空
