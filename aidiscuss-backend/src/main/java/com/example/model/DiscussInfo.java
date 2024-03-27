@@ -20,6 +20,7 @@ public class DiscussInfo {
     private List<String> segmentQuestionList;
     // 片段理解列表
     private List<String> segmentUnderstandList;
+    private List<String> segmentRemarkList;
     // 时间切片总结列表
     private List<String> timeSlicedSummaryList;
     // 关键词列表
@@ -40,6 +41,7 @@ public class DiscussInfo {
     private int segmentQuestionCursor;
     // 片段理解游标
     private int segmentUnderstandCursor;
+    private int segmentRemarkCursor;
     // 时间切片总结游标
     private int timeSlicedSummaryCursor;
     // 关键词游标
@@ -54,6 +56,7 @@ public class DiscussInfo {
         segmentSummaryList = new ArrayList<>();
         segmentQuestionList = new ArrayList<>();
         segmentUnderstandList = new ArrayList<>();
+        segmentRemarkList = new ArrayList<>();
         timeSlicedSummaryList = new ArrayList<>();
         keyWordList = new ArrayList<>();
         keySentenceList = new ArrayList<>();
@@ -235,5 +238,21 @@ public class DiscussInfo {
 
     public void setSegmentCorrectCursor(int segmentCorrectCursor) {
         this.segmentCorrectCursor = segmentCorrectCursor;
+    }
+
+    public List<String> getSegmentRemarkList() {
+        return segmentRemarkList;
+    }
+
+    public void setSegmentRemarkList(List<String> segmentRemarkList) {
+        this.segmentRemarkList = segmentRemarkList;
+    }
+
+    public int getSegmentRemarkCursor() {
+        return segmentRemarkCursor;
+    }
+
+    public void setSegmentRemarkCursor(int segmentRemarkCursor) {
+        this.segmentRemarkCursor = segmentRemarkCursor;
     }
 }
