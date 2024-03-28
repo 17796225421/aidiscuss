@@ -24,6 +24,7 @@ public class DiscussInfo {
     private List<String> segmentRestateList;
     private List<String> segmentAnalogyList;
     private List<String> segmentContinueList;
+    private List<String> segmentMultiangleList;
     // 时间切片总结列表
     private List<String> timeSlicedSummaryList;
     // 关键词列表
@@ -48,6 +49,7 @@ public class DiscussInfo {
     private int segmentRestateCursor;
     private int segmentAnalogyCursor;
     private int segmentContinueCursor;
+    private int segmentMultiangleCursor;
     // 时间切片总结游标
     private int timeSlicedSummaryCursor;
     // 关键词游标
@@ -66,6 +68,7 @@ public class DiscussInfo {
         segmentRestateList = new ArrayList<>();
         segmentAnalogyList = new ArrayList<>();
         segmentContinueList = new ArrayList<>();
+        segmentMultiangleList = new ArrayList<>();
         timeSlicedSummaryList = new ArrayList<>();
         keyWordList = new ArrayList<>();
         keySentenceList = new ArrayList<>();
@@ -311,5 +314,21 @@ public class DiscussInfo {
 
     public void setSegmentContinueCursor(int segmentContinueCursor) {
         this.segmentContinueCursor = segmentContinueCursor;
+    }
+
+    public List<String> getSegmentMultiangleList() {
+        return segmentMultiangleList;
+    }
+
+    public void setSegmentMultiangleList(List<String> segmentMultiangleList) {
+        this.segmentMultiangleList = segmentMultiangleList;
+    }
+
+    public int getSegmentMultiangleCursor() {
+        return segmentMultiangleCursor;
+    }
+
+    public void setSegmentMultiangleCursor(int segmentMultiangleCursor) {
+        this.segmentMultiangleCursor = segmentMultiangleCursor;
     }
 }
