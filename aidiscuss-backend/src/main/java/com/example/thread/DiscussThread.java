@@ -11,6 +11,7 @@ public class DiscussThread {
     private SegmentUnderstandThread segmentUnderstandThread;
     private SegmentRemarkThread segmentRemarkThread;
     private SegmentRestateThread segmentRestateThread;
+    private SegmentAnalogyThread segmentAnalogyThread;
     private TimeSlicedSummaryThread timeSlicedSummaryThread;
     private KeyWordThread keyWordThread;
     private KeySentenceThread keySentenceThread;
@@ -26,6 +27,7 @@ public class DiscussThread {
         this.segmentUnderstandThread = new SegmentUnderstandThread(discussId);
         this.segmentRemarkThread = new SegmentRemarkThread(discussId);
         this.segmentRestateThread = new SegmentRestateThread(discussId);
+        this.segmentAnalogyThread = new SegmentAnalogyThread(discussId);
         this.timeSlicedSummaryThread = new TimeSlicedSummaryThread(discussId);
         this.keyWordThread=new KeyWordThread(discussId);
         this.keySentenceThread=new KeySentenceThread(discussId);
@@ -43,6 +45,7 @@ public class DiscussThread {
         segmentUnderstandThread.start();
         segmentRemarkThread.start();
         segmentRestateThread.start();
+        segmentAnalogyThread.start();
         timeSlicedSummaryThread.start();
         keyWordThread.start();
         keySentenceThread.start();
@@ -59,6 +62,7 @@ public class DiscussThread {
         segmentUnderstandThread.stopRunning();
         segmentRemarkThread.stopRunning();
         segmentRestateThread.stopRunning();
+        segmentAnalogyThread.stopRunning();
         timeSlicedSummaryThread.stopRunning();
         keyWordThread.stopRunning();
         keySentenceThread.stopRunning();

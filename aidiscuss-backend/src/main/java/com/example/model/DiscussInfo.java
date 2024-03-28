@@ -22,6 +22,7 @@ public class DiscussInfo {
     private List<String> segmentUnderstandList;
     private List<String> segmentRemarkList;
     private List<String> segmentRestateList;
+    private List<String> segmentAnalogyList;
     // 时间切片总结列表
     private List<String> timeSlicedSummaryList;
     // 关键词列表
@@ -44,6 +45,7 @@ public class DiscussInfo {
     private int segmentUnderstandCursor;
     private int segmentRemarkCursor;
     private int segmentRestateCursor;
+    private int segmentAnalogyCursor;
     // 时间切片总结游标
     private int timeSlicedSummaryCursor;
     // 关键词游标
@@ -60,6 +62,7 @@ public class DiscussInfo {
         segmentUnderstandList = new ArrayList<>();
         segmentRemarkList = new ArrayList<>();
         segmentRestateList = new ArrayList<>();
+        segmentAnalogyList = new ArrayList<>();
         timeSlicedSummaryList = new ArrayList<>();
         keyWordList = new ArrayList<>();
         keySentenceList = new ArrayList<>();
@@ -273,5 +276,21 @@ public class DiscussInfo {
 
     public void setSegmentRestateCursor(int segmentRestateCursor) {
         this.segmentRestateCursor = segmentRestateCursor;
+    }
+
+    public List<String> getSegmentAnalogyList() {
+        return segmentAnalogyList;
+    }
+
+    public void setSegmentAnalogyList(List<String> segmentAnalogyList) {
+        this.segmentAnalogyList = segmentAnalogyList;
+    }
+
+    public int getSegmentAnalogyCursor() {
+        return segmentAnalogyCursor;
+    }
+
+    public void setSegmentAnalogyCursor(int segmentAnalogyCursor) {
+        this.segmentAnalogyCursor = segmentAnalogyCursor;
     }
 }
