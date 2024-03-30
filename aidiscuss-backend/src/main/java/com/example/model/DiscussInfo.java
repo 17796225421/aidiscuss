@@ -26,6 +26,7 @@ public class DiscussInfo {
     private List<String> segmentContinueList;
     private List<String> segmentMultiangleList;
     private List<String> segmentLogicList;
+    private List<String> segmentManagingupList;
     // 时间切片总结列表
     private List<String> timeSlicedSummaryList;
     // 关键词列表
@@ -52,6 +53,7 @@ public class DiscussInfo {
     private int segmentContinueCursor;
     private int segmentMultiangleCursor;
     private int segmentLogicCursor;
+    private int segmentManagingupCursor;
     // 时间切片总结游标
     private int timeSlicedSummaryCursor;
     // 关键词游标
@@ -72,6 +74,7 @@ public class DiscussInfo {
         segmentContinueList = new ArrayList<>();
         segmentMultiangleList = new ArrayList<>();
         segmentLogicList = new ArrayList<>();
+        segmentManagingupList = new ArrayList<>();
         timeSlicedSummaryList = new ArrayList<>();
         keyWordList = new ArrayList<>();
         keySentenceList = new ArrayList<>();
@@ -349,5 +352,21 @@ public class DiscussInfo {
 
     public void setSegmentLogicCursor(int segmentLogicCursor) {
         this.segmentLogicCursor = segmentLogicCursor;
+    }
+
+    public List<String> getSegmentManagingupList() {
+        return segmentManagingupList;
+    }
+
+    public void setSegmentManagingupList(List<String> segmentManagingupList) {
+        this.segmentManagingupList = segmentManagingupList;
+    }
+
+    public int getSegmentManagingupCursor() {
+        return segmentManagingupCursor;
+    }
+
+    public void setSegmentManagingupCursor(int segmentManagingupCursor) {
+        this.segmentManagingupCursor = segmentManagingupCursor;
     }
 }
