@@ -22,8 +22,8 @@ public class DiscussService {
         return redisService.getDiscussInfo(discussId);
     }
 
-    public List<Sentence> getSentences(String discussId) {
-        return redisService.getSentences(discussId);
+    public DiscussInfo getDiscussInfo(String discussId) {
+        return redisService.getDiscussInfo(discussId);
     }
 
     public void askQuestion(QuestionRequest questionRequest) throws IOException {

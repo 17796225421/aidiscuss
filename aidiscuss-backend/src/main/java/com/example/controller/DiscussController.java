@@ -33,10 +33,10 @@ public class DiscussController {
         return ResponseEntity.ok(discussInfo);
     }
 
-    @MessageMapping("/sentenceListConnection/{discussId}")
+    @MessageMapping("/discussInfoConnection/{discussId}")
     public void sentenceListConnection(@DestinationVariable String discussId) {
-        List<Sentence> sentenceList= discussService.getSentences(discussId);
-        simpMessagingTemplate.convertAndSend("/topic/sentenceListConnection/" + discussId, sentenceList);
+        DiscussInfo discussInfo = discussService.getDiscussInfo(discussId);
+        simpMessagingTemplate.convertAndSend("/topic/discussInfoConnection/" + discussId, discussInfo);
     }
 
     @PostMapping("/askQuestion")
