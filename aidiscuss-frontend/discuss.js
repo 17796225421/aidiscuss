@@ -50,7 +50,34 @@ function discussInfoConnection(discussId) {
                 console.log("discussInfo:" + message.body);
                 const data = JSON.parse(message.body);
                 const discussInfo = new DiscussInfo(data);
-                console.log(discussInfo.discussId);
+
+                // 将discussName设置到页面上
+                document.getElementById('discussName').textContent = discussInfo.discussName;
+
+                // 获取sentenceList容器
+                const sentenceListContainer = document.getElementById('sentenceList');
+
+                // 清空sentenceList容器
+                sentenceListContainer.innerHTML = '';
+
+                // 遍历sentenceList并生成HTML
+                discussInfo.sentenceList.forEach(sentence => {
+                    const sentenceElement = document.createElement('div');
+                    sentenceElement.classList.add('sentence');
+
+                    const textElement = document.createElement('div');
+                    textElement.classList.add('text');
+                    textElement.textContent = sentence.text;
+
+                    const metaElement = document.createElement('div');
+                    metaElement.classList.add('meta');
+                    metaElement.textContent = `${sentence.summary} | ${sentence.beginTime} | ${sentence.micTypeEnum}`;
+
+                    sentenceElement.appendChild(textElement);
+                    sentenceElement.appendChild(metaElement);
+
+                    sentenceListContainer.appendChild(sentenceElement);
+                });
             }
 
             if (!isWaitingToSend) {

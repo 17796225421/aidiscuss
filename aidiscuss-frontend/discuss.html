@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
     <title id="discussTitle"></title>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.0/dist/sockjs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
@@ -11,8 +12,13 @@
     <script src="discussInfo.js"></script>
 </head>
 <body>
-<div id="externMicSentencesDisplay">externMicSentences</div>
-<div id="wireMicSentencesDisplay">wireMicSentences</div>
-<div id="virtualMicSentencesDisplay">virtualMicSentences</div>
+<div class="discuss-name-container">
+    <h1 id="discussName"></h1>
+</div>
+<div class="discuss-container">
+    <h2>对话内容</h2>
+    <div id="sentenceList"></div>
+</div>
+
 </body>
 </html>
