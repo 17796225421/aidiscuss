@@ -48,5 +48,9 @@ function discussInfoConnection(discussId) {
 }
 
 function displayDiscussInfo(discussInfo) {
+    const DiscussDisplayComponent = () => {
+        return React.createElement('div', null, `会议名称：${discussInfo.discussName}`);
+    };
 
+    ReactDOM.render(React.createElement(DiscussDisplayComponent), document.getElementById('discussDisplay'));
 }
