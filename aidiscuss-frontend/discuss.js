@@ -42,18 +42,20 @@ function discussInfoConnection(discussId) {
 }
 
 function displayDiscussName(discussName) {
-    document.getElementById('discussName').innerText = discussName;
+    const discussNameElement = document.getElementById('discussName');
+    updateTextIfNeeded(discussNameElement, discussName);
 }
 
 function displaySentenceList(sentenceList) {
     const sentenceListContainer = document.getElementById('sentenceList');
     const existingChildren = sentenceListContainer.children;
     sentenceList.forEach((sentence, index) => {
+        const sentenceText = `Text: ${sentence.text}, Summary: ${sentence.summary}, Begin Time: ${sentence.beginTime}, Mic Type: ${sentence.micTypeEnum}`;
         if (index < existingChildren.length) {
-            existingChildren[index].innerText = `Text: ${sentence.text}, Summary: ${sentence.summary}, Begin Time: ${sentence.beginTime}, Mic Type: ${sentence.micTypeEnum}`;
+            updateTextIfNeeded(existingChildren[index], sentenceText);
         } else {
             const sentenceElement = document.createElement('div');
-            sentenceElement.innerText = `Text: ${sentence.text}, Summary: ${sentence.summary}, Begin Time: ${sentence.beginTime}, Mic Type: ${sentence.micTypeEnum}`;
+            sentenceElement.innerText = sentenceText;
             sentenceListContainer.appendChild(sentenceElement);
         }
     });
@@ -63,4 +65,10 @@ function displayDiscussInfo(discussInfo) {
     displayDiscussName(discussInfo.discussName);
     displaySentenceList(discussInfo.sentenceList);
 
+}
+
+function updateTextIfNeeded(element, newText) {
+    if (element.innerText !== newText) {
+        element.innerText = newText;
+    }
 }
