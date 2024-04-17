@@ -1,13 +1,7 @@
-// 从URL中获取discussId参数
-function getDiscussIdFromUrl() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('discussId');
-}
-
-
 // 添加选择条的事件监听
 document.addEventListener('DOMContentLoaded', () => {
-    const discussId = getDiscussIdFromUrl();
+    const urlParams = new URLSearchParams(window.location.search);
+    const discussId= urlParams.get('discussId');
     if (discussId) {
         discussInfoConnection(discussId);
     } else {
@@ -47,10 +41,22 @@ function discussInfoConnection(discussId) {
     }
 }
 
-function displayDiscussInfo(discussInfo) {
-    const DiscussDisplayComponent = () => {
-        return React.createElement('div', null, `会议名称：${discussInfo.discussName}`);
-    };
+function displayDiscussName(discussName) {
+    document.getElementById('discussName').innerText = discussName;
+}
 
-    ReactDOM.render(React.createElement(DiscussDisplayComponent), document.getElementById('discussDisplay'));
+function displaySentenceList(sentenceList) {
+    const sentenceListContainer = document.getElementById('sentenceList');
+    sentenceListContainer.innerHTML = ''; // 清空旧的列表
+    sentenceList.forEach(sentence => {
+        const sentenceElement = document.createElement('div');
+        sentenceElement.innerText = `Text: ${sentence.text}, Summary: ${sentence.summary}, Begin Time: ${sentence.beginTime}, Mic Type: ${sentence.micTypeEnum}`;
+        sentenceListContainer.appendChild(sentenceElement);
+    });
+}
+
+function displayDiscussInfo(discussInfo) {
+    displayDiscussName(discussInfo.discussName);
+    displaySentenceList(discussInfo.sentenceList);
+
 }
