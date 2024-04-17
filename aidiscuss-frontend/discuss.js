@@ -47,11 +47,15 @@ function displayDiscussName(discussName) {
 
 function displaySentenceList(sentenceList) {
     const sentenceListContainer = document.getElementById('sentenceList');
-    sentenceListContainer.innerHTML = ''; // 清空旧的列表
-    sentenceList.forEach(sentence => {
-        const sentenceElement = document.createElement('div');
-        sentenceElement.innerText = `Text: ${sentence.text}, Summary: ${sentence.summary}, Begin Time: ${sentence.beginTime}, Mic Type: ${sentence.micTypeEnum}`;
-        sentenceListContainer.appendChild(sentenceElement);
+    const existingChildren = sentenceListContainer.children;
+    sentenceList.forEach((sentence, index) => {
+        if (index < existingChildren.length) {
+            existingChildren[index].innerText = `Text: ${sentence.text}, Summary: ${sentence.summary}, Begin Time: ${sentence.beginTime}, Mic Type: ${sentence.micTypeEnum}`;
+        } else {
+            const sentenceElement = document.createElement('div');
+            sentenceElement.innerText = `Text: ${sentence.text}, Summary: ${sentence.summary}, Begin Time: ${sentence.beginTime}, Mic Type: ${sentence.micTypeEnum}`;
+            sentenceListContainer.appendChild(sentenceElement);
+        }
     });
 }
 
