@@ -61,9 +61,41 @@ function displaySentenceList(sentenceList) {
     });
 }
 
+function displayStartTimeList(startTimeList) {
+    const startTimeListContainer = document.getElementById('startTimeList');
+    const existingChildren = startTimeListContainer.children;
+    startTimeList.forEach((startTime, index) => {
+        const startTimeText = `startTime: ${startTime}`;
+        if (index < existingChildren.length) {
+            updateTextIfNeeded(existingChildren[index], startTimeText);
+        } else {
+            const startTimeElement = document.createElement('div');
+            startTimeElement.innerText = startTimeText;
+            startTimeListContainer.appendChild(startTimeElement);
+        }
+    });
+}
+
+function displayStopTimeList(stopTimeList) {
+    const stopTimeListContainer = document.getElementById('stopTimeList');
+    const existingChildren = stopTimeListContainer.children;
+    stopTimeList.forEach((stopTime, index) => {
+        const startTimeText = `stopTime: ${stopTime}`;
+        if (index < existingChildren.length) {
+            updateTextIfNeeded(existingChildren[index], stopTimeText);
+        } else {
+            const stopTimeElement = document.createElement('div');
+            stopTimeElement.innerText = startTimeText;
+            stopTimeListContainer.appendChild(stopTimeElement);
+        }
+    });
+}
+
 function displayDiscussInfo(discussInfo) {
     displayDiscussName(discussInfo.discussName);
     displaySentenceList(discussInfo.sentenceList);
+    displayStartTimeList(discussInfo.startTimeList);
+    displayStopTimeList(discussInfo.stopTimeList);
 
 }
 
