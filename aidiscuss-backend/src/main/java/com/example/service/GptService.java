@@ -1,9 +1,11 @@
 package com.example.service;
 
+import com.google.gson.JsonParser;
 import io.github.cdimascio.dotenv.Dotenv;
 import okhttp3.*;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import okio.BufferedSource;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -54,12 +56,8 @@ public class GptService {
     }
 
     public String requestGpt4(String model, String system, String user) throws IOException {
-        return requestGpt4(model, system, user, false);
-    }
-
-    public String requestGpt4(String model, String system, String user, boolean stream) throws IOException {
         // 构建JSON请求体
-        JsonObject jsonObject = buildJsonRequestBody(model, system, user, stream);
+        JsonObject jsonObject = buildJsonRequestBody(model, system, user,false);
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
 
         // 构建请求
@@ -87,6 +85,25 @@ public class GptService {
         }
     }
 
+    public BufferedSource  requestGpt4Stream(String model, String system, String user) throws IOException {
+        JsonObject jsonObject = buildJsonRequestBody(model, system, user, true);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
+        Request request = new Request.Builder()
+                .url(gpt4Url)
+                .addHeader("Authorization", "Bearer " + gpt4Key)
+                .addHeader("Content-Type", "application/json")
+                .post(requestBody)
+                .build();
+
+        Response response = client.newCall(request).execute();
+        if (!response.isSuccessful()) {
+            throw new IOException("Unexpected code " + response);
+        }
+
+        return response.body().source();
+    }
+
+
     private JsonObject buildJsonRequestBody(String model, String system, String user, boolean stream) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("model", model);
@@ -110,8 +127,45 @@ public class GptService {
 
     public static void main(String[] args) throws IOException {
         GptService gptService = new GptService();
-        String s = gptService.requestGpt3("gpt-3.5-turbo-0125", "你是个有帮助的助手", "早上吃什么");
-        System.out.println(s);
+        StringBuilder accumulativeContent = new StringBuilder();
+        String lastContent = "";
+        long lastPrintTime = 0;
+
+        try {
+            BufferedSource source = gptService.requestGpt4Stream("gpt-4-turbo-2024-04-09", "你是个有帮助的助手", "晚上吃什么");
+            while (!source.exhausted()) {
+                String line = source.readUtf8Line();
+                if (line != null && !line.isEmpty()) {
+                    if (line.startsWith("data:")) {
+                        String jsonStr = line.substring("data:".length()).trim();
+                        if (jsonStr.equals("[DONE]")) {
+                            break;
+                        }
+                        JsonObject data = JsonParser.parseString(jsonStr).getAsJsonObject();
+                        JsonArray choices = data.getAsJsonArray("choices");
+                        if (choices != null && !choices.isEmpty()) {
+                            JsonObject delta = choices.get(0).getAsJsonObject().getAsJsonObject("delta");
+                            if (delta != null && delta.has("content")) {
+                                String content = delta.get("content").getAsString();
+                                if (content != null) {
+                                    accumulativeContent.append(content);
+                                    long currentTime = System.currentTimeMillis();
+                                    if (!accumulativeContent.toString().equals(lastContent) && currentTime - lastPrintTime >= 1000) {
+                                        lastContent = accumulativeContent.toString();
+                                        System.out.println(lastContent);
+                                        lastPrintTime = currentTime;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            System.out.println(accumulativeContent.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
 
 }

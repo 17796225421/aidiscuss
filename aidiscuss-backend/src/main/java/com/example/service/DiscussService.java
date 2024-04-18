@@ -1,8 +1,10 @@
 package com.example.service;
 
 import com.example.model.*;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import okio.BufferedSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,13 +51,52 @@ public class DiscussService {
         inputBuilder.append("Question: ").append(questionRequest.getQuestion()).append("\n");
         inputBuilder.append("Answer: ");
         inputBuilder.append("discussText: ").append(allMicSentencesText);
-        System.out.println(inputBuilder.toString());
-        String gptText = gptService.requestGpt3("gpt-3.5-turbo-0125", "你是一个有帮助的助手", inputBuilder.toString());
 
-        QuestionAnswer questionAnswer = new QuestionAnswer(questionRequest.getQuestion(), gptText);
+        processQuestionStream(inputBuilder.toString(), questionRequest);
+    }
 
-        // 将更新后的历史信息保存到RedisService中
-        redisService.addQuestionAnswer(questionRequest.getDiscussId(), questionAnswer);
+    private void processQuestionStream(String user, QuestionRequest questionRequest) {
+        StringBuilder accumulativeContent = new StringBuilder();
+        String lastContent = "";
+        long lastPrintTime = 0;
+        try {
+            BufferedSource source = gptService.requestGpt4Stream("gpt-4-turbo-2024-04-09", "你是个有帮助的助手", user);
+            while (!source.exhausted()) {
+                String line = source.readUtf8Line();
+                if (line != null && !line.isEmpty()) {
+                    if (line.startsWith("data:")) {
+                        String jsonStr = line.substring("data:".length()).trim();
+                        if (jsonStr.equals("[DONE]")) {
+                            break;
+                        }
+                        JsonObject data = JsonParser.parseString(jsonStr).getAsJsonObject();
+                        JsonArray choices = data.getAsJsonArray("choices");
+                        if (choices != null && !choices.isEmpty()) {
+                            JsonObject delta = choices.get(0).getAsJsonObject().getAsJsonObject("delta");
+                            if (delta != null && delta.has("content")) {
+                                String content = delta.get("content").getAsString();
+                                if (content != null) {
+                                    accumulativeContent.append(content);
+                                    long currentTime = System.currentTimeMillis();
+                                    if (!accumulativeContent.toString().equals(lastContent) && currentTime - lastPrintTime >= 1000) {
+                                        QuestionAnswer questionAnswer = new QuestionAnswer(questionRequest.getQuestion(), accumulativeContent.toString());
+                                        redisService.setLastQuestionAnswer(questionRequest.getDiscussId(),questionAnswer);
+                                        lastContent = accumulativeContent.toString();
+
+                                        System.out.println(lastContent);
+                                        lastPrintTime = currentTime;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            QuestionAnswer questionAnswer = new QuestionAnswer(questionRequest.getQuestion(), accumulativeContent.toString());
+            redisService.setLastQuestionAnswer(questionRequest.getDiscussId(),questionAnswer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void updateBackground(BackgroundRequest backgroundRequest) {

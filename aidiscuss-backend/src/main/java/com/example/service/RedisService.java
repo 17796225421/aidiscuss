@@ -294,10 +294,25 @@ public class RedisService {
         return questionAnswerList;
     }
 
-    public void addQuestionAnswer(String discussId, QuestionAnswer questionAnswer) {
+    public void setLastQuestionAnswer(String discussId, QuestionAnswer questionAnswer) {
         Jedis jedis = findDiscussDatabase(discussId);
+        if (jedis == null) return; // 确保有有效的数据库连接
+
         String questionAnswerJson = new Gson().toJson(questionAnswer);
-        jedis.rpush("questionAnswerList", questionAnswerJson);
+        long listLength = jedis.llen("questionAnswerList");
+
+        if (listLength > 0) {
+            String lastQuestionAnswerJson = jedis.lindex("questionAnswerList", -1);
+            QuestionAnswer lastQuestionAnswer = new Gson().fromJson(lastQuestionAnswerJson, QuestionAnswer.class);
+
+            if (lastQuestionAnswer.getQuestion().equals(questionAnswer.getQuestion())) {
+                jedis.lset("questionAnswerList", listLength - 1, questionAnswerJson);
+            } else {
+                jedis.rpush("questionAnswerList", questionAnswerJson);
+            }
+        } else {
+            jedis.rpush("questionAnswerList", questionAnswerJson);
+        }
     }
 
     public List<String> getBackgroundList(String discussId) {
