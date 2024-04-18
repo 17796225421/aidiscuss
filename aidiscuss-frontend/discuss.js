@@ -12,9 +12,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     .then(response => response.json())
                     .then(data => {
                         backgroundDiv.innerHTML = '';
-                        data.forEach(item => {
+                        data.forEach((item, index) => {
                             const itemDiv = document.createElement("div");
-                            updateTextIfNeeded(itemDiv,item);
+                            updateTextIfNeeded(itemDiv, item);
+                            itemDiv.contentEditable = "true";
+                            itemDiv.onblur = function() {
+                                if (itemDiv.innerText.trim() === '') {
+                                    fetch(`http://127.0.0.1:10002/deleteBackground`, {
+                                        method: 'POST',
+                                        headers: {'Content-Type': 'application/json'},
+                                        body: JSON.stringify({ discussId, index })
+                                    });
+                                } else {
+                                    fetch(`http://127.0.0.1:10002/updateBackground`, {
+                                        method: 'POST',
+                                        headers: {'Content-Type': 'application/json'},
+                                        body: JSON.stringify({ discussId, index, background: itemDiv.innerText.trim() })
+                                    });
+                                }
+                            };
                             backgroundDiv.appendChild(itemDiv);
                         });
                         backgroundDiv.style.display = 'block';
