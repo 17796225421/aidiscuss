@@ -3,6 +3,50 @@ document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const discussId= urlParams.get('discussId');
     if (discussId) {
+
+        document.getElementById('getBackground').addEventListener('click', function() {
+            const backgroundDiv = document.getElementById('background');
+            if (backgroundDiv.style.display === 'block') {
+                backgroundDiv.style.display = 'none';
+            } else {
+                fetch(`http://127.0.0.1:10002/getBackground/${discussId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        backgroundDiv.innerHTML = '';
+                        data.forEach((item, index) => {
+                            const para = document.createElement("p");
+                            para.textContent = index + ' ' + item;
+                            backgroundDiv.appendChild(para);
+                        });
+                        backgroundDiv.style.display = 'block';
+                    });
+            }
+        });
+
+        document.getElementById('addBackground').addEventListener('click', function() { // 为新按钮添加事件监听器
+            let userInput = prompt("请输入背景信息:");
+
+            if(userInput!==null){
+                const backgroundData = { /* 假设的背景数据，需要具体业务逻辑来定义 */
+                    discussId: discussId,
+                    background: userInput
+                };
+                fetch(`http://127.0.0.1:10002/addBackground`, { // 调用添加背景的后端接口
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(backgroundData)
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log('背景添加成功');
+                        }
+                    })
+                    .catch(error => console.error('添加背景失败', error));
+            }
+        });
+
         discussInfoConnection(discussId);
     } else {
         console.error('缺少discussId参数');
@@ -286,21 +330,6 @@ function displayKeySentenceList(keySentenceList) {
     });
 }
 
-function displayBackgroundList(backgroundList) {
-    const backgroundListContainer = document.getElementById('backgroundList');
-    const existingChildren = backgroundListContainer.children;
-    backgroundList.forEach((background, index) => {
-        const backgroundText = `background: ${background}`;
-        if (index < existingChildren.length) {
-            updateTextIfNeeded(existingChildren[index], backgroundText);
-        } else {
-            const backgroundElement = document.createElement('div');
-            backgroundElement.innerText = backgroundText;
-            backgroundListContainer.appendChild(backgroundElement);
-        }
-    });
-}
-
 function displayQuestionAnswerList(questionAnswerList) {
     const questionAnswerListContainer = document.getElementById('questionAnswerList');
     const existingChildren = questionAnswerListContainer.children;
@@ -334,8 +363,7 @@ function displayDiscussInfo(discussInfo) {
     displayTimeSlicedSummaryList(discussInfo.timeSlicedSummaryList);
     displayKeyWordList(discussInfo.keyWordList);
     displayKeySentenceList(discussInfo.keySentenceList);
-    displayBackgroundList(discussInfo.backgroundList);
-    displayStopTimeList(discussInfo.stopTimeList);
+    displayQuestionAnswerList(discussInfo.questionAnswerList);
 
 }
 
