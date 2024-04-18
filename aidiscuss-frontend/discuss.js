@@ -1,4 +1,3 @@
-// 添加选择条的事件监听
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const discussId= urlParams.get('discussId');
@@ -15,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         backgroundDiv.innerHTML = '';
                         data.forEach(item => {
                             const itemDiv = document.createElement("div");
-                            itemDiv.innerText=item;
+                            updateTextIfNeeded(itemDiv,item);
                             backgroundDiv.appendChild(itemDiv);
                         });
                         backgroundDiv.style.display = 'block';

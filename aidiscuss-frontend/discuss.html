@@ -6,6 +6,15 @@
     <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
     <script src="discuss.js"></script>
     <script src="discussInfo.js"></script>
+    <style>
+        #background > div {
+            max-height: 150px;  /* 设置最大高度 */
+            overflow-y: auto;   /* 启用垂直滚动条 */
+            overflow-x: hidden; /* 隐藏水平滚动条 */
+            border: 1px solid black; /* 可选，为了更明显地看到每个框框 */
+            margin-bottom: 2px; /* 可选，为每个框框增加一些底部外边距 */
+        }
+    </style>
 </head>
 <body>
 <button id="getBackground">查看背景</button>
