@@ -39,13 +39,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.getElementById('addBackground').addEventListener('click', function() {
-            const modal = document.getElementById('inputModal');
+            const modal = document.getElementById('backgroundInputModal');
             modal.style.display = 'block';
         });
 
-        document.getElementById('submitInput').addEventListener('click', function() {
-            const userInput = document.getElementById('userInput').value;
-            const modal = document.getElementById('inputModal');
+        document.getElementById('backgroundSubmitInput').addEventListener('click', function() {
+            const userInput = document.getElementById('backgroundUserInput').value;
+            const modal = document.getElementById('backgroundInputModal');
             modal.style.display = 'none';
 
             if (userInput !== '') {
@@ -69,9 +69,43 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        document.getElementById('cancelInput').addEventListener('click', function() {
-            const modal = document.getElementById('inputModal');
+        document.getElementById('backgroundCancelInput').addEventListener('click', function() {
+            const modal = document.getElementById('backgroundInputModal');
             modal.style.display = 'none';
+        });
+
+        document.getElementById('getQuestionAnswerList').addEventListener('click', function() {
+            const qaListDiv = document.getElementById('questionAnswerList');
+            qaListDiv.style.display = qaListDiv.style.display === 'block' ? 'none' : 'block';
+        });
+
+        document.getElementById('askQuestion').addEventListener('click', function() {
+            document.getElementById('questionInputModal').style.display = 'block';
+        });
+
+        document.getElementById('questionSubmitInput').addEventListener('click', function() {
+            const questionInput = document.getElementById('questionUserInput').value;
+            const modal = document.getElementById('questionInputModal');
+            modal.style.display = 'none';
+
+            if (questionInput !== '') {
+                fetch(`http://127.0.0.1:10002/askQuestion`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ discussId, question: questionInput })
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log('问题提交成功');
+                            document.getElementById('questionInputModal').style.display = 'none';
+                        }
+                    })
+                    .catch(error => console.error('提交问题失败', error));
+            }
+        });
+
+        document.getElementById('questionCancelInput').addEventListener('click', function() {
+            document.getElementById('questionInputModal').style.display = 'none';
         });
 
         discussInfoConnection(discussId);

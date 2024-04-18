@@ -17,14 +17,25 @@
     </style>
 </head>
 <body>
+
 <button id="getBackground">查看背景</button>
 <button id="addBackground">添加背景</button>
-<div id="inputModal" style="display: none;">
-    <textarea id="userInput" rows="5" cols="50"></textarea>
-    <button id="submitInput">提交</button>
-    <button id="cancelInput">取消</button>
+<div id="backgroundInputModal" style="display: none;">
+    <textarea id="backgroundUserInput" rows="5" cols="50"></textarea>
+    <button id="backgroundSubmitInput">提交</button>
+    <button id="backgroundCancelInput">取消</button>
 </div>
 <div id="background" style="display: none;"></div>
+
+<button id="getQuestionAnswerList">查看问答</button>
+<button id="askQuestion">提问</button>
+<div id="questionInputModal" style="display: none;">
+    <textarea id="questionUserInput" rows="5" cols="50"></textarea>
+    <button id="questionSubmitInput">提交</button>
+    <button id="questionCancelInput">取消</button>
+</div>
+<div id="questionAnswerList"  style="display: none;"></div>
+
 <div id="discussName"></div>
 <div id="sentenceList"></div>
 <div id="startTimeList"></div>
@@ -42,7 +53,6 @@
 <div id="timeSlicedSummaryList"></div>
 <div id="keyWordList"></div>
 <div id="keySentenceList"></div>
-<div id="questionAnswerList"></div>
 
 </body>
 </html>
