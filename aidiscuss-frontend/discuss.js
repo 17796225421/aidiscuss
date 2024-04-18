@@ -13,25 +13,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     .then(response => response.json())
                     .then(data => {
                         backgroundDiv.innerHTML = '';
-                        data.forEach((item, index) => {
-                            const para = document.createElement("p");
-                            para.textContent = index + ' ' + item;
-                            backgroundDiv.appendChild(para);
+                        data.forEach(item => {
+                            const itemDiv = document.createElement("div");
+                            itemDiv.innerText=item;
+                            backgroundDiv.appendChild(itemDiv);
                         });
                         backgroundDiv.style.display = 'block';
                     });
             }
         });
 
-        document.getElementById('addBackground').addEventListener('click', function() { // 为新按钮添加事件监听器
-            let userInput = prompt("请输入背景信息:");
+        document.getElementById('addBackground').addEventListener('click', function() {
+            const modal = document.getElementById('inputModal');
+            modal.style.display = 'block';
+        });
 
-            if(userInput!==null){
-                const backgroundData = { /* 假设的背景数据，需要具体业务逻辑来定义 */
+        document.getElementById('submitInput').addEventListener('click', function() {
+            const userInput = document.getElementById('userInput').value;
+            const modal = document.getElementById('inputModal');
+            modal.style.display = 'none';
+
+            if (userInput !== '') {
+                const backgroundData = {
                     discussId: discussId,
                     background: userInput
                 };
-                fetch(`http://127.0.0.1:10002/addBackground`, { // 调用添加背景的后端接口
+                fetch(`http://127.0.0.1:10002/addBackground`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -45,6 +52,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     })
                     .catch(error => console.error('添加背景失败', error));
             }
+        });
+
+        document.getElementById('cancelInput').addEventListener('click', function() {
+            const modal = document.getElementById('inputModal');
+            modal.style.display = 'none';
         });
 
         discussInfoConnection(discussId);
