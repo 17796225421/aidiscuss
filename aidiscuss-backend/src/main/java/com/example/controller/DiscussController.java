@@ -45,6 +45,12 @@ public class DiscussController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/deleteQuestion")
+    public ResponseEntity<Void> deleteQuestion(@RequestBody QuestionRequest questionRequest) throws IOException {
+        discussService.deleteQuestion(questionRequest);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/updateBackground")
     public ResponseEntity<Void> updateBackground(@RequestBody BackgroundRequest backgroundRequest) throws IOException {
         discussService.updateBackground(backgroundRequest);

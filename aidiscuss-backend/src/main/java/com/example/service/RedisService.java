@@ -317,6 +317,27 @@ public class RedisService {
         }
     }
 
+    public void deleteQuestion(String discussId, String question) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        List<String> questionAnswerJsonList = jedis.lrange("questionAnswerList", 0, -1);
+        List<QuestionAnswer> questionAnswerList = questionAnswerJsonList.stream()
+                .map(json -> new Gson().fromJson(json, QuestionAnswer.class))
+                .collect(Collectors.toList());
+
+        int lastIndex = -1;
+        for (int i = questionAnswerList.size() - 1; i >= 0; i--) {
+            if (questionAnswerList.get(i).getQuestion().equals(question)) {
+                lastIndex = i;
+                break;
+            }
+        }
+
+        if (lastIndex != -1) {
+            jedis.lset("questionAnswerList", lastIndex, "");
+            jedis.lrem("questionAnswerList", 0, "");
+        }
+    }
+
     public List<String> getBackgroundList(String discussId) {
         Jedis jedis = findDiscussDatabase(discussId);
         return jedis.lrange("backgroundList", 0, -1);

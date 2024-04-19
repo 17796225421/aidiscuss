@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
-    const discussId= urlParams.get('discussId');
+    const discussId = urlParams.get('discussId');
     if (discussId) {
 
-        document.getElementById('getBackground').addEventListener('click', function() {
+        document.getElementById('getBackground').addEventListener('click', function () {
             const backgroundDiv = document.getElementById('background');
             if (backgroundDiv.style.display === 'block') {
                 backgroundDiv.style.display = 'none';
@@ -16,18 +16,18 @@ document.addEventListener('DOMContentLoaded', () => {
                             const itemDiv = document.createElement("div");
                             updateTextIfNeeded(itemDiv, item);
                             itemDiv.contentEditable = "true";
-                            itemDiv.onblur = function() {
+                            itemDiv.onblur = function () {
                                 if (itemDiv.innerText.trim() === '') {
                                     fetch(`http://127.0.0.1:10002/deleteBackground`, {
                                         method: 'POST',
                                         headers: {'Content-Type': 'application/json'},
-                                        body: JSON.stringify({ discussId, index })
+                                        body: JSON.stringify({discussId, index})
                                     });
                                 } else {
                                     fetch(`http://127.0.0.1:10002/updateBackground`, {
                                         method: 'POST',
                                         headers: {'Content-Type': 'application/json'},
-                                        body: JSON.stringify({ discussId, index, background: itemDiv.innerText.trim() })
+                                        body: JSON.stringify({discussId, index, background: itemDiv.innerText.trim()})
                                     });
                                 }
                             };
@@ -38,12 +38,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        document.getElementById('addBackground').addEventListener('click', function() {
+        document.getElementById('addBackground').addEventListener('click', function () {
             const modal = document.getElementById('backgroundInputModal');
             modal.style.display = 'block';
         });
 
-        document.getElementById('backgroundSubmitInput').addEventListener('click', function() {
+        document.getElementById('backgroundSubmitInput').addEventListener('click', function () {
             const userInput = document.getElementById('backgroundUserInput').value;
             const modal = document.getElementById('backgroundInputModal');
             modal.style.display = 'none';
@@ -69,21 +69,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        document.getElementById('backgroundCancelInput').addEventListener('click', function() {
+        document.getElementById('backgroundCancelInput').addEventListener('click', function () {
             const modal = document.getElementById('backgroundInputModal');
             modal.style.display = 'none';
         });
 
-        document.getElementById('getQuestionAnswerList').addEventListener('click', function() {
+        document.getElementById('getQuestionAnswerList').addEventListener('click', function () {
             const qaListDiv = document.getElementById('questionAnswerList');
             qaListDiv.style.display = qaListDiv.style.display === 'block' ? 'none' : 'block';
         });
 
-        document.getElementById('askQuestion').addEventListener('click', function() {
+        document.getElementById('askQuestion').addEventListener('click', function () {
             document.getElementById('questionInputModal').style.display = 'block';
         });
 
-        document.getElementById('questionSubmitInput').addEventListener('click', function() {
+        document.getElementById('questionSubmitInput').addEventListener('click', function () {
             const questionInput = document.getElementById('questionUserInput').value;
             const modal = document.getElementById('questionInputModal');
             modal.style.display = 'none';
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 fetch(`http://127.0.0.1:10002/askQuestion`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ discussId, question: questionInput })
+                    body: JSON.stringify({discussId, question: questionInput})
                 })
                     .then(response => {
                         if (response.ok) {
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        document.getElementById('questionCancelInput').addEventListener('click', function() {
+        document.getElementById('questionCancelInput').addEventListener('click', function () {
             document.getElementById('questionInputModal').style.display = 'none';
         });
 
@@ -300,7 +300,9 @@ function displaySegmentContinueList(segmentContinueList) {
         }
     });
 }
+
 S
+
 function displaySegmentMultiangleList(segmentMultiangleList) {
     const segmentMultiangleListContainer = document.getElementById('segmentMultiangleList');
     const existingChildren = segmentMultiangleListContainer.children;
@@ -391,10 +393,11 @@ function displayKeySentenceList(keySentenceList) {
     });
 }
 
-function displayQuestionAnswerList(questionAnswerList) {
+function displayQuestionAnswerList(discussId, questionAnswerList) {
     const questionAnswerListContainer = document.getElementById('questionAnswerList');
     questionAnswerListContainer.innerHTML = ''; // 清空现有内容
-    questionAnswerList.forEach(questionAnswer => {
+
+    questionAnswerList.forEach((questionAnswer) => {
         // 创建问题元素
         const questionElement = document.createElement('div');
         questionElement.style.fontWeight = 'bold'; // 加粗
@@ -408,6 +411,26 @@ function displayQuestionAnswerList(questionAnswerList) {
         answerElement.style.marginTop = '5px'; // 顶部外边距
         answerElement.innerText = questionAnswer.answer;
         questionAnswerListContainer.appendChild(answerElement);
+
+        // 创建删除按钮
+        const deleteButton = document.createElement('button');
+        deleteButton.innerText = '删除';
+        deleteButton.addEventListener('click', function () {
+            fetch(`http://127.0.0.1:10002/deleteQuestion`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({discussId, question: questionAnswer.question})
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('问题删除成功');
+                        qaElement.remove(); // 删除对应的questionElement
+                    }
+                })
+                .catch(error => console.error('删除问题失败', error));
+        });
+
+        questionAnswerListContainer.appendChild(deleteButton);
     });
 }
 
@@ -429,7 +452,7 @@ function displayDiscussInfo(discussInfo) {
     displayTimeSlicedSummaryList(discussInfo.timeSlicedSummaryList);
     displayKeyWordList(discussInfo.keyWordList);
     displayKeySentenceList(discussInfo.keySentenceList);
-    displayQuestionAnswerList(discussInfo.questionAnswerList);
+    displayQuestionAnswerList(discussInfo.discussId, discussInfo.questionAnswerList);
 
 }
 

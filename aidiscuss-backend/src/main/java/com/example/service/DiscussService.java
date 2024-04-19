@@ -99,6 +99,10 @@ public class DiscussService {
         }
     }
 
+    public void deleteQuestion(QuestionRequest questionRequest){
+        redisService.deleteQuestion(questionRequest.getDiscussId(),questionRequest.getQuestion());
+    }
+
     public void updateBackground(BackgroundRequest backgroundRequest) {
         String discussId = backgroundRequest.getDiscussId();
         int index = backgroundRequest.getIndex();
