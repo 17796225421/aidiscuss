@@ -393,16 +393,21 @@ function displayKeySentenceList(keySentenceList) {
 
 function displayQuestionAnswerList(questionAnswerList) {
     const questionAnswerListContainer = document.getElementById('questionAnswerList');
-    const existingChildren = questionAnswerListContainer.children;
-    questionAnswerList.forEach((questionAnswer, index) => {
-        const questionAnswerText = `question: ${questionAnswer.question}, answer: ${questionAnswer.answer}`;
-        if (index < existingChildren.length) {
-            updateTextIfNeeded(existingChildren[index], questionAnswerText);
-        } else {
-            const questionAnswerElement = document.createElement('div');
-            questionAnswerElement.innerText = questionAnswerText;
-            questionAnswerListContainer.appendChild(questionAnswerElement);
-        }
+    questionAnswerListContainer.innerHTML = ''; // 清空现有内容
+    questionAnswerList.forEach(questionAnswer => {
+        // 创建问题元素
+        const questionElement = document.createElement('div');
+        questionElement.style.fontWeight = 'bold'; // 加粗
+        questionElement.innerText = questionAnswer.question;
+        questionAnswerListContainer.appendChild(questionElement);
+
+        // 创建答案元素
+        const answerElement = document.createElement('div');
+        answerElement.style.border = '1px solid #ccc'; // 设置边框
+        answerElement.style.padding = '10px'; // 内边距
+        answerElement.style.marginTop = '5px'; // 顶部外边距
+        answerElement.innerText = questionAnswer.answer;
+        questionAnswerListContainer.appendChild(answerElement);
     });
 }
 
