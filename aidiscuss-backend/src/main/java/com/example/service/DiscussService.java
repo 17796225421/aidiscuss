@@ -80,7 +80,7 @@ public class DiscussService {
                                     long currentTime = System.currentTimeMillis();
                                     if (!accumulativeContent.toString().equals(lastContent) && currentTime - lastPrintTime >= 1000) {
                                         QuestionAnswer questionAnswer = new QuestionAnswer(questionRequest.getQuestion(), accumulativeContent.toString());
-                                        redisService.setLastQuestionAnswer(questionRequest.getDiscussId(),questionAnswer);
+                                        redisService.setQuestionAnswer(questionRequest.getDiscussId(),questionAnswer);
                                         lastContent = accumulativeContent.toString();
 
                                         System.out.println(lastContent);
@@ -93,7 +93,7 @@ public class DiscussService {
                 }
             }
             QuestionAnswer questionAnswer = new QuestionAnswer(questionRequest.getQuestion(), accumulativeContent.toString());
-            redisService.setLastQuestionAnswer(questionRequest.getDiscussId(),questionAnswer);
+            redisService.setQuestionAnswer(questionRequest.getDiscussId(),questionAnswer);
         } catch (IOException e) {
             e.printStackTrace();
         }

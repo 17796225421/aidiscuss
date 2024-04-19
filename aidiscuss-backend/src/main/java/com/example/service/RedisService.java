@@ -2,13 +2,11 @@ package com.example.service;
 
 import com.example.model.*;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -294,23 +292,27 @@ public class RedisService {
         return questionAnswerList;
     }
 
-    public void setLastQuestionAnswer(String discussId, QuestionAnswer questionAnswer) {
+    public void setQuestionAnswer(String discussId, QuestionAnswer questionAnswer) {
         Jedis jedis = findDiscussDatabase(discussId);
-        if (jedis == null) return; // 确保有有效的数据库连接
+        List<String> questionAnswerJsonList = jedis.lrange("questionAnswerList", 0, -1);
+        List<QuestionAnswer> questionAnswerList = questionAnswerJsonList.stream()
+                .map(json -> new Gson().fromJson(json, QuestionAnswer.class))
+                .collect(Collectors.toList());
 
-        String questionAnswerJson = new Gson().toJson(questionAnswer);
-        long listLength = jedis.llen("questionAnswerList");
-
-        if (listLength > 0) {
-            String lastQuestionAnswerJson = jedis.lindex("questionAnswerList", -1);
-            QuestionAnswer lastQuestionAnswer = new Gson().fromJson(lastQuestionAnswerJson, QuestionAnswer.class);
-
-            if (lastQuestionAnswer.getQuestion().equals(questionAnswer.getQuestion())) {
-                jedis.lset("questionAnswerList", listLength - 1, questionAnswerJson);
-            } else {
-                jedis.rpush("questionAnswerList", questionAnswerJson);
+        int lastIndex = -1;
+        for (int i = questionAnswerList.size() - 1; i >= 0; i--) {
+            if (questionAnswerList.get(i).getQuestion().equals(questionAnswer.getQuestion())) {
+                lastIndex = i;
+                break;
             }
+        }
+
+        if (lastIndex != -1) {
+            questionAnswerList.set(lastIndex, questionAnswer);
+            String updatedJson = new Gson().toJson(questionAnswer);
+            jedis.lset("questionAnswerList", lastIndex, updatedJson);
         } else {
+            String questionAnswerJson = new Gson().toJson(questionAnswer);
             jedis.rpush("questionAnswerList", questionAnswerJson);
         }
     }
