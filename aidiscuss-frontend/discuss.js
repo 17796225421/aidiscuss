@@ -225,7 +225,7 @@ function displaySegmentSummaryList(segmentSummaryList) {
     const segmentSummaryListContainer = document.getElementById('segmentSummaryList');
     const existingChildren = segmentSummaryListContainer.children;
     segmentSummaryList.forEach((segmentSummary, index) => {
-        const segmentSummaryText = `segmentSummary: ${segmentSummary}`;
+        const segmentSummaryText = `${segmentSummary}`;
         if (index < existingChildren.length) {
             updateTextIfNeeded(existingChildren[index], segmentSummaryText);
         } else {
@@ -240,7 +240,7 @@ function displaySegmentQuestionList(segmentQuestionList) {
     const segmentQuestionListContainer = document.getElementById('segmentQuestionList');
     const existingChildren = segmentQuestionListContainer.children;
     segmentQuestionList.forEach((segmentQuestion, index) => {
-        const segmentQuestionText = `segmentQuestion: ${segmentQuestion}`;
+        const segmentQuestionText = `${segmentQuestion}`;
         if (index < existingChildren.length) {
             updateTextIfNeeded(existingChildren[index], segmentQuestionText);
         } else {
@@ -255,7 +255,7 @@ function displaySegmentUnderstandList(segmentUnderstandList) {
     const segmentUnderstandListContainer = document.getElementById('segmentUnderstandList');
     const existingChildren = segmentUnderstandListContainer.children;
     segmentUnderstandList.forEach((segmentUnderstand, index) => {
-        const segmentUnderstandText = `segmentUnderstand: ${segmentUnderstand}`;
+        const segmentUnderstandText = `${segmentUnderstand}`;
         if (index < existingChildren.length) {
             updateTextIfNeeded(existingChildren[index], segmentUnderstandText);
         } else {
@@ -270,7 +270,7 @@ function displaySegmentRemarkList(segmentRemarkList) {
     const segmentRemarkListContainer = document.getElementById('segmentRemarkList');
     const existingChildren = segmentRemarkListContainer.children;
     segmentRemarkList.forEach((segmentRemark, index) => {
-        const segmentRemarkText = `segmentRemark: ${segmentRemark}`;
+        const segmentRemarkText = `${segmentRemark}`;
         if (index < existingChildren.length) {
             updateTextIfNeeded(existingChildren[index], segmentRemarkText);
         } else {
@@ -285,7 +285,7 @@ function displaySegmentRestateList(segmentRestateList) {
     const segmentRestateListContainer = document.getElementById('segmentRestateList');
     const existingChildren = segmentRestateListContainer.children;
     segmentRestateList.forEach((segmentRestate, index) => {
-        const segmentRestateText = `segmentRestate: ${segmentRestate}`;
+        const segmentRestateText = `${segmentRestate}`;
         if (index < existingChildren.length) {
             updateTextIfNeeded(existingChildren[index], segmentRestateText);
         } else {
@@ -300,7 +300,7 @@ function displaySegmentAnalogyList(segmentAnalogyList) {
     const segmentAnalogyListContainer = document.getElementById('segmentAnalogyList');
     const existingChildren = segmentAnalogyListContainer.children;
     segmentAnalogyList.forEach((segmentAnalogy, index) => {
-        const segmentAnalogyText = `segmentAnalogy: ${segmentAnalogy}`;
+        const segmentAnalogyText = `${segmentAnalogy}`;
         if (index < existingChildren.length) {
             updateTextIfNeeded(existingChildren[index], segmentAnalogyText);
         } else {
@@ -315,7 +315,7 @@ function displaySegmentContinueList(segmentContinueList) {
     const segmentContinueListContainer = document.getElementById('segmentContinueList');
     const existingChildren = segmentContinueListContainer.children;
     segmentContinueList.forEach((segmentContinue, index) => {
-        const segmentContinueText = `segmentContinue: ${segmentContinue}`;
+        const segmentContinueText = `${segmentContinue}`;
         if (index < existingChildren.length) {
             updateTextIfNeeded(existingChildren[index], segmentContinueText);
         } else {
@@ -330,7 +330,7 @@ function displaySegmentMultiangleList(segmentMultiangleList) {
     const segmentMultiangleListContainer = document.getElementById('segmentMultiangleList');
     const existingChildren = segmentMultiangleListContainer.children;
     segmentMultiangleList.forEach((segmentMultiangle, index) => {
-        const segmentMultiangleText = `segmentMultiangle: ${segmentMultiangle}`;
+        const segmentMultiangleText = `${segmentMultiangle}`;
         if (index < existingChildren.length) {
             updateTextIfNeeded(existingChildren[index], segmentMultiangleText);
         } else {
@@ -345,7 +345,7 @@ function displaySegmentLogicList(segmentLogicList) {
     const segmentLogicListContainer = document.getElementById('segmentLogicList');
     const existingChildren = segmentLogicListContainer.children;
     segmentLogicList.forEach((segmentLogic, index) => {
-        const segmentLogicText = `segmentLogic: ${segmentLogic}`;
+        const segmentLogicText = `${segmentLogic}`;
         if (index < existingChildren.length) {
             updateTextIfNeeded(existingChildren[index], segmentLogicText);
         } else {
@@ -360,7 +360,7 @@ function displaySegmentManagingupList(segmentManagingupList) {
     const segmentManagingupListContainer = document.getElementById('segmentManagingupList');
     const existingChildren = segmentManagingupListContainer.children;
     segmentManagingupList.forEach((segmentManagingup, index) => {
-        const segmentManagingupText = `segmentManagingup: ${segmentManagingup}`;
+        const segmentManagingupText = `${segmentManagingup}`;
         if (index < existingChildren.length) {
             updateTextIfNeeded(existingChildren[index], segmentManagingupText);
         } else {
@@ -375,7 +375,7 @@ function displayTimeSlicedSummaryList(timeSlicedSummaryList) {
     const timeSlicedSummaryListContainer = document.getElementById('timeSlicedSummaryList');
     const existingChildren = timeSlicedSummaryListContainer.children;
     timeSlicedSummaryList.forEach((timeSlicedSummary, index) => {
-        const timeSlicedSummaryText = `timeSlicedSummary: ${timeSlicedSummary}`;
+        const timeSlicedSummaryText = `${timeSlicedSummary}`;
         if (index < existingChildren.length) {
             updateTextIfNeeded(existingChildren[index], timeSlicedSummaryText);
         } else {
@@ -390,7 +390,7 @@ function displayKeyWordList(keyWordList) {
     const keyWordListContainer = document.getElementById('keyWordList');
     const existingChildren = keyWordListContainer.children;
     keyWordList.forEach((keyWord, index) => {
-        const keyWordText = `keyWord: ${keyWord}`;
+        const keyWordText = `${keyWord}`;
         if (index < existingChildren.length) {
             updateTextIfNeeded(existingChildren[index], keyWordText);
         } else {
@@ -405,7 +405,7 @@ function displayKeySentenceList(keySentenceList) {
     const keySentenceListContainer = document.getElementById('keySentenceList');
     const existingChildren = keySentenceListContainer.children;
     keySentenceList.forEach((keySentence, index) => {
-        const keySentenceText = `keySentence: ${keySentence}`;
+        const keySentenceText = `${keySentence}`;
         if (index < existingChildren.length) {
             updateTextIfNeeded(existingChildren[index], keySentenceText);
         } else {
