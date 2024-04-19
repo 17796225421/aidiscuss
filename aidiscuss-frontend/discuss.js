@@ -153,13 +153,14 @@ function displayDiscussName(discussName) {
 
 function displaySentenceList(sentenceList) {
     const sentenceListContainer = document.getElementById('sentenceList');
-    const existingChildren = sentenceListContainer.children;
+    const existingChildren = Array.from(sentenceListContainer.children).filter(child => child.className === 'sentence');
     sentenceList.forEach((sentence, index) => {
         const sentenceText = `Text: ${sentence.text}, Summary: ${sentence.summary}, Begin Time: ${sentence.beginTime}, Mic Type: ${sentence.micTypeEnum}`;
         if (index < existingChildren.length) {
             updateTextIfNeeded(existingChildren[index], sentenceText);
         } else {
             const sentenceElement = document.createElement('div');
+            sentenceElement.className = 'sentence';
             sentenceElement.innerText = sentenceText;
             sentenceListContainer.appendChild(sentenceElement);
         }
@@ -167,34 +168,54 @@ function displaySentenceList(sentenceList) {
 }
 
 function displayStartTimeList(startTimeList) {
-    const startTimeListContainer = document.getElementById('startTimeList');
-    const existingChildren = startTimeListContainer.children;
-    startTimeList.forEach((startTime, index) => {
-        const startTimeText = `startTime: ${startTime}`;
-        if (index < existingChildren.length) {
-            updateTextIfNeeded(existingChildren[index], startTimeText);
-        } else {
-            const startTimeElement = document.createElement('div');
-            startTimeElement.innerText = startTimeText;
-            startTimeListContainer.appendChild(startTimeElement);
+    const sentenceListContainer = document.getElementById('sentenceList');
+    const existingChildren = Array.from(sentenceListContainer.children);
+    let startTimeIndex = 0;
+
+    for (let i = 0; i < existingChildren.length && startTimeIndex < startTimeList.length; i++) {
+        const timeText = existingChildren[i].textContent.match(/(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})/)[1];
+        if (startTimeList[startTimeIndex]) {
+            const startTime = startTimeList[startTimeIndex];
+            if (timeText > startTime) {
+                if (i > 0 && existingChildren[i - 1].className === 'startTime') {
+                    updateTextIfNeeded(existingChildren[i - 1], `开始时间: ${startTime}`);
+                } else {
+                    const startTimeDiv = document.createElement('div');
+                    startTimeDiv.className = 'startTime';
+                    startTimeDiv.innerText = `开始时间: ${startTime}`;
+                    sentenceListContainer.insertBefore(startTimeDiv, existingChildren[i]);
+                }
+                startTimeIndex++;
+            }
         }
-    });
+    }
 }
 
 function displayStopTimeList(stopTimeList) {
-    const stopTimeListContainer = document.getElementById('stopTimeList');
-    const existingChildren = stopTimeListContainer.children;
-    stopTimeList.forEach((stopTime, index) => {
-        const stopTimeText = `stopTime: ${stopTime}`;
-        if (index < existingChildren.length) {
-            updateTextIfNeeded(existingChildren[index], stopTimeText);
-        } else {
-            const stopTimeElement = document.createElement('div');
-            stopTimeElement.innerText = stopTimeText;
-            stopTimeListContainer.appendChild(stopTimeElement);
+    const sentenceListContainer = document.getElementById('sentenceList');
+    const existingChildren = Array.from(sentenceListContainer.children);
+    let stopTimeIndex = 0;
+
+    for (let i = 0; i < existingChildren.length && stopTimeIndex < stopTimeList.length; i++) {
+        const timeText = existingChildren[i].textContent.match(/(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})/)[1];
+        if (stopTimeList[stopTimeIndex]) {
+            const stopTime = stopTimeList[stopTimeIndex];
+            if (timeText > stopTime) {
+                if (i > 0 && existingChildren[i - 1].className === 'stopTime') {
+                    updateTextIfNeeded(existingChildren[i - 1], `停止时间: ${stopTime}`);
+                } else {
+                    const stopTimeDiv = document.createElement('div');
+                    stopTimeDiv.className = 'stopTime';
+                    stopTimeDiv.innerText = `停止时间: ${stopTime}`;
+                    sentenceListContainer.insertBefore(stopTimeDiv, existingChildren[i]);
+                }
+                stopTimeIndex++;
+            }
         }
-    });
+    }
 }
+
+
 
 function displaySegmentSummaryList(segmentSummaryList) {
     const segmentSummaryListContainer = document.getElementById('segmentSummaryList');
