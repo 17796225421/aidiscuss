@@ -155,13 +155,15 @@ function displaySentenceList(sentenceList) {
     const sentenceListContainer = document.getElementById('sentenceList');
     const existingChildren = Array.from(sentenceListContainer.children).filter(child => child.className === 'sentence');
     sentenceList.forEach((sentence, index) => {
-        const sentenceText = `Text: ${sentence.text}, Summary: ${sentence.summary}, Begin Time: ${sentence.beginTime}, Mic Type: ${sentence.micTypeEnum}`;
+        const sentenceText = `Text: ${sentence.text}, Summary: ${sentence.summary}`;
         if (index < existingChildren.length) {
             updateTextIfNeeded(existingChildren[index], sentenceText);
+            existingChildren[index].setAttribute('time', sentence.beginTime);
         } else {
             const sentenceElement = document.createElement('div');
             sentenceElement.className = 'sentence';
             sentenceElement.innerText = sentenceText;
+            sentenceElement.setAttribute('time', sentence.beginTime);
             sentenceListContainer.appendChild(sentenceElement);
         }
     });
@@ -173,22 +175,20 @@ function displayStartTimeList(startTimeList) {
     let startTimeIndex = 0;
 
     for (let i = 0; i < existingChildren.length && startTimeIndex < startTimeList.length; i++) {
-        const match = existingChildren[i].textContent.match(/(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})/);
-        if (match && match[1]) {
-            const timeText = match[1];
-            if (startTimeList[startTimeIndex]) {
-                const startTime = startTimeList[startTimeIndex];
-                if (timeText > startTime) {
-                    if (i > 0 && existingChildren[i - 1].className === 'startTime') {
-                        updateTextIfNeeded(existingChildren[i - 1], `开始时间: ${startTime}`);
-                    } else {
-                        const startTimeDiv = document.createElement('div');
-                        startTimeDiv.className = 'startTime';
-                        startTimeDiv.innerText = `开始时间: ${startTime}`;
-                        sentenceListContainer.insertBefore(startTimeDiv, existingChildren[i]);
-                    }
-                    startTimeIndex++;
+        const timeText = existingChildren[i].getAttribute('time');
+        if (startTimeList[startTimeIndex]) {
+            const startTime = startTimeList[startTimeIndex];
+            if (timeText > startTime) {
+                if (i > 0 && existingChildren[i - 1].className === 'startTime') {
+                    updateTextIfNeeded(existingChildren[i - 1], `开始时间: ${startTime}`);
+                } else {
+                    const startTimeDiv = document.createElement('div');
+                    startTimeDiv.className = 'startTime';
+                    startTimeDiv.innerText = `开始时间: ${startTime}`;
+                    startTimeDiv.setAttribute('time', startTime);
+                    sentenceListContainer.insertBefore(startTimeDiv, existingChildren[i]);
                 }
+                startTimeIndex++;
             }
         }
     }
@@ -200,22 +200,20 @@ function displayStopTimeList(stopTimeList) {
     let stopTimeIndex = 0;
 
     for (let i = 0; i < existingChildren.length && stopTimeIndex < stopTimeList.length; i++) {
-        const match = existingChildren[i].textContent.match(/(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})/);
-        if (match && match[1]) {
-            const timeText = match[1];
-            if (stopTimeList[stopTimeIndex]) {
-                const stopTime = stopTimeList[stopTimeIndex];
-                if (timeText > stopTime) {
-                    if (i > 0 && existingChildren[i - 1].className === 'stopTime') {
-                        updateTextIfNeeded(existingChildren[i - 1], `停止时间: ${stopTime}`);
-                    } else {
-                        const stopTimeDiv = document.createElement('div');
-                        stopTimeDiv.className = 'stopTime';
-                        stopTimeDiv.innerText = `停止时间: ${stopTime}`;
-                        sentenceListContainer.insertBefore(stopTimeDiv, existingChildren[i]);
-                    }
-                    stopTimeIndex++;
+        const timeText = existingChildren[i].getAttribute('time');
+        if (stopTimeList[stopTimeIndex]) {
+            const stopTime = stopTimeList[stopTimeIndex];
+            if (timeText > stopTime) {
+                if (i > 0 && existingChildren[i - 1].className === 'stopTime') {
+                    updateTextIfNeeded(existingChildren[i - 1], `停止时间: ${stopTime}`);
+                } else {
+                    const stopTimeDiv = document.createElement('div');
+                    stopTimeDiv.className = 'stopTime';
+                    stopTimeDiv.innerText = `停止时间: ${stopTime}`;
+                    stopTimeDiv.setAttribute('time', stopTime);
+                    sentenceListContainer.insertBefore(stopTimeDiv, existingChildren[i]);
                 }
+                stopTimeIndex++;
             }
         }
     }
@@ -327,8 +325,6 @@ function displaySegmentContinueList(segmentContinueList) {
         }
     });
 }
-
-S
 
 function displaySegmentMultiangleList(segmentMultiangleList) {
     const segmentMultiangleListContainer = document.getElementById('segmentMultiangleList');
