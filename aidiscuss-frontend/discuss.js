@@ -395,27 +395,35 @@ function displayKeySentenceList(keySentenceList) {
 
 function displayQuestionAnswerList(discussId, questionAnswerList) {
     const questionAnswerListContainer = document.getElementById('questionAnswerList');
-    questionAnswerListContainer.innerHTML = ''; // 清空现有内容
+    const existingChildren = questionAnswerListContainer.children;
+    questionAnswerList.forEach((questionAnswer, index) => {
+        let baseIndex = index * 3; // 每个问题答案组有三个元素：问题、答案和删除按钮
+        let questionElement, answerElement, deleteButton;
 
-    questionAnswerList.forEach((questionAnswer) => {
-        // 创建问题元素
-        const questionElement = document.createElement('div');
-        questionElement.style.fontWeight = 'bold'; // 加粗
-        questionElement.innerText = questionAnswer.question;
-        questionAnswerListContainer.appendChild(questionElement);
+        if (baseIndex < existingChildren.length) {
+            questionElement = existingChildren[baseIndex];
+            answerElement = existingChildren[baseIndex + 1];
+            deleteButton = existingChildren[baseIndex + 2];
+        } else {
+            questionElement = document.createElement('div');
+            questionElement.style.fontWeight = 'bold';
+            questionAnswerListContainer.appendChild(questionElement);
 
-        // 创建答案元素
-        const answerElement = document.createElement('div');
-        answerElement.style.border = '1px solid #ccc'; // 设置边框
-        answerElement.style.padding = '10px'; // 内边距
-        answerElement.style.marginTop = '5px'; // 顶部外边距
-        answerElement.innerText = questionAnswer.answer;
-        questionAnswerListContainer.appendChild(answerElement);
+            answerElement = document.createElement('div');
+            answerElement.style.border = '1px solid #ccc';
+            answerElement.style.padding = '10px';
+            answerElement.style.marginTop = '5px';
+            questionAnswerListContainer.appendChild(answerElement);
 
-        // 创建删除按钮
-        const deleteButton = document.createElement('button');
-        deleteButton.innerText = '删除';
-        deleteButton.addEventListener('click', function () {
+            deleteButton = document.createElement('button');
+            deleteButton.innerText = '删除';
+            questionAnswerListContainer.appendChild(deleteButton);
+        }
+
+        updateTextIfNeeded(questionElement, questionAnswer.question);
+        updateTextIfNeeded(answerElement, questionAnswer.answer);
+
+        deleteButton.onclick = function () {
             fetch(`http://127.0.0.1:10002/deleteQuestion`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -424,15 +432,21 @@ function displayQuestionAnswerList(discussId, questionAnswerList) {
                 .then(response => {
                     if (response.ok) {
                         console.log('问题删除成功');
-                        qaElement.remove(); // 删除对应的questionElement
+                        questionElement.remove();
+                        answerElement.remove();
+                        deleteButton.remove();
                     }
                 })
                 .catch(error => console.error('删除问题失败', error));
-        });
-
-        questionAnswerListContainer.appendChild(deleteButton);
+        };
     });
+
+    // 清理超出的DOM元素
+    for (let i = questionAnswerList.length * 3; i < existingChildren.length; i++) {
+        questionAnswerListContainer.removeChild(existingChildren[i]);
+    }
 }
+
 
 function displayDiscussInfo(discussInfo) {
     displayDiscussName(discussInfo.discussName);
