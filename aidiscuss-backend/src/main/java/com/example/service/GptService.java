@@ -9,9 +9,12 @@ import okio.BufferedSource;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.concurrent.TimeUnit;
 
 public class GptService {
+
     private final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(60, TimeUnit.SECONDS) // 连接超时时间
             .writeTimeout(60, TimeUnit.SECONDS) // 写入超时时间
@@ -22,37 +25,36 @@ public class GptService {
     private final String gpt4Url = dotenv.get("GPT4_URL");
     private final String gpt3Key = dotenv.get("GPT3_KEY");
     private final String gpt3Url = dotenv.get("GPT3_URL");
-
-
+    private final String llama3Key = dotenv.get("LLAMA3_KEY");
+    private final String llama3Url = dotenv.get("LLAMA3_URL");
     public String requestGpt3(String model, String system, String user) throws IOException {
-        return "gpt3";
-//        // 构建JSON请求体
-//        JsonObject jsonObject = buildJsonRequestBody(model, system, user, false);
-//        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
-//
-//        // 构建请求
-//        Request request = new Request.Builder()
-//                .url(gpt3Url)
-//                .addHeader("Authorization", "Bearer " + gpt3Key)
-//                .addHeader("Content-Type", "application/json")
-//                .post(requestBody)
-//                .build();
-//
-//        // 发送请求并获取响应
-//        try (Response response = client.newCall(request).execute()) {
-//            if (!response.isSuccessful()) {
-//                throw new IOException("Unexpected code " + response);
-//            }
-//
-//            // 解析响应体
-//            String responseBody = response.body().string();
-//            JSONObject responseJson = new JSONObject(responseBody);
-//
-//            // 获取GPT文本
-//            String gptContent = responseJson.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content");
-//
-//            return gptContent;
-//        }
+        // 构建JSON请求体
+        JsonObject jsonObject = buildJsonRequestBody(model, system, user, false);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
+
+        // 构建请求
+        Request request = new Request.Builder()
+                .url(gpt3Url)
+                .addHeader("Authorization", "Bearer " + gpt3Key)
+                .addHeader("Content-Type", "application/json")
+                .post(requestBody)
+                .build();
+
+        // 发送请求并获取响应
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Unexpected code " + response);
+            }
+
+            // 解析响应体
+            String responseBody = response.body().string();
+            JSONObject responseJson = new JSONObject(responseBody);
+
+            // 获取GPT文本
+            String gptContent = responseJson.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content");
+
+            return gptContent;
+        }
     }
 
     public String requestGpt4(String model, String system, String user) throws IOException {
@@ -85,6 +87,35 @@ public class GptService {
         }
     }
 
+    public String requestLlama3(String model, String system, String user) throws IOException {
+        // 构建JSON请求体
+        JsonObject jsonObject = buildJsonRequestBody(model, system, user,false);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
+
+        // 构建请求
+        Request request = new Request.Builder()
+                .url(llama3Url)
+                .addHeader("Authorization", "Bearer " + llama3Key)
+                .addHeader("Content-Type", "application/json")
+                .post(requestBody)
+                .build();
+
+        // 发送请求并获取响应
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Unexpected code " + response);
+            }
+
+            // 解析响应体
+            String responseBody = response.body().string();
+            JSONObject responseJson = new JSONObject(responseBody);
+
+            return responseJson.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content");
+        }
+    }
+
+
+
     public BufferedSource  requestGpt4Stream(String model, String system, String user) throws IOException {
         JsonObject jsonObject = buildJsonRequestBody(model, system, user, true);
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
@@ -96,6 +127,32 @@ public class GptService {
                 .build();
 
         Response response = client.newCall(request).execute();
+        if (!response.isSuccessful()) {
+            throw new IOException("Unexpected code " + response);
+        }
+
+        return response.body().source();
+    }
+
+    public BufferedSource requestLlama3Stream(String model, String system, String user) throws IOException {
+        JsonObject jsonObject = buildJsonRequestBody(model, system, user, true);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
+
+        OkHttpClient clientWithProxy = new OkHttpClient.Builder()
+                .proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 10809)))
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(120, TimeUnit.SECONDS)
+                .build();
+
+        Request request = new Request.Builder()
+                .url(llama3Url)
+                .addHeader("Authorization", "Bearer " + llama3Key)
+                .addHeader("Content-Type", "application/json")
+                .post(requestBody)
+                .build();
+
+        Response response = clientWithProxy.newCall(request).execute();
         if (!response.isSuccessful()) {
             throw new IOException("Unexpected code " + response);
         }

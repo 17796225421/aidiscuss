@@ -36,7 +36,7 @@ public class SegmentCorrectThread extends Thread {
 
                 if (unprocessedText.length() > MAX_TEXT_LENGTH) {
                     String text = unprocessedText.toString();
-                    String gptText = gptService.requestGpt3("gpt-3.5-turbo-0125", "你是一个有帮助的助手", text);
+                    String gptText = gptService.requestLlama3("llama3-70b-8192", "你是一个有帮助的助手", text);
                     gptText="1\n2\n3\n4\n5\n6\n7\n8\n9";
                     List<String> sentencesText = Arrays.asList(gptText.split("\n"));
                     for (int i = begin; i < segmentCorrectCursor; i++) {

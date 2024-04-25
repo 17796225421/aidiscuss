@@ -37,7 +37,7 @@ public class SegmentLogicThread extends Thread {
 
                 if (unprocessedText.length() > MAX_TEXT_LENGTH) {
                     String text = unprocessedText.toString();
-                    String segmentLogic = gptService.requestGpt3("gpt-3.5-turbo-0125", "你是一个有帮助的助手", text);
+                    String segmentLogic = gptService.requestLlama3("llama3-70b-8192", "你是一个有帮助的助手", text);
                     System.out.println("segmentLogic" + segmentLogic);
                     redisService.addSegmentLogic(discussId, segmentLogic);
 
