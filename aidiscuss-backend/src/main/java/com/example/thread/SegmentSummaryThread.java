@@ -37,6 +37,7 @@ public class SegmentSummaryThread extends Thread {
 
                 if (unprocessedText.length() > MAX_TEXT_LENGTH) {
                     String text = unprocessedText.toString();
+//                    String segmentSummary = gptService.requestGpt3("gpt-3.5-turbo", "你是一个有帮助的助手", text);
                     String segmentSummary = gptService.requestLlama3("llama3-70b-8192", "你是一个有帮助的助手", text);
                     System.out.println("segmentSummary" + segmentSummary);
                     redisService.addSegmentSummary(discussId, segmentSummary);

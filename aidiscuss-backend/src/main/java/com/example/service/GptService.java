@@ -92,7 +92,13 @@ public class GptService {
         JsonObject jsonObject = buildJsonRequestBody(model, system, user,false);
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
 
-        // 构建请求
+        OkHttpClient clientWithProxy = new OkHttpClient.Builder()
+                .proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 10809)))
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(120, TimeUnit.SECONDS)
+                .build();
+
         Request request = new Request.Builder()
                 .url(llama3Url)
                 .addHeader("Authorization", "Bearer " + llama3Key)
@@ -101,7 +107,7 @@ public class GptService {
                 .build();
 
         // 发送请求并获取响应
-        try (Response response = client.newCall(request).execute()) {
+        try (Response response = clientWithProxy.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 throw new IOException("Unexpected code " + response);
             }

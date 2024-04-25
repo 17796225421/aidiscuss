@@ -49,20 +49,20 @@ public class DiscussThread {
         wireMicThread.start();
         virtualMicThread.start();
         segmentSummaryThread.start();
-        segmentQuestionThread.start();
-        segmentUnderstandThread.start();
-        segmentRemarkThread.start();
-        segmentRestateThread.start();
-        segmentAnalogyThread.start();
-        segmentContinueThread.start();
-        segmentMultiangleThread.start();
-        segmentLogicThread.start();
-        segmentManagingupThread.start();
-        timeSlicedSummaryThread.start();
-        keyWordThread.start();
-        keySentenceThread.start();
-        sentenceSummaryThread.start();
-        segmentCorrectThread.start();
+//        segmentQuestionThread.start();
+//        segmentUnderstandThread.start();
+//        segmentRemarkThread.start();
+//        segmentRestateThread.start();
+//        segmentAnalogyThread.start();
+//        segmentContinueThread.start();
+//        segmentMultiangleThread.start();
+//        segmentLogicThread.start();
+//        segmentManagingupThread.start();
+//        timeSlicedSummaryThread.start();
+//        keyWordThread.start();
+//        keySentenceThread.start();
+//        sentenceSummaryThread.start();
+//        segmentCorrectThread.start();
     }
 
     public void stop() {
