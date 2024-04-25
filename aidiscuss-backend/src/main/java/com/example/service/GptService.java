@@ -27,6 +27,7 @@ public class GptService {
     private final String gpt3Url = dotenv.get("GPT3_URL");
     private final String llama3Key = dotenv.get("LLAMA3_KEY");
     private final String llama3Url = dotenv.get("LLAMA3_URL");
+
     public String requestGpt3(String model, String system, String user) throws IOException {
         // 构建JSON请求体
         JsonObject jsonObject = buildJsonRequestBody(model, system, user, false);
@@ -59,7 +60,7 @@ public class GptService {
 
     public String requestGpt4(String model, String system, String user) throws IOException {
         // 构建JSON请求体
-        JsonObject jsonObject = buildJsonRequestBody(model, system, user,false);
+        JsonObject jsonObject = buildJsonRequestBody(model, system, user, false);
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
 
         // 构建请求
@@ -89,7 +90,41 @@ public class GptService {
 
     public String requestLlama3(String model, String system, String user) throws IOException {
         // 构建JSON请求体
-        JsonObject jsonObject = buildJsonRequestBody(model, system, user,false);
+        JsonObject jsonObject = buildJsonRequestBody(model, system, user, false);
+        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
+
+        OkHttpClient clientWithProxy = new OkHttpClient.Builder()
+                .proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 10809)))
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(120, TimeUnit.SECONDS)
+                .build();
+
+        Request request = new Request.Builder()
+                .url(llama3Url)
+                .addHeader("Authorization", "Bearer " + llama3Key)
+                .addHeader("Content-Type", "application/json")
+                .post(requestBody)
+                .build();
+
+        // 发送请求并获取响应
+        try (Response response = clientWithProxy.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Unexpected code " + response);
+            }
+
+            // 解析响应体
+            String responseBody = response.body().string();
+            JSONObject responseJson = new JSONObject(responseBody);
+
+            String englishAnswer = responseJson.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content");
+            return translate(englishAnswer);
+        }
+    }
+
+    public String translate(String user) throws IOException {
+        // 构建JSON请求体
+        JsonObject jsonObject = buildJsonRequestBody("llama3-70b-8192", "You are a professional, authentic translation engine. You only return the translated text, without any explanations.", "Please translate into Chinese (avoid explaining the original text):" + user, false);
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
 
         OkHttpClient clientWithProxy = new OkHttpClient.Builder()
@@ -121,8 +156,7 @@ public class GptService {
     }
 
 
-
-    public BufferedSource  requestGpt4Stream(String model, String system, String user) throws IOException {
+    public BufferedSource requestGpt4Stream(String model, String system, String user) throws IOException {
         JsonObject jsonObject = buildJsonRequestBody(model, system, user, true);
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
         Request request = new Request.Builder()
