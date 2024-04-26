@@ -14,7 +14,7 @@ import java.net.Proxy;
 import java.util.concurrent.TimeUnit;
 
 public class GptService {
-
+    TranslateService translateService = new TranslateService();
     private final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(60, TimeUnit.SECONDS) // 连接超时时间
             .writeTimeout(60, TimeUnit.SECONDS) // 写入超时时间
@@ -88,7 +88,8 @@ public class GptService {
         }
     }
 
-    public String requestLlama3(String model, String system, String user) throws IOException {
+    public String requestLlama3(String model, String system, String chineseUser) throws IOException {
+        String user = translateService.translateToEnglish(chineseUser);
         // 构建JSON请求体
         JsonObject jsonObject = buildJsonRequestBody(model, system, user, false);
         RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
@@ -118,40 +119,7 @@ public class GptService {
             JSONObject responseJson = new JSONObject(responseBody);
 
             String englishAnswer = responseJson.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content");
-            return translate(englishAnswer);
-        }
-    }
-
-    public String translate(String user) throws IOException {
-        // 构建JSON请求体
-        JsonObject jsonObject = buildJsonRequestBody("llama3-70b-8192", "You are a professional, authentic translation engine. You only return the translated text, without any explanations.", "Please translate into Chinese (avoid explaining the original text):" + user, false);
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
-
-        OkHttpClient clientWithProxy = new OkHttpClient.Builder()
-                .proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 10809)))
-                .connectTimeout(60, TimeUnit.SECONDS)
-                .writeTimeout(60, TimeUnit.SECONDS)
-                .readTimeout(120, TimeUnit.SECONDS)
-                .build();
-
-        Request request = new Request.Builder()
-                .url(llama3Url)
-                .addHeader("Authorization", "Bearer " + llama3Key)
-                .addHeader("Content-Type", "application/json")
-                .post(requestBody)
-                .build();
-
-        // 发送请求并获取响应
-        try (Response response = clientWithProxy.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                throw new IOException("Unexpected code " + response);
-            }
-
-            // 解析响应体
-            String responseBody = response.body().string();
-            JSONObject responseJson = new JSONObject(responseBody);
-
-            return responseJson.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content");
+            return translateService.translateToChinese(englishAnswer);
         }
     }
 
@@ -167,32 +135,6 @@ public class GptService {
                 .build();
 
         Response response = client.newCall(request).execute();
-        if (!response.isSuccessful()) {
-            throw new IOException("Unexpected code " + response);
-        }
-
-        return response.body().source();
-    }
-
-    public BufferedSource requestLlama3Stream(String model, String system, String user) throws IOException {
-        JsonObject jsonObject = buildJsonRequestBody(model, system, user, true);
-        RequestBody requestBody = RequestBody.create(MediaType.parse("application/json"), jsonObject.toString());
-
-        OkHttpClient clientWithProxy = new OkHttpClient.Builder()
-                .proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress("127.0.0.1", 10809)))
-                .connectTimeout(60, TimeUnit.SECONDS)
-                .writeTimeout(60, TimeUnit.SECONDS)
-                .readTimeout(120, TimeUnit.SECONDS)
-                .build();
-
-        Request request = new Request.Builder()
-                .url(llama3Url)
-                .addHeader("Authorization", "Bearer " + llama3Key)
-                .addHeader("Content-Type", "application/json")
-                .post(requestBody)
-                .build();
-
-        Response response = clientWithProxy.newCall(request).execute();
         if (!response.isSuccessful()) {
             throw new IOException("Unexpected code " + response);
         }

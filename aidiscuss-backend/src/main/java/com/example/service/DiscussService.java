@@ -60,8 +60,7 @@ public class DiscussService {
         String lastContent = "";
         long lastPrintTime = 0;
         try {
-            BufferedSource source = gptService.requestLlama3Stream("llama3-70b-8192", "你是个有帮助的助手", user);
-//            BufferedSource source = gptService.requestGpt4Stream("gpt-4-turbo-2024-04-09", "你是个有帮助的助手", user);
+            BufferedSource source = gptService.requestGpt4Stream("gpt-4-turbo-2024-04-09", "你是个有帮助的助手", user);
 
             while (!source.exhausted()) {
                 String line = source.readUtf8Line();

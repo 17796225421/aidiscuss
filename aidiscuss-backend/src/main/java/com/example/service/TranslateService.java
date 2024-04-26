@@ -1,11 +1,13 @@
 package com.example.service;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Collections;
 
@@ -27,9 +29,15 @@ public class TranslateService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
-        String requestJson = "{\"text\":\"" + text + "\", \"target_lang\":\"" + targetLang + "\"}";
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode requestJson = objectMapper.createObjectNode();
+        requestJson.put("text", text);
+        requestJson.put("target_lang", targetLang);
+        requestJson.put("source_lang", "auto");
 
-        HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
+        String requestBody = requestJson.toString();
+
+        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
 
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<TranslateResponse> response = restTemplate.postForEntity(url, entity, TranslateResponse.class);
@@ -41,7 +49,6 @@ public class TranslateService {
             return "";
         }
     }
-
     public static class TranslateResponse {
         private int code;
         private long id;
@@ -59,7 +66,7 @@ public class TranslateService {
 
     public static void main(String[] args) {
         TranslateService service = new TranslateService();
-        System.out.println(service.translateToChinese("Hello"));
+        System.out.println(service.translateToChinese("Hello\nhi"));
         System.out.println(service.translateToEnglish("早上吃什么"));
     }
 }
