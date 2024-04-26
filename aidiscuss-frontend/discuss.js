@@ -167,6 +167,7 @@ function displaySentenceList(sentenceList) {
             const textElement = document.createElement('div');
             textElement.className = 'text';
             textElement.innerText = sentence.text;
+            textElement.style.fontSize = '15px';
             sentenceElement.appendChild(textElement);
 
             const summaryElement = document.createElement('div');
