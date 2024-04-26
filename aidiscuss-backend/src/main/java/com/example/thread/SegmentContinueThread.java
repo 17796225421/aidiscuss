@@ -37,7 +37,7 @@ public class SegmentContinueThread extends Thread {
 
                 if (unprocessedText.length() > MAX_TEXT_LENGTH) {
                     String text = unprocessedText.toString();
-                    String segmentContinue = gptService.requestLlama3("llama3-70b-8192", "你是一个有帮助的助手", text);
+                    String segmentContinue = gptService.requestLlama3("llama3-70b-8192", "你擅长根据根据已有信息推理之后会发生的事情", text+"\n之后会发生什么？");
                     System.out.println("segmentContinue" + segmentContinue);
                     redisService.addSegmentContinue(discussId, segmentContinue);
 

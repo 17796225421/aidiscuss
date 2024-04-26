@@ -43,7 +43,7 @@ public class TimeSlicedSummaryThread extends Thread {
 
                 if (unprocessedText.length() > 0) {
                     String text = unprocessedText.toString();
-                    String timeSlicedSummary = gptService.requestLlama3("llama3-70b-8192", "你是一个有帮助的助手", text);
+                    String timeSlicedSummary = gptService.requestLlama3("llama3-70b-8192", "你是一个擅长将大段文字总结成简单摘要的程序员", "将以下内容总结成简单摘要\n" + text);
                     System.out.println("timeSlicedSummary" + timeSlicedSummary);
                     redisService.addTimeSlicedSummary(discussId, timeSlicedSummary);
 

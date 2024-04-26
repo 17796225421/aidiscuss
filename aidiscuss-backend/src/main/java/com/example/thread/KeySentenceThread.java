@@ -38,7 +38,8 @@ public class KeySentenceThread extends Thread {
 
                 if (unprocessedText.length() > MAX_TEXT_LENGTH) {
                     String text = unprocessedText.toString();
-                    String gptText = gptService.requestLlama3("llama3-70b-8192", "你是一个有帮助的助手", text);
+                    String gptText = gptService.requestGpt4("gpt-4-turbo-2024-04-09", "你擅长从大段文字中找出关键句子", "给你一段文字，找出关键句子，每句关键句子输出一行：" + text);
+//                    String gptText = gptService.requestLlama3("llama3-70b-8192", "你是一个有帮助的助手", text);
                     List<String> keySentenceList = Arrays.asList(gptText.split("\n"));
 
                     redisService.addKeySentenceList(discussId, keySentenceList);

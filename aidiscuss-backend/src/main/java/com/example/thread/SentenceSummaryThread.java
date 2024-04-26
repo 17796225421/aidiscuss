@@ -24,8 +24,8 @@ public class SentenceSummaryThread extends Thread {
                 int sentenceSummaryCursor = redisService.getSentenceSummaryCursor(discussId);
                 if (sentenceSummaryCursor < sentenceList.size()) {
                     String text = sentenceList.get(sentenceSummaryCursor).getText();
-                    String gptText = gptService.requestLlama3("llama3-70b-8192", "缩句，越短越好", text);
-                    System.out.println("gptText "+gptText);
+                    String gptText = gptService.requestLlama3("llama3-70b-8192", "你擅长缩句", "对这段话进行缩句：" + text);
+                    System.out.println("gptText " + gptText);
                     redisService.setSentenceSummary(discussId, sentenceSummaryCursor, gptText);
                     redisService.setSentenceSummaryCursor(discussId, sentenceSummaryCursor + 1);
                 }
