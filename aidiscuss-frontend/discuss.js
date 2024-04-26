@@ -231,6 +231,9 @@ function displaySegmentSummaryList(segmentSummaryList) {
         } else {
             const segmentSummaryElement = document.createElement('div');
             segmentSummaryElement.innerText = segmentSummaryText;
+            // 设置内边距和边框样式增加可读性
+            segmentSummaryElement.style.padding = '20px';
+            segmentSummaryElement.style.borderBottom = '1px solid #cccccc';
             segmentSummaryListContainer.appendChild(segmentSummaryElement);
         }
     });
@@ -246,6 +249,9 @@ function displaySegmentQuestionList(segmentQuestionList) {
         } else {
             const segmentQuestionElement = document.createElement('div');
             segmentQuestionElement.innerText = segmentQuestionText;
+            // 设置内边距和边框样式增加可读性
+            segmentQuestionElement.style.padding = '20px';
+            segmentQuestionElement.style.borderBottom = '1px solid #cccccc';
             segmentQuestionListContainer.appendChild(segmentQuestionElement);
         }
     });
@@ -261,6 +267,9 @@ function displaySegmentUnderstandList(segmentUnderstandList) {
         } else {
             const segmentUnderstandElement = document.createElement('div');
             segmentUnderstandElement.innerText = segmentUnderstandText;
+            // 设置内边距和边框样式增加可读性
+            segmentUnderstandElement.style.padding = '20px';
+            segmentUnderstandElement.style.borderBottom = '1px solid #cccccc';
             segmentUnderstandListContainer.appendChild(segmentUnderstandElement);
         }
     });
@@ -276,6 +285,9 @@ function displaySegmentRemarkList(segmentRemarkList) {
         } else {
             const segmentRemarkElement = document.createElement('div');
             segmentRemarkElement.innerText = segmentRemarkText;
+            // 设置内边距和边框样式增加可读性
+            segmentRemarkElement.style.padding = '20px';
+            segmentRemarkElement.style.borderBottom = '1px solid #cccccc';
             segmentRemarkListContainer.appendChild(segmentRemarkElement);
         }
     });
@@ -291,6 +303,9 @@ function displaySegmentRestateList(segmentRestateList) {
         } else {
             const segmentRestateElement = document.createElement('div');
             segmentRestateElement.innerText = segmentRestateText;
+            // 设置内边距和边框样式增加可读性
+            segmentRestateElement.style.padding = '20px';
+            segmentRestateElement.style.borderBottom = '1px solid #cccccc';
             segmentRestateListContainer.appendChild(segmentRestateElement);
         }
     });
@@ -306,6 +321,9 @@ function displaySegmentAnalogyList(segmentAnalogyList) {
         } else {
             const segmentAnalogyElement = document.createElement('div');
             segmentAnalogyElement.innerText = segmentAnalogyText;
+            // 设置内边距和边框样式增加可读性
+            segmentAnalogyElement.style.padding = '20px';
+            segmentAnalogyElement.style.borderBottom = '1px solid #cccccc';
             segmentAnalogyListContainer.appendChild(segmentAnalogyElement);
         }
     });
@@ -321,6 +339,9 @@ function displaySegmentContinueList(segmentContinueList) {
         } else {
             const segmentContinueElement = document.createElement('div');
             segmentContinueElement.innerText = segmentContinueText;
+            // 设置内边距和边框样式增加可读性
+            segmentContinueElement.style.padding = '20px';
+            segmentContinueElement.style.borderBottom = '1px solid #cccccc';
             segmentContinueListContainer.appendChild(segmentContinueElement);
         }
     });
@@ -336,6 +357,9 @@ function displaySegmentMultiangleList(segmentMultiangleList) {
         } else {
             const segmentMultiangleElement = document.createElement('div');
             segmentMultiangleElement.innerText = segmentMultiangleText;
+            // 设置内边距和边框样式增加可读性
+            segmentMultiangleElement.style.padding = '20px';
+            segmentMultiangleElement.style.borderBottom = '1px solid #cccccc';
             segmentMultiangleListContainer.appendChild(segmentMultiangleElement);
         }
     });
@@ -351,6 +375,9 @@ function displaySegmentLogicList(segmentLogicList) {
         } else {
             const segmentLogicElement = document.createElement('div');
             segmentLogicElement.innerText = segmentLogicText;
+            // 设置内边距和边框样式增加可读性
+            segmentLogicElement.style.padding = '20px';
+            segmentLogicElement.style.borderBottom = '1px solid #cccccc';
             segmentLogicListContainer.appendChild(segmentLogicElement);
         }
     });
@@ -366,6 +393,9 @@ function displaySegmentManagingupList(segmentManagingupList) {
         } else {
             const segmentManagingupElement = document.createElement('div');
             segmentManagingupElement.innerText = segmentManagingupText;
+            // 设置内边距和边框样式增加可读性
+            segmentManagingupElement.style.padding = '20px';
+            segmentManagingupElement.style.borderBottom = '1px solid #cccccc';
             segmentManagingupListContainer.appendChild(segmentManagingupElement);
         }
     });
@@ -381,6 +411,9 @@ function displayTimeSlicedSummaryList(timeSlicedSummaryList) {
         } else {
             const timeSlicedSummaryElement = document.createElement('div');
             timeSlicedSummaryElement.innerText = timeSlicedSummaryText;
+            // 设置内边距和边框样式增加可读性
+            timeSlicedSummaryElement.style.padding = '20px';
+            timeSlicedSummaryElement.style.borderBottom = '1px solid #cccccc';
             timeSlicedSummaryListContainer.appendChild(timeSlicedSummaryElement);
         }
     });
@@ -396,6 +429,9 @@ function displayKeyWordList(keyWordList) {
         } else {
             const keyWordElement = document.createElement('div');
             keyWordElement.innerText = keyWordText;
+            // 设置内边距和边框样式增加可读性
+            keyWordElement.style.padding = '20px';
+            keyWordElement.style.borderBottom = '1px solid #cccccc';
             keyWordListContainer.appendChild(keyWordElement);
         }
     });
@@ -411,6 +447,9 @@ function displayKeySentenceList(keySentenceList) {
         } else {
             const keySentenceElement = document.createElement('div');
             keySentenceElement.innerText = keySentenceText;
+            // 设置内边距和边框样式增加可读性
+            keySentenceElement.style.padding = '20px';
+            keySentenceElement.style.borderBottom = '1px solid #cccccc';
             keySentenceListContainer.appendChild(keySentenceElement);
         }
     });
