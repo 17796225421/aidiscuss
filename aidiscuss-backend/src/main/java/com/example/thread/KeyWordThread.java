@@ -14,7 +14,7 @@ public class KeyWordThread extends Thread {
     private volatile boolean running = true; // 添加 running 标志变量
     private RedisService redisService =new RedisService();
     private GptService gptService = new GptService();
-    private static final int MAX_TEXT_LENGTH = 10;
+    private static final int MAX_TEXT_LENGTH = 100;
     public KeyWordThread(String discussId) {
         this.discussId = discussId;
     }

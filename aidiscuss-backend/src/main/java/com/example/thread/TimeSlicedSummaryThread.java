@@ -24,7 +24,7 @@ public class TimeSlicedSummaryThread extends Thread {
         try {
             while (running) {
                 // 周期一分钟
-                Thread.sleep(10 * 1000);
+                Thread.sleep(60 * 1000);
                 if (!running) {
                     break;
                 }

@@ -13,7 +13,7 @@ public class SegmentMultiangleThread extends Thread {
     private volatile boolean running = true;
     private RedisService redisService = new RedisService();
     private GptService gptService = new GptService();
-    private static final int MAX_TEXT_LENGTH = 10;
+    private static final int MAX_TEXT_LENGTH = 100;
 
     public SegmentMultiangleThread(String discussId) {
         this.discussId = discussId;

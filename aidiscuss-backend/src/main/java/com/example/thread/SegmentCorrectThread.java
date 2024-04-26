@@ -12,7 +12,7 @@ public class SegmentCorrectThread extends Thread {
     private volatile boolean running = true;
     private RedisService redisService = new RedisService();
     private GptService gptService = new GptService();
-    private static final int MAX_TEXT_LENGTH = 10;
+    private static final int MAX_TEXT_LENGTH = 100;
 
     public SegmentCorrectThread(String discussId) {
         this.discussId = discussId;
@@ -36,8 +36,7 @@ public class SegmentCorrectThread extends Thread {
 
                 if (unprocessedText.length() > MAX_TEXT_LENGTH) {
                     String text = unprocessedText.toString();
-                    String gptText = gptService.requestLlama3("llama3-70b-8192", "你是一个有帮助的助手", text);
-                    gptText="1\n2\n3\n4\n5\n6\n7\n8\n9";
+                    String gptText = gptService.requestLlama3("llama3-70b-8192", "你是一个文字纠正大师","给你一段语音识别文字，尽可能纠正识别结果，只输出纠正后的内容：" text);
                     List<String> sentencesText = Arrays.asList(gptText.split("\n"));
                     for (int i = begin; i < segmentCorrectCursor; i++) {
                         redisService.updateSentenceText(discussId, i, sentencesText.get(i));
