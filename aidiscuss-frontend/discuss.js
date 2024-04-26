@@ -155,15 +155,29 @@ function displaySentenceList(sentenceList) {
     const sentenceListContainer = document.getElementById('sentenceList');
     const existingChildren = Array.from(sentenceListContainer.children).filter(child => child.className === 'sentence');
     sentenceList.forEach((sentence, index) => {
-        const sentenceText = `Text: ${sentence.text}, Summary: ${sentence.summary}`;
         if (index < existingChildren.length) {
-            updateTextIfNeeded(existingChildren[index], sentenceText);
-            existingChildren[index].setAttribute('time', sentence.beginTime);
+            const sentenceElement = existingChildren[index];
+            updateTextIfNeeded(sentenceElement.querySelector('.text'), sentence.text);
+            updateTextIfNeeded(sentenceElement.querySelector('.summary'), sentence.summary);
+            sentenceElement.setAttribute('time', sentence.beginTime);
         } else {
             const sentenceElement = document.createElement('div');
             sentenceElement.className = 'sentence';
-            sentenceElement.innerText = sentenceText;
+
+            const textElement = document.createElement('div');
+            textElement.className = 'text';
+            textElement.innerText = sentence.text;
+            sentenceElement.appendChild(textElement);
+
+            const summaryElement = document.createElement('div');
+            summaryElement.className = 'summary';
+            summaryElement.innerHTML = sentence.summary;
+            summaryElement.style.opacity = '0.5'; // 设置半透明样式
+            summaryElement.style.fontSize = '10px';
+            sentenceElement.appendChild(summaryElement);
+
             sentenceElement.setAttribute('time', sentence.beginTime);
+            sentenceElement.setAttribute('micTypeEnum',sentence.micTypeEnum);
             sentenceListContainer.appendChild(sentenceElement);
         }
     });
