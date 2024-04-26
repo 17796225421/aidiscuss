@@ -36,7 +36,7 @@ public class SegmentCorrectThread extends Thread {
 
                 if (unprocessedText.length() > MAX_TEXT_LENGTH) {
                     String text = unprocessedText.toString();
-                    String gptText = gptService.requestLlama3("llama3-70b-8192", "你是一个文字纠正大师","给你一段语音识别文字，尽可能纠正识别结果，只输出纠正后的内容：" text);
+                    String gptText = gptService.requestLlama3("llama3-70b-8192", "你是一个文字纠正大师","给你一段语音识别文字，尽可能纠正识别结果，只输出纠正后的内容："+ text);
                     List<String> sentencesText = Arrays.asList(gptText.split("\n"));
                     for (int i = begin; i < segmentCorrectCursor; i++) {
                         redisService.updateSentenceText(discussId, i, sentencesText.get(i));
