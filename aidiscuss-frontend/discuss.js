@@ -474,16 +474,17 @@ function displayKeyWordList(keyWordList) {
     const keyWordListContainer = document.getElementById('keyWordList');
     const existingChildren = keyWordListContainer.children;
     keyWordList.forEach((keyWord, index) => {
-        const keyWordText = `${keyWord}`;
-        if (index < existingChildren.length) {
-            updateTextIfNeeded(existingChildren[index], keyWordText);
-        } else {
-            const keyWordElement = document.createElement('div');
-            keyWordElement.innerText = keyWordText;
-            // 设置内边距和边框样式增加可读性
-            keyWordElement.style.padding = '10px';
-            keyWordElement.style.borderBottom = '1px solid #cccccc';
-            keyWordListContainer.appendChild(keyWordElement);
+        if (keyWord.trim() !== '') {
+            const keyWordText = `${keyWord}`;
+            if (index < existingChildren.length) {
+                updateTextIfNeeded(existingChildren[index], keyWordText);
+            } else {
+                const keyWordElement = document.createElement('div');
+                keyWordElement.innerText = keyWordText;
+                keyWordElement.style.padding = '10px';
+                keyWordElement.style.borderBottom = '1px solid #cccccc';
+                keyWordListContainer.appendChild(keyWordElement);
+            }
         }
     });
 }
@@ -492,16 +493,17 @@ function displayKeySentenceList(keySentenceList) {
     const keySentenceListContainer = document.getElementById('keySentenceList');
     const existingChildren = keySentenceListContainer.children;
     keySentenceList.forEach((keySentence, index) => {
-        const keySentenceText = `${keySentence}`;
-        if (index < existingChildren.length) {
-            updateTextIfNeeded(existingChildren[index], keySentenceText);
-        } else {
-            const keySentenceElement = document.createElement('div');
-            keySentenceElement.innerText = keySentenceText;
-            // 设置内边距和边框样式增加可读性
-            keySentenceElement.style.padding = '10px';
-            keySentenceElement.style.borderBottom = '1px solid #cccccc';
-            keySentenceListContainer.appendChild(keySentenceElement);
+        if (keySentence.trim() !== '') {
+            const keySentenceText = `${keySentence}`;
+            if (index < existingChildren.length) {
+                updateTextIfNeeded(existingChildren[index], keySentenceText);
+            } else {
+                const keySentenceElement = document.createElement('div');
+                keySentenceElement.innerText = keySentenceText;
+                keySentenceElement.style.padding = '10px';
+                keySentenceElement.style.borderBottom = '1px solid #cccccc';
+                keySentenceListContainer.appendChild(keySentenceElement);
+            }
         }
     });
 }

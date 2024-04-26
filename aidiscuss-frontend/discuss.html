@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>讨论页面布局</title>
     <style>
+        #discussName {
+            font-weight: bold; /* 加粗样式 */
+        }
         #sentenceList {
             display: flex;
             flex-direction: column-reverse;
@@ -49,6 +52,7 @@
 <body>
 <div class="container">
     <div class="left">
+        <div id="discussName"></div>
         <button id="getBackground">查看背景</button>
         <button id="addBackground">添加背景</button>
         <div id="backgroundInputModal" style="display: none;">
@@ -67,8 +71,7 @@
         </div>
         <div id="questionAnswerList" style="display: none;"></div>
 
-        <div id="discussName"></div>
-        <div id="sentenceList">对话</div>
+        <div id="sentenceList"></div>
     </div>
     <div class="right">
         <div class="tab-nav">
