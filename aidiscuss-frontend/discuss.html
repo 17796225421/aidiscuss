@@ -1,56 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.0/dist/sockjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
-    <script src="discuss.js"></script>
-    <script src="discussInfo.js"></script>
+    <title>讨论页面布局</title>
     <style>
-        #background > div {
-            max-height: 150px;  /* 设置最大高度 */
-            overflow-y: auto;   /* 启用垂直滚动条 */
-            overflow-x: hidden; /* 隐藏水平滚动条 */
-            border: 1px solid black; /* 可选，为了更明显地看到每个框框 */
-            margin-bottom: 2px; /* 可选，为每个框框增加一些底部外边距 */
+        .container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .left, .right {
+            width: 50%;
+            border: 1px solid #000;
+            padding: 2px;
+        }
+        #background > div, #questionAnswerList > div {
+            max-height: 150px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            border: 1px solid black;
+            margin-bottom: 2px;
         }
     </style>
 </head>
 <body>
+<div class="container">
+    <div class="left">
+        <button id="getBackground">查看背景</button>
+        <button id="addBackground">添加背景</button>
+        <div id="backgroundInputModal" style="display: none;">
+            <textarea id="backgroundUserInput" rows="5" cols="50"></textarea>
+            <button id="backgroundSubmitInput">提交</button>
+            <button id="backgroundCancelInput">取消</button>
+        </div>
+        <div id="background" style="display: none;"></div>
 
-<button id="getBackground">查看背景</button>
-<button id="addBackground">添加背景</button>
-<div id="backgroundInputModal" style="display: none;">
-    <textarea id="backgroundUserInput" rows="5" cols="50"></textarea>
-    <button id="backgroundSubmitInput">提交</button>
-    <button id="backgroundCancelInput">取消</button>
+        <button id="getQuestionAnswerList">查看问答</button>
+        <button id="askQuestion">提问</button>
+        <div id="questionInputModal" style="display: none;">
+            <textarea id="questionUserInput" rows="5" cols="50"></textarea>
+            <button id="questionSubmitInput">提交</button>
+            <button id="questionCancelInput">取消</button>
+        </div>
+        <div id="questionAnswerList" style="display: none;"></div>
+
+        <div id="discussName"></div>
+        <div id="sentenceList">对话</div>
+    </div>
+    <div class="right">
+        <div id="segmentSummaryList">摘要</div>
+        <div id="segmentQuestionList">追问</div>
+        <div id="segmentUnderstandList">理解</div>
+        <div id="segmentRemarkList">评论</div>
+        <div id="segmentRestateList">重述</div>
+        <div id="segmentAnalogyList">比喻</div>
+        <div id="segmentContinueList">续写</div>
+        <div id="segmentMultiangleList">多角度</div>
+        <div id="segmentLogicList">逻辑</div>
+        <div id="segmentManagingupList">向上管理</div>
+        <div id="timeSlicedSummaryList">时间摘要</div>
+        <div id="keyWordList">关键词</div>
+        <div id="keySentenceList">关键句</div>
+    </div>
 </div>
-<div id="background" style="display: none;"></div>
 
-<button id="getQuestionAnswerList">查看问答</button>
-<button id="askQuestion">提问</button>
-<div id="questionInputModal" style="display: none;">
-    <textarea id="questionUserInput" rows="5" cols="50"></textarea>
-    <button id="questionSubmitInput">提交</button>
-    <button id="questionCancelInput">取消</button>
-</div>
-<div id="questionAnswerList"  style="display: none;"></div>
-
-<div id="discussName"></div>
-<div id="sentenceList">对话</div>
-<div id="segmentSummaryList">摘要</div>
-<div id="segmentQuestionList">追问</div>
-<div id="segmentUnderstandList">理解</div>
-<div id="segmentRemarkList">评论</div>
-<div id="segmentRestateList">重述</div>
-<div id="segmentAnalogyList">比喻</div>
-<div id="segmentContinueList">续写</div>
-<div id="segmentMultiangleList">多角度</div>
-<div id="segmentLogicList">逻辑</div>
-<div id="segmentManagingupList">向上管理</div>
-<div id="timeSlicedSummaryList">时间摘要</div>
-<div id="keyWordList">关键词</div>
-<div id="keySentenceList">关键句</div>
-
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.0/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+<script src="discuss.js"></script>
+<script src="discussInfo.js"></script>
 </body>
 </html>
