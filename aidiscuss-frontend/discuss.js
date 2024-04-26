@@ -208,7 +208,7 @@ function displaySentenceList(sentenceList) {
             summaryElement.className = 'summary';
             summaryElement.innerHTML = sentence.summary;
             summaryElement.style.opacity = '0.5'; // 设置半透明样式
-            summaryElement.style.fontSize = '10px';
+            summaryElement.style.fontSize = '13px';
             summaryElement.style.padding = '5px';
             sentenceElement.appendChild(summaryElement);
 
@@ -236,6 +236,7 @@ function displayStartTimeList(startTimeList) {
                     startTimeDiv.className = 'startTime';
                     startTimeDiv.innerText = `开始时间: ${startTime}`;
                     startTimeDiv.setAttribute('time', startTime);
+                    startTimeDiv.style.color = 'lightgreen';
                     sentenceListContainer.insertBefore(startTimeDiv, existingChildren[i]);
                 }
                 startTimeIndex++;
@@ -261,6 +262,7 @@ function displayStopTimeList(stopTimeList) {
                     stopTimeDiv.className = 'stopTime';
                     stopTimeDiv.innerText = `停止时间: ${stopTime}`;
                     stopTimeDiv.setAttribute('time', stopTime);
+                    stopTimeDiv.style.color = 'lightcoral';
                     sentenceListContainer.insertBefore(stopTimeDiv, existingChildren[i]);
                 }
                 stopTimeIndex++;
