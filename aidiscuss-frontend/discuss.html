@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <title>讨论页面布局</title>
     <style>
+        #sentenceList {
+            display: flex;
+            flex-direction: column-reverse;
+        }
         .container {
             display: flex;
             justify-content: space-between;
@@ -33,6 +37,10 @@
         }
         .tab-item.active {
             border-bottom: 2px solid #333;
+        }
+        .tab-content{
+            display: flex;
+            flex-direction: column-reverse;
         }
     </style>
 </head>

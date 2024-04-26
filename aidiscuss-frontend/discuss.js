@@ -127,9 +127,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // 隐藏所有tab内容
                     tabContents.forEach(content => content.style.display = 'none');
-                    // 显示当前tab对应的内容
+                    // 显示当前tab对应的内容,并保持逆序显示
                     const tabId = item.getAttribute('data-tab');
-                    document.getElementById(tabId + 'List').style.display = 'block';
+                    const currentContent = document.getElementById(tabId + 'List');
+                    currentContent.style.display = 'flex';
+                    currentContent.style.flexDirection = 'column-reverse';
                 }, 0.5 * 1000);
             });
 
@@ -580,7 +582,9 @@ function displayDiscussInfo(discussInfo) {
 }
 
 function updateTextIfNeeded(element, newText) {
-    if (element.innerText !== newText) {
+    const elementText = element.innerText.replace(/\n/g, '');
+    const formattedNewText = newText.replace(/\n/g, '');
+    if (elementText !== formattedNewText) {
         element.innerText = newText;
     }
 }
