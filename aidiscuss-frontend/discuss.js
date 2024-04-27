@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const currentContent = document.getElementById(tabId + 'List');
                     currentContent.style.display = 'flex';
                     currentContent.style.flexDirection = 'column-reverse';
-                }, 0.5 * 1000);
+                }, 0.2 * 1000);
             });
 
             // 当鼠标移出按钮时,清除定时器
