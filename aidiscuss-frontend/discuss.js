@@ -165,17 +165,7 @@ function discussInfoConnection(discussId) {
                 const discussInfo = new DiscussInfo(data);
                 displayDiscussInfo(discussInfo);
 
-                const tabs = document.querySelectorAll('.tab-content');
-                tabs.forEach(tab => {
-                    const children = tab.children;
-                    for (let i = 0; i < children.length; i++) {
-                        const child = children[i];
-                        const formatHTML = marked.parse(child.innerHTML,{breaks:true});
-                        if (child.innerHTML !== formatHTML) {
-                            child.innerHTML = formatHTML;
-                        }
-                    }
-                });
+                formatTabContent();
             }
 
             if (!isWaitingToSend) {
@@ -189,6 +179,34 @@ function discussInfoConnection(discussId) {
         stompClient.send(`/app/discussInfoConnection/${discussId}`, {}, JSON.stringify({}));
         isWaitingToSend = false;
     }
+}
+
+function formatTabContent() {
+    const tabs = document.querySelectorAll('.tab-content');
+    const renderer = new marked.Renderer();
+
+    // 自定义列表的渲染方式
+    renderer.list = function(body, ordered, start) {
+        const type = ordered ? 'ol' : 'ul';
+        const startAttr = (ordered && start !== 1) ? (` start="${start}"`) : '';
+        return `<${type}${startAttr} style="margin-left: 5px; padding-left: 10px;">${body}</${type}>`;
+    };
+
+    marked.setOptions({
+        renderer: renderer,
+        breaks: true
+    });
+
+    tabs.forEach(tab => {
+        const children = tab.children;
+        for (let i = 0; i < children.length; i++) {
+            const child = children[i];
+            const formatHTML = marked.parse(child.innerHTML);
+            if (child.innerHTML !== formatHTML) {
+                child.innerHTML = formatHTML;
+            }
+        }
+    });
 }
 
 function displayDiscussName(discussName) {
