@@ -164,6 +164,18 @@ function discussInfoConnection(discussId) {
                 const data = JSON.parse(message.body);
                 const discussInfo = new DiscussInfo(data);
                 displayDiscussInfo(discussInfo);
+
+                const tabs = document.querySelectorAll('.tab-content');
+                tabs.forEach(tab => {
+                    const children = tab.children;
+                    for (let i = 0; i < children.length; i++) {
+                        const child = children[i];
+                        const formatHTML = marked.parse(child.innerHTML);
+                        if (child.innerHTML !== formatHTML) {
+                            child.innerHTML = formatHTML;
+                        }
+                    }
+                });
             }
 
             if (!isWaitingToSend) {
@@ -593,11 +605,10 @@ function displayDiscussInfo(discussInfo) {
 
 function updateTextIfNeeded(element, newText) {
     if (element && newText) {
-        const elementText = element.innerText.replace(/\n/g, '');
-        const formattedNewText = newText.replace(/\n/g, '');
-        if (elementText !== formattedNewText) {
+        var currentText = element.innerText.replace(/[\s\+\-\*\/\(\)\[\]]+/g, '');
+        var processedNewText = newText.replace(/[\s\+\-\*\/\(\)\[\]]+/g, '');
+        if (currentText !== processedNewText) {
             element.innerText = newText;
         }
     }
 }
-
