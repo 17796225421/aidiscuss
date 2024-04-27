@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             updateTextIfNeeded(itemDiv, item);
                             itemDiv.contentEditable = "true";
                             itemDiv.onblur = function () {
-                                if (itemDiv.innerText.trim() === '') {
+                                if (itemDiv.textContent.trim() === '') {
                                     fetch(`http://127.0.0.1:10002/deleteBackground`, {
                                         method: 'POST',
                                         headers: {'Content-Type': 'application/json'},
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     fetch(`http://127.0.0.1:10002/updateBackground`, {
                                         method: 'POST',
                                         headers: {'Content-Type': 'application/json'},
-                                        body: JSON.stringify({discussId, index, background: itemDiv.innerText.trim()})
+                                        body: JSON.stringify({discussId, index, background: itemDiv.textContent.trim()})
                                     });
                                 }
                             };
@@ -170,7 +170,7 @@ function discussInfoConnection(discussId) {
                     const children = tab.children;
                     for (let i = 0; i < children.length; i++) {
                         const child = children[i];
-                        const formatHTML = marked.parse(child.innerHTML);
+                        const formatHTML = marked.parse(child.innerHTML,{breaks:true});
                         if (child.innerHTML !== formatHTML) {
                             child.innerHTML = formatHTML;
                         }
@@ -216,7 +216,7 @@ function displaySentenceList(sentenceList) {
 
             const textElement = document.createElement('div');
             textElement.className = 'text';
-            textElement.innerText = sentence.text;
+            textElement.textContent = sentence.text;
             textElement.style.fontSize = '15px';
             textElement.style.padding = '5px';
             sentenceElement.appendChild(textElement);
@@ -251,7 +251,7 @@ function displayStartTimeList(startTimeList) {
                 } else {
                     const startTimeDiv = document.createElement('div');
                     startTimeDiv.className = 'startTime';
-                    startTimeDiv.innerText = `开始时间: ${startTime}`;
+                    startTimeDiv.textContent = `开始时间: ${startTime}`;
                     startTimeDiv.setAttribute('time', startTime);
                     startTimeDiv.style.color = 'lightgreen';
                     sentenceListContainer.insertBefore(startTimeDiv, existingChildren[i]);
@@ -277,7 +277,7 @@ function displayStopTimeList(stopTimeList) {
                 } else {
                     const stopTimeDiv = document.createElement('div');
                     stopTimeDiv.className = 'stopTime';
-                    stopTimeDiv.innerText = `停止时间: ${stopTime}`;
+                    stopTimeDiv.textContent = `停止时间: ${stopTime}`;
                     stopTimeDiv.setAttribute('time', stopTime);
                     stopTimeDiv.style.color = 'lightcoral';
                     sentenceListContainer.insertBefore(stopTimeDiv, existingChildren[i]);
@@ -298,7 +298,7 @@ function displaySegmentSummaryList(segmentSummaryList) {
             updateTextIfNeeded(existingChildren[index], segmentSummaryText);
         } else {
             const segmentSummaryElement = document.createElement('div');
-            segmentSummaryElement.innerText = segmentSummaryText;
+            segmentSummaryElement.textContent = segmentSummaryText;
             // 设置内边距和边框样式增加可读性
             segmentSummaryElement.style.padding = '5px';
             segmentSummaryElement.style.borderBottom = '1px solid #cccccc';
@@ -316,7 +316,7 @@ function displaySegmentQuestionList(segmentQuestionList) {
             updateTextIfNeeded(existingChildren[index], segmentQuestionText);
         } else {
             const segmentQuestionElement = document.createElement('div');
-            segmentQuestionElement.innerText = segmentQuestionText;
+            segmentQuestionElement.textContent = segmentQuestionText;
             // 设置内边距和边框样式增加可读性
             segmentQuestionElement.style.padding = '10px';
             segmentQuestionElement.style.borderBottom = '1px solid #cccccc';
@@ -334,7 +334,7 @@ function displaySegmentUnderstandList(segmentUnderstandList) {
             updateTextIfNeeded(existingChildren[index], segmentUnderstandText);
         } else {
             const segmentUnderstandElement = document.createElement('div');
-            segmentUnderstandElement.innerText = segmentUnderstandText;
+            segmentUnderstandElement.textContent = segmentUnderstandText;
             // 设置内边距和边框样式增加可读性
             segmentUnderstandElement.style.padding = '10px';
             segmentUnderstandElement.style.borderBottom = '1px solid #cccccc';
@@ -352,7 +352,7 @@ function displaySegmentRemarkList(segmentRemarkList) {
             updateTextIfNeeded(existingChildren[index], segmentRemarkText);
         } else {
             const segmentRemarkElement = document.createElement('div');
-            segmentRemarkElement.innerText = segmentRemarkText;
+            segmentRemarkElement.textContent = segmentRemarkText;
             // 设置内边距和边框样式增加可读性
             segmentRemarkElement.style.padding = '10px';
             segmentRemarkElement.style.borderBottom = '1px solid #cccccc';
@@ -370,7 +370,7 @@ function displaySegmentRestateList(segmentRestateList) {
             updateTextIfNeeded(existingChildren[index], segmentRestateText);
         } else {
             const segmentRestateElement = document.createElement('div');
-            segmentRestateElement.innerText = segmentRestateText;
+            segmentRestateElement.textContent = segmentRestateText;
             // 设置内边距和边框样式增加可读性
             segmentRestateElement.style.padding = '10px';
             segmentRestateElement.style.borderBottom = '1px solid #cccccc';
@@ -388,7 +388,7 @@ function displaySegmentAnalogyList(segmentAnalogyList) {
             updateTextIfNeeded(existingChildren[index], segmentAnalogyText);
         } else {
             const segmentAnalogyElement = document.createElement('div');
-            segmentAnalogyElement.innerText = segmentAnalogyText;
+            segmentAnalogyElement.textContent = segmentAnalogyText;
             // 设置内边距和边框样式增加可读性
             segmentAnalogyElement.style.padding = '10px';
             segmentAnalogyElement.style.borderBottom = '1px solid #cccccc';
@@ -406,7 +406,7 @@ function displaySegmentContinueList(segmentContinueList) {
             updateTextIfNeeded(existingChildren[index], segmentContinueText);
         } else {
             const segmentContinueElement = document.createElement('div');
-            segmentContinueElement.innerText = segmentContinueText;
+            segmentContinueElement.textContent = segmentContinueText;
             // 设置内边距和边框样式增加可读性
             segmentContinueElement.style.padding = '10px';
             segmentContinueElement.style.borderBottom = '1px solid #cccccc';
@@ -424,7 +424,7 @@ function displaySegmentMultiangleList(segmentMultiangleList) {
             updateTextIfNeeded(existingChildren[index], segmentMultiangleText);
         } else {
             const segmentMultiangleElement = document.createElement('div');
-            segmentMultiangleElement.innerText = segmentMultiangleText;
+            segmentMultiangleElement.textContent = segmentMultiangleText;
             // 设置内边距和边框样式增加可读性
             segmentMultiangleElement.style.padding = '10px';
             segmentMultiangleElement.style.borderBottom = '1px solid #cccccc';
@@ -442,7 +442,7 @@ function displaySegmentLogicList(segmentLogicList) {
             updateTextIfNeeded(existingChildren[index], segmentLogicText);
         } else {
             const segmentLogicElement = document.createElement('div');
-            segmentLogicElement.innerText = segmentLogicText;
+            segmentLogicElement.textContent = segmentLogicText;
             // 设置内边距和边框样式增加可读性
             segmentLogicElement.style.padding = '10px';
             segmentLogicElement.style.borderBottom = '1px solid #cccccc';
@@ -460,7 +460,7 @@ function displaySegmentManagingupList(segmentManagingupList) {
             updateTextIfNeeded(existingChildren[index], segmentManagingupText);
         } else {
             const segmentManagingupElement = document.createElement('div');
-            segmentManagingupElement.innerText = segmentManagingupText;
+            segmentManagingupElement.textContent = segmentManagingupText;
             // 设置内边距和边框样式增加可读性
             segmentManagingupElement.style.padding = '10px';
             segmentManagingupElement.style.borderBottom = '1px solid #cccccc';
@@ -478,7 +478,7 @@ function displayTimeSlicedSummaryList(timeSlicedSummaryList) {
             updateTextIfNeeded(existingChildren[index], timeSlicedSummaryText);
         } else {
             const timeSlicedSummaryElement = document.createElement('div');
-            timeSlicedSummaryElement.innerText = timeSlicedSummaryText;
+            timeSlicedSummaryElement.textContent = timeSlicedSummaryText;
             // 设置内边距和边框样式增加可读性
             timeSlicedSummaryElement.style.padding = '10px';
             timeSlicedSummaryElement.style.borderBottom = '1px solid #cccccc';
@@ -497,7 +497,7 @@ function displayKeyWordList(keyWordList) {
                 updateTextIfNeeded(existingChildren[index], keyWordText);
             } else {
                 const keyWordElement = document.createElement('div');
-                keyWordElement.innerText = keyWordText;
+                keyWordElement.textContent = keyWordText;
                 keyWordElement.style.padding = '10px';
                 keyWordElement.style.borderBottom = '1px solid #cccccc';
                 keyWordListContainer.appendChild(keyWordElement);
@@ -516,7 +516,7 @@ function displayKeySentenceList(keySentenceList) {
                 updateTextIfNeeded(existingChildren[index], keySentenceText);
             } else {
                 const keySentenceElement = document.createElement('div');
-                keySentenceElement.innerText = keySentenceText;
+                keySentenceElement.textContent = keySentenceText;
                 keySentenceElement.style.padding = '10px';
                 keySentenceElement.style.borderBottom = '1px solid #cccccc';
                 keySentenceListContainer.appendChild(keySentenceElement);
@@ -548,7 +548,7 @@ function displayQuestionAnswerList(discussId, questionAnswerList) {
             questionAnswerListContainer.appendChild(answerElement);
 
             deleteButton = document.createElement('button');
-            deleteButton.innerText = '删除';
+            deleteButton.textContent = '删除';
             questionAnswerListContainer.appendChild(deleteButton);
         }
 
@@ -605,9 +605,9 @@ function displayDiscussInfo(discussInfo) {
 
 function updateTextIfNeeded(element, newText) {
     if (element && newText) {
-        var currentText = element.innerText.replace(/[\s\+\-\*\/\(\)\[\]]+/g, '');
-        var processedNewText = newText.replace(/[\s\+\-\*\/\(\)\[\]]+/g, '');
-        if (currentText !== processedNewText) {
+        const cleanElement = element.innerText.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '');
+        const cleanNewText = newText.replace(/[^a-zA-Z\u4e00-\u9fa5]/g, '');
+        if (cleanElement !== cleanNewText) {
             element.innerText = newText;
         }
     }
