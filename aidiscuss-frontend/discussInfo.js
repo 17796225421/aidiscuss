@@ -2,6 +2,7 @@ class DiscussInfo {
     constructor(data) {
         this.discussId = data.discussId;
         this.discussName = data.discussName;
+        this.realTimeSentence=data.realTimeSentence;
         this.sentenceList = data.sentenceList;
         this.startTimeList = data.startTimeList;
         this.stopTimeList = data.stopTimeList;
