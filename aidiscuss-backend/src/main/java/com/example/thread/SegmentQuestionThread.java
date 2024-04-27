@@ -38,7 +38,7 @@ public class SegmentQuestionThread extends Thread {
                 if (unprocessedText.length() > MAX_TEXT_LENGTH) {
                     String text = unprocessedText.toString();
                     String segmentQuestion = gptService.requestLlama3("llama3-70b-8192", "你是一个擅长提问的程序员", text + "\n以上内容可以提出什么问题？每个问题输出一行。");
-                    System.out.println("segmentQuestion" + segmentQuestion);
+//                    System.out.println("segmentQuestion" + segmentQuestion);
                     redisService.addSegmentQuestion(discussId, segmentQuestion);
 
                     // 将更新后的游标位置保存到Redis中

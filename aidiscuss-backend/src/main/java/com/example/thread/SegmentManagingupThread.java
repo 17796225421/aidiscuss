@@ -38,7 +38,7 @@ public class SegmentManagingupThread extends Thread {
                 if (unprocessedText.length() > MAX_TEXT_LENGTH) {
                     String text = unprocessedText.toString();
                     String segmentManagingup = gptService.requestLlama3("llama3-70b-8192", "你是一个久经职场擅长向上管理的程序员", text + "\n对于以上情况，我如何向上管理？");
-                    System.out.println("segmentManagingup" + segmentManagingup);
+//                    System.out.println("segmentManagingup" + segmentManagingup);
                     redisService.addSegmentManagingup(discussId, segmentManagingup);
 
                     // 将更新后的游标位置保存到Redis中

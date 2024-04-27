@@ -39,7 +39,7 @@ public class SegmentSummaryThread extends Thread {
                     String text = unprocessedText.toString();
 //                    String segmentSummary = gptService.requestGpt3("gpt-3.5-turbo", "你是一个有帮助的助手", text);
                     String segmentSummary = gptService.requestLlama3("llama3-70b-8192", "你是一个擅长将大段文字总结成简单摘要的程序员", "将以下内容总结成简单摘要\n" + text);
-                    System.out.println("segmentSummary" + segmentSummary);
+//                    System.out.println("segmentSummary" + segmentSummary);
                     redisService.addSegmentSummary(discussId, segmentSummary);
 
                     // 将更新后的游标位置保存到Redis中

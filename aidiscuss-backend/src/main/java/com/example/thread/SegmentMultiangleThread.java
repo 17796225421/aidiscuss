@@ -38,7 +38,7 @@ public class SegmentMultiangleThread extends Thread {
                 if (unprocessedText.length() > MAX_TEXT_LENGTH) {
                     String text = unprocessedText.toString();
                     String segmentMultiangle = gptService.requestLlama3("llama3-70b-8192", "你是一个思维发散头脑灵活知识广度大的程序员", "从多角度分析以下内容：" + text);
-                    System.out.println("segmentMultiangle" + segmentMultiangle);
+//                    System.out.println("segmentMultiangle" + segmentMultiangle);
                     redisService.addSegmentMultiangle(discussId, segmentMultiangle);
 
                     // 将更新后的游标位置保存到Redis中

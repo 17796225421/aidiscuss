@@ -38,7 +38,7 @@ public class SegmentAnalogyThread extends Thread {
                 if (unprocessedText.length() > MAX_TEXT_LENGTH) {
                     String text = unprocessedText.toString();
                     String segmentAnalogy = gptService.requestLlama3("llama3-70b-8192", "你是一个有帮助的助手", text);
-                    System.out.println("segmentAnalogy" + segmentAnalogy);
+//                    System.out.println("segmentAnalogy" + segmentAnalogy);
                     redisService.addSegmentAnalogy(discussId, segmentAnalogy);
 
                     // 将更新后的游标位置保存到Redis中

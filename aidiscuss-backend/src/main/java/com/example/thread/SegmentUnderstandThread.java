@@ -38,7 +38,7 @@ public class SegmentUnderstandThread extends Thread {
                 if (unprocessedText.length() > MAX_TEXT_LENGTH) {
                     String text = unprocessedText.toString();
                     String segmentUnderstand = gptService.requestLlama3("llama3-70b-8192", "你是一个擅长提供潜在意图隐藏信息额外背景来辅助理解一大段文字的老师", "对于以下文字，输出辅助理解的潜在意图隐藏信息额外背景\n" + text);
-                    System.out.println("segmentUnderstand" + segmentUnderstand);
+//                    System.out.println("segmentUnderstand" + segmentUnderstand);
                     redisService.addSegmentUnderstand(discussId, segmentUnderstand);
 
                     // 将更新后的游标位置保存到Redis中

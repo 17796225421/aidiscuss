@@ -60,11 +60,34 @@ public class MicTranscriberService {
             // 创建语音识别实例并设置参数
             transcriber = new SpeechTranscriber(client, getTranscriberListener(discussId, micTypeEnum));
             transcriber.setAppKey(appKey);
+            //输入音频编码方式。
             transcriber.setFormat(InputFormatEnum.PCM);
+            //输入音频采样率。
             transcriber.setSampleRate(SampleRateEnum.SAMPLE_RATE_16K);
+            //是否返回中间识别结果。
             transcriber.setEnableIntermediateResult(true);
+            //是否生成并返回标点符号。
             transcriber.setEnablePunctuation(true);
-            transcriber.setEnableITN(false);
+            //是否将返回结果规整化，比如将一百返回为100。
+            transcriber.setEnableITN(true);
+
+            //设置vad断句参数。默认值：800ms，有效值：200ms～2000ms。
+            //transcriber.addCustomedParam("max_sentence_silence", 600);
+            //设置是否语义断句。
+            transcriber.addCustomedParam("enable_semantic_sentence_detection",true);
+            //设置是否开启过滤语气词，即声音顺滑。
+            transcriber.addCustomedParam("disfluency",true);
+            //设置是否开启词模式。
+            //transcriber.addCustomedParam("enable_words",true);
+            //设置vad噪音阈值参数，参数取值为-1～+1，如-0.9、-0.8、0.2、0.9。
+            //取值越趋于-1，判定为语音的概率越大，亦即有可能更多噪声被当成语音被误识别。
+            //取值越趋于+1，判定为噪音的越多，亦即有可能更多语音段被当成噪音被拒绝识别。
+            //该参数属高级参数，调整需慎重和重点测试。
+            transcriber.addCustomedParam("speech_noise_threshold",0.3);
+            //设置训练后的定制语言模型id。
+            //transcriber.addCustomedParam("customization_id","你的定制语言模型id");
+            //设置训练后的定制热词id。
+            //transcriber.addCustomedParam("vocabulary_id","你的定制热词id");
 
             // 打开指定的麦克风设备
             Mixer mixer = AudioSystem.getMixer(selectedMixerInfo);
