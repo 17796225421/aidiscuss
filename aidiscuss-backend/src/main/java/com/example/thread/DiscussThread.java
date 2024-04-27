@@ -62,7 +62,7 @@ public class DiscussThread {
         keyWordThread.start();
         keySentenceThread.start();
         sentenceSummaryThread.start();
-        segmentCorrectThread.start();
+//        segmentCorrectThread.start();
     }
 
     public void stop() {

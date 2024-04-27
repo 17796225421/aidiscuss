@@ -77,6 +77,7 @@ public class RedisService {
                     jedis.set("discussId", discussInfo.getDiscussId());
                     jedis.set("discussName", discussInfo.getDiscussName());
                     jedis.set("discussStatus", String.valueOf(discussInfo.getDiscussStatus()));
+                    jedis.set("realTimeSentence","");
 
                     jedis.del("sentenceList");
                     jedis.del("startTimeList");
@@ -125,6 +126,7 @@ public class RedisService {
         discussInfo.setDiscussId(jedis.get("discussId"));
         discussInfo.setDiscussName(jedis.get("discussName"));
         discussInfo.setDiscussStatus(Integer.parseInt(jedis.get("discussStatus")));
+        discussInfo.setRealTimeSentence(jedis.get("realTimeSentence"));
 
         List<String> sentenceJsonList = jedis.lrange("sentenceList", 0, -1);
         List<Sentence> sentenceList = sentenceJsonList.stream()
@@ -557,5 +559,10 @@ public class RedisService {
     public void setSegmentManagingupCursor(String discussId, int segmentManagingupCursor) {
         Jedis jedis = findDiscussDatabase(discussId);
         jedis.set("segmentManagingupCursor", String.valueOf(segmentManagingupCursor));
+    }
+
+    public void updateRealTimeSentence(String discussId, String realTimeSentence) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.set("realTimeSentence", realTimeSentence);
     }
 }

@@ -8,6 +8,7 @@ public class DiscussInfo {
     String discussId;
     // 讨论名称
     String discussName;
+    String realTimeSentence;
     // 句子列表
     List<Sentence> sentenceList;
     // 开始时间列表
@@ -96,6 +97,14 @@ public class DiscussInfo {
 
     public void setDiscussName(String discussName) {
         this.discussName = discussName;
+    }
+
+    public String getRealTimeSentence() {
+        return realTimeSentence;
+    }
+
+    public void setRealTimeSentence(String realTimeSentence) {
+        this.realTimeSentence = realTimeSentence;
     }
 
     public List<String> getStartTimeList() {

@@ -184,6 +184,11 @@ function displayDiscussName(discussName) {
     updateTextIfNeeded(discussNameElement, discussName);
 }
 
+function displayRealTimeSentence(realTimeSentence) {
+    const realTimeSentenceElement = document.getElementById('realTimeSentence');
+    updateTextIfNeeded(realTimeSentenceElement, realTimeSentence);
+}
+
 function displaySentenceList(sentenceList) {
     const sentenceListContainer = document.getElementById('sentenceList');
     const existingChildren = Array.from(sentenceListContainer.children).filter(child => child.className === 'sentence');
@@ -565,6 +570,7 @@ function displayQuestionAnswerList(discussId, questionAnswerList) {
 
 function displayDiscussInfo(discussInfo) {
     displayDiscussName(discussInfo.discussName);
+    displayRealTimeSentence(discussInfo.realTimeSentence);
     displaySentenceList(discussInfo.sentenceList);
     displayStartTimeList(discussInfo.startTimeList);
     displayStopTimeList(discussInfo.stopTimeList);
@@ -586,9 +592,12 @@ function displayDiscussInfo(discussInfo) {
 }
 
 function updateTextIfNeeded(element, newText) {
-    const elementText = element.innerText.replace(/\n/g, '');
-    const formattedNewText = newText.replace(/\n/g, '');
-    if (elementText !== formattedNewText) {
-        element.innerText = newText;
+    if (element && newText) {
+        const elementText = element.innerText.replace(/\n/g, '');
+        const formattedNewText = newText.replace(/\n/g, '');
+        if (elementText !== formattedNewText) {
+            element.innerText = newText;
+        }
     }
 }
+

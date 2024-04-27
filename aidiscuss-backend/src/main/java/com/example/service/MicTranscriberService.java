@@ -74,16 +74,16 @@ public class MicTranscriberService {
             //设置vad断句参数。默认值：800ms，有效值：200ms～2000ms。
             //transcriber.addCustomedParam("max_sentence_silence", 600);
             //设置是否语义断句。
-            transcriber.addCustomedParam("enable_semantic_sentence_detection",true);
+            transcriber.addCustomedParam("enable_semantic_sentence_detection", true);
             //设置是否开启过滤语气词，即声音顺滑。
-            transcriber.addCustomedParam("disfluency",true);
+            transcriber.addCustomedParam("disfluency", true);
             //设置是否开启词模式。
             //transcriber.addCustomedParam("enable_words",true);
             //设置vad噪音阈值参数，参数取值为-1～+1，如-0.9、-0.8、0.2、0.9。
             //取值越趋于-1，判定为语音的概率越大，亦即有可能更多噪声被当成语音被误识别。
             //取值越趋于+1，判定为噪音的越多，亦即有可能更多语音段被当成噪音被拒绝识别。
             //该参数属高级参数，调整需慎重和重点测试。
-            transcriber.addCustomedParam("speech_noise_threshold",0.3);
+            transcriber.addCustomedParam("speech_noise_threshold", 0.3);
             //设置训练后的定制语言模型id。
             //transcriber.addCustomedParam("customization_id","你的定制语言模型id");
             //设置训练后的定制热词id。
@@ -125,10 +125,16 @@ public class MicTranscriberService {
 
     public SpeechTranscriberListener getTranscriberListener(String discussId, MicTypeEnum micTypeEnum) {
         SpeechTranscriberListener listener = new SpeechTranscriberListener() {
+            //识别出中间结果。仅当setEnableIntermediateResult为true时，才会返回该消息。
             @Override
             public void onTranscriptionResultChange(SpeechTranscriberResponse response) {
-
+//                System.out.println(String.format(
+//                        "result: %s",
+//                        response.getTransSentenceText()                //当前的识别结果
+//                ));
+                redisService.updateRealTimeSentence(discussId, response.getTransSentenceText());
             }
+
 
             @Override
             public void onTranscriberStart(SpeechTranscriberResponse response) {
@@ -144,12 +150,9 @@ public class MicTranscriberService {
             @Override
             public void onSentenceEnd(SpeechTranscriberResponse response) {
                 System.out.println(String.format(
-                        "[%s] index: %d, result: %s, begin_time: %.1f, time: %.1f",
-                        Thread.currentThread().getName(),    // 获取当前线程的名称
+                        "index: %d, result: %s",
                         response.getTransSentenceIndex(),               //句子编号,从1开始递增
-                        response.getTransSentenceText(),                //当前的识别结果
-                        response.getSentenceBeginTime() / 1000.0,       //句子开始时间,单位是秒
-                        response.getTransSentenceTime() / 1000.0        //当前已处理的音频时长,单位是秒
+                        response.getTransSentenceText()                //当前的识别结果
                 ));
 
                 Sentence sentence = new Sentence();
