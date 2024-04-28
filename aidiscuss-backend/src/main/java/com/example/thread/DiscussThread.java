@@ -40,7 +40,7 @@ public class DiscussThread {
         this.keyWordThread=new KeyWordThread(discussId);
         this.keySentenceThread=new KeySentenceThread(discussId);
         this.sentenceSummaryThread=new SentenceSummaryThread(discussId);
-        this.segmentCorrectThread=new SegmentCorrectThread(discussId);
+//        this.segmentCorrectThread=new SegmentCorrectThread(discussId);
     }
 
 
@@ -83,6 +83,6 @@ public class DiscussThread {
         keyWordThread.stopRunning();
         keySentenceThread.stopRunning();
         sentenceSummaryThread.stopRunning();
-        segmentCorrectThread.stopRunning();
+//        segmentCorrectThread.stopRunning();
     }
 }
