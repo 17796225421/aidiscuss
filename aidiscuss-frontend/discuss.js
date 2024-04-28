@@ -219,6 +219,7 @@ function displayRealTimeSentence(realTimeSentence) {
     updateTextIfNeeded(realTimeSentenceElement, realTimeSentence);
 }
 
+const summaryOpacity = 0.3;
 function displaySentenceList(sentenceList) {
     const sentenceListContainer = document.getElementById('sentenceList');
     const existingChildren = Array.from(sentenceListContainer.children).filter(child => child.className === 'sentence');
@@ -231,21 +232,32 @@ function displaySentenceList(sentenceList) {
         } else {
             const sentenceElement = document.createElement('div');
             sentenceElement.className = 'sentence';
+            sentenceElement.style.display = 'flex';  // 使用flex布局
+            sentenceElement.style.alignItems = 'center';  // 垂直居中对齐
+            sentenceElement.style.justifyContent = 'space-between';  // 子元素间隔均匀分布
 
             const textElement = document.createElement('div');
             textElement.className = 'text';
             textElement.textContent = sentence.text;
             textElement.style.fontSize = '15px';
-            textElement.style.padding = '5px';
+            textElement.style.padding = '1px';
+            const opacity = summaryOpacity + (sentence.score / 10) * (1 - summaryOpacity);
+            console.log(opacity);
+            textElement.style.opacity = opacity.toString();
             sentenceElement.appendChild(textElement);
 
             const summaryElement = document.createElement('div');
             summaryElement.className = 'summary';
             summaryElement.innerHTML = sentence.summary;
-            summaryElement.style.opacity = '0.5'; // 设置半透明样式
-            summaryElement.style.fontSize = '13px';
-            summaryElement.style.padding = '5px';
+            summaryElement.style.opacity = summaryOpacity.toString(); // 设置半透明样式
+            summaryElement.style.fontSize = '12px';
+            summaryElement.style.padding = '1px';
+            summaryElement.style.marginBottom = '2px'; // 添加2px的底部外边距
             sentenceElement.appendChild(summaryElement);
+
+            sentenceElement.setAttribute('time', sentence.beginTime);
+            sentenceElement.setAttribute('micTypeEnum', sentence.micTypeEnum);
+            sentenceListContainer.appendChild(sentenceElement);
 
             sentenceElement.setAttribute('time', sentence.beginTime);
             sentenceElement.setAttribute('micTypeEnum', sentence.micTypeEnum);
@@ -513,7 +525,8 @@ function displayKeyWordList(keyWordList) {
             const regex = new RegExp(keyWord, 'gu');
             if (sentenceText.innerHTML.includes(keyWord) && !sentenceText.innerHTML.includes('<b>' + keyWord + '</b>')) {
                 sentenceText.innerHTML = sentenceText.innerHTML.replace(regex, match => `<b>${match}</b>`);
-d            }
+                d
+            }
         });
     });
 }
