@@ -32,8 +32,6 @@ public class DiscussInfo {
     private List<String> timeSlicedSummaryList;
     // 关键词列表
     private List<String> keyWordList;
-    // 关键句列表
-    private List<String> keySentenceList;
     // 背景列表
     private List<String> backgroundList;
     // 问答列表
@@ -42,8 +40,6 @@ public class DiscussInfo {
     int discussStatus;
     // 片段总结游标
     private int segmentSummaryCursor;
-    private int segmentCorrectCursor;
-    private int sentenceSummaryCursor;
     // 片段问题游标
     private int segmentQuestionCursor;
     // 片段理解游标
@@ -59,8 +55,6 @@ public class DiscussInfo {
     private int timeSlicedSummaryCursor;
     // 关键词游标
     private int keyWordCursor;
-    // 关键句游标
-    private int keySentenceCursor;
 
     public DiscussInfo() {
         sentenceList = new ArrayList<>();
@@ -78,7 +72,6 @@ public class DiscussInfo {
         segmentManagingupList = new ArrayList<>();
         timeSlicedSummaryList = new ArrayList<>();
         keyWordList = new ArrayList<>();
-        keySentenceList = new ArrayList<>();
         backgroundList = new ArrayList<>();
         questionAnswerList = new ArrayList<>();
     }
@@ -163,14 +156,6 @@ public class DiscussInfo {
         this.keyWordList = keyWordList;
     }
 
-    public List<String> getKeySentenceList() {
-        return keySentenceList;
-    }
-
-    public void setKeySentenceList(List<String> keySentenceList) {
-        this.keySentenceList = keySentenceList;
-    }
-
     public List<String> getBackgroundList() {
         return backgroundList;
     }
@@ -235,36 +220,12 @@ public class DiscussInfo {
         this.keyWordCursor = keyWordCursor;
     }
 
-    public int getKeySentenceCursor() {
-        return keySentenceCursor;
-    }
-
-    public void setKeySentenceCursor(int keySentenceCursor) {
-        this.keySentenceCursor = keySentenceCursor;
-    }
-
     public List<Sentence> getSentenceList() {
         return sentenceList;
     }
 
     public void setSentenceList(List<Sentence> sentenceList) {
         this.sentenceList = sentenceList;
-    }
-
-    public int getSentenceSummaryCursor() {
-        return sentenceSummaryCursor;
-    }
-
-    public void setSentenceSummaryCursor(int sentenceSummaryCursor) {
-        this.sentenceSummaryCursor = sentenceSummaryCursor;
-    }
-
-    public int getSegmentCorrectCursor() {
-        return segmentCorrectCursor;
-    }
-
-    public void setSegmentCorrectCursor(int segmentCorrectCursor) {
-        this.segmentCorrectCursor = segmentCorrectCursor;
     }
 
     public List<String> getSegmentRemarkList() {

@@ -94,12 +94,10 @@ public class RedisService {
                     jedis.del("segmentManagingupList");
                     jedis.del("timeSlicedSummaryList");
                     jedis.del("keyWordList");
-                    jedis.del("keySentenceList");
                     jedis.del("backgroundList");
                     jedis.del("questionAnswerList");
 
                     jedis.set("segmentSummaryCursor", "0");
-                    jedis.set("segmentCorrectCursor", "0");
                     jedis.set("sentenceSummaryCursor", "0");
                     jedis.set("segmentQuestionCursor", "0");
                     jedis.set("segmentRemarkCursor", "0");
@@ -112,7 +110,6 @@ public class RedisService {
                     jedis.set("segmentUnderstandCursor", "0");
                     jedis.set("timeSlicedSummaryCursor", "0");
                     jedis.set("keyWordCursor", "0");
-                    jedis.set("keySentenceCursor", "0");
                     break;
                 }
             }
@@ -147,7 +144,6 @@ public class RedisService {
         discussInfo.setSegmentManagingupList(jedis.lrange("segmentManagingupList", 0, -1));
         discussInfo.setTimeSlicedSummaryList(jedis.lrange("timeSlicedSummaryList", 0, -1));
         discussInfo.setKeyWordList(jedis.lrange("keyWordList", 0, -1));
-        discussInfo.setKeySentenceList(jedis.lrange("keySentenceList", 0, -1));
         discussInfo.setBackgroundList(jedis.lrange("backgroundList", 0, -1));
         List<String> questionAnswerJsonList = jedis.lrange("questionAnswerList", 0, -1);
         List<QuestionAnswer> questionAnswerList = questionAnswerJsonList.stream()
@@ -156,8 +152,6 @@ public class RedisService {
         discussInfo.setQuestionAnswerList(questionAnswerList);
 
         discussInfo.setSegmentSummaryCursor(Integer.parseInt(jedis.get("segmentSummaryCursor")));
-        discussInfo.setSegmentCorrectCursor(Integer.parseInt(jedis.get("segmentCorrectCursor")));
-        discussInfo.setSentenceSummaryCursor(Integer.parseInt(jedis.get("sentenceSummaryCursor")));
         discussInfo.setSegmentQuestionCursor(Integer.parseInt(jedis.get("segmentQuestionCursor")));
         discussInfo.setSegmentUnderstandCursor(Integer.parseInt(jedis.get("segmentUnderstandCursor")));
         discussInfo.setSegmentRemarkCursor(Integer.parseInt(jedis.get("segmentRemarkCursor")));
@@ -169,7 +163,6 @@ public class RedisService {
         discussInfo.setSegmentManagingupCursor(Integer.parseInt(jedis.get("segmentManagingupCursor")));
         discussInfo.setTimeSlicedSummaryCursor(Integer.parseInt(jedis.get("timeSlicedSummaryCursor")));
         discussInfo.setKeyWordCursor(Integer.parseInt(jedis.get("keyWordCursor")));
-        discussInfo.setKeySentenceCursor(Integer.parseInt(jedis.get("keySentenceCursor")));
 
         return discussInfo;
     }
@@ -250,36 +243,15 @@ public class RedisService {
         return 0;
     }
 
-    public int getKeySentenceCursor(String discussId) {
-        Jedis jedis = findDiscussDatabase(discussId);
-        if (jedis != null) {
-            String cursor = jedis.get("keySentenceCursor");
-            return Integer.parseInt(cursor);
-        }
-        return 0;
-    }
-
     public void setKeyWordCursor(String discussId, int keyWordCursor) {
         Jedis jedis = findDiscussDatabase(discussId);
         jedis.set("keyWordCursor", String.valueOf(keyWordCursor));
-    }
-
-    public void setKeySentenceCursor(String discussId, int keySentenceCursor) {
-        Jedis jedis = findDiscussDatabase(discussId);
-        jedis.set("keySentenceCursor", String.valueOf(keySentenceCursor));
     }
 
     public void addKeyWordList(String discussId, List<String> newKeyWordList) {
         Jedis jedis = findDiscussDatabase(discussId);
         for (String newKeyWord : newKeyWordList) {
             jedis.rpush("keyWordList", newKeyWord);
-        }
-    }
-
-    public void addKeySentenceList(String discussId, List<String> newKeySentenceList) {
-        Jedis jedis = findDiscussDatabase(discussId);
-        for (String newKeySentence : newKeySentenceList) {
-            jedis.rpush("keySentenceList", newKeySentence);
         }
     }
 
@@ -406,60 +378,6 @@ public class RedisService {
     public List<String> getStartTimeList(String discussId) {
         Jedis jedis = findDiscussDatabase(discussId);
         return jedis.lrange("startTimeList", 0, -1);
-    }
-
-    public int getSentenceSummaryCursor(String discussId) {
-        Jedis jedis = findDiscussDatabase(discussId);
-        return Integer.parseInt(jedis.get("sentenceSummaryCursor"));
-    }
-
-    public void setSentenceSummary(String discussId, int sentenceSummaryCursor, String summary) {
-        Jedis jedis = findDiscussDatabase(discussId);
-        List<String> sentenceJsonList = jedis.lrange("sentenceList", 0, -1);
-        List<Sentence> sentenceList = sentenceJsonList.stream()
-                .map(json -> new Gson().fromJson(json, Sentence.class))
-                .collect(Collectors.toList());
-
-        if (sentenceSummaryCursor >= 0 && sentenceSummaryCursor < sentenceList.size()) {
-            Sentence sentence = sentenceList.get(sentenceSummaryCursor);
-            sentence.setSummary(summary);
-            String updatedJson = new Gson().toJson(sentence);
-            jedis.lset("sentenceList", sentenceSummaryCursor, updatedJson);
-        }
-    }
-
-    public void setSentenceSummaryCursor(String discussId, int sentenceSummaryCursor) {
-        Jedis jedis = findDiscussDatabase(discussId);
-        jedis.set("sentenceSummaryCursor", String.valueOf(sentenceSummaryCursor));
-    }
-
-    public int getSegmentCorrectCursor(String discussId) {
-        Jedis jedis = findDiscussDatabase(discussId);
-        if (jedis != null) {
-            String cursor = jedis.get("segmentCorrectCursor");
-            return Integer.parseInt(cursor);
-        }
-        return 0;
-    }
-
-    public void updateSentenceText(String discussId, int index, String sentenceText) {
-        Jedis jedis = findDiscussDatabase(discussId);
-        List<String> sentenceJsonList = jedis.lrange("sentenceList", 0, -1);
-        List<Sentence> sentenceList = sentenceJsonList.stream()
-                .map(json -> new Gson().fromJson(json, Sentence.class))
-                .collect(Collectors.toList());
-
-        if (index >= 0 && index < sentenceList.size()) {
-            Sentence sentence = sentenceList.get(index);
-            sentence.setText(sentenceText);
-            String updatedJson = new Gson().toJson(sentence);
-            jedis.lset("sentenceList", index, updatedJson);
-        }
-    }
-
-    public void setSegmentCorrectCursor(String discussId, int segmentCorrectCursor) {
-        Jedis jedis = findDiscussDatabase(discussId);
-        jedis.set("segmentCorrectCursor", String.valueOf(segmentCorrectCursor));
     }
 
     public int getSegmentRemarkCursor(String discussId) {
