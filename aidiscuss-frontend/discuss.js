@@ -170,7 +170,7 @@ function discussInfoConnection(discussId) {
 
             if (!isWaitingToSend) {
                 isWaitingToSend = true;
-                setTimeout(sendRequest, 1000);
+                setTimeout(sendRequest, 1 * 1000);
             }
         });
     });
@@ -186,7 +186,7 @@ function formatTabContent() {
     const renderer = new marked.Renderer();
 
     // 自定义列表的渲染方式
-    renderer.list = function(body, ordered, start) {
+    renderer.list = function (body, ordered, start) {
         const type = ordered ? 'ol' : 'ul';
         const startAttr = (ordered && start !== 1) ? (` start="${start}"`) : '';
         return `<${type}${startAttr} style="margin-left: 5px; padding-left: 10px;">${body}</${type}>`;
@@ -506,40 +506,29 @@ function displayTimeSlicedSummaryList(timeSlicedSummaryList) {
 }
 
 function displayKeyWordList(keyWordList) {
-    const keyWordListContainer = document.getElementById('keyWordList');
-    const existingChildren = keyWordListContainer.children;
-    keyWordList.forEach((keyWord, index) => {
-        if (keyWord.trim() !== '') {
-            const keyWordText = `${keyWord}`;
-            if (index < existingChildren.length) {
-                updateTextIfNeeded(existingChildren[index], keyWordText);
-            } else {
-                const keyWordElement = document.createElement('div');
-                keyWordElement.textContent = keyWordText;
-                keyWordElement.style.padding = '10px';
-                keyWordElement.style.borderBottom = '1px solid #cccccc';
-                keyWordListContainer.appendChild(keyWordElement);
+    const sentenceTexts = document.querySelectorAll('.sentence .text');
+    keyWordList.forEach(keyWord => {
+        if (keyWord.trim() === '') return; // 跳过空字符串
+        sentenceTexts.forEach(sentenceText => {
+            const regex = new RegExp(keyWord, 'gu');
+            if (sentenceText.innerHTML.includes(keyWord) && !sentenceText.innerHTML.includes('<b>' + keyWord + '</b>')) {
+                sentenceText.innerHTML = sentenceText.innerHTML.replace(regex, match => `<b>${match}</b>`);
             }
-        }
+        });
     });
 }
 
+
 function displayKeySentenceList(keySentenceList) {
-    const keySentenceListContainer = document.getElementById('keySentenceList');
-    const existingChildren = keySentenceListContainer.children;
-    keySentenceList.forEach((keySentence, index) => {
-        if (keySentence.trim() !== '') {
-            const keySentenceText = `${keySentence}`;
-            if (index < existingChildren.length) {
-                updateTextIfNeeded(existingChildren[index], keySentenceText);
-            } else {
-                const keySentenceElement = document.createElement('div');
-                keySentenceElement.textContent = keySentenceText;
-                keySentenceElement.style.padding = '10px';
-                keySentenceElement.style.borderBottom = '1px solid #cccccc';
-                keySentenceListContainer.appendChild(keySentenceElement);
+    const sentenceTexts = document.querySelectorAll('.sentence .text');
+    keySentenceList.forEach(keySentence => {
+        if (keySentence.trim() === '') return; // 跳过空字符串
+        sentenceTexts.forEach(sentenceText => {
+            const regex = new RegExp(keySentence, 'gu');
+            if (sentenceText.innerHTML.includes(keySentence) && !sentenceText.innerHTML.includes('<span class="highlight">' + keySentence + '</span>')) {
+                sentenceText.innerHTML = sentenceText.innerHTML.replace(regex, match => `<span class="highlight">${match}</span>`);
             }
-        }
+        });
     });
 }
 
