@@ -55,6 +55,7 @@ public class DiscussInfo {
     private int timeSlicedSummaryCursor;
     // 关键词游标
     private int keyWordCursor;
+    private int sentenceProcessCursor;
 
     public DiscussInfo() {
         sentenceList = new ArrayList<>();
@@ -338,5 +339,13 @@ public class DiscussInfo {
 
     public void setSegmentManagingupCursor(int segmentManagingupCursor) {
         this.segmentManagingupCursor = segmentManagingupCursor;
+    }
+
+    public int getSentenceProcessCursor() {
+        return sentenceProcessCursor;
+    }
+
+    public void setSentenceProcessCursor(int sentenceProcessCursor) {
+        this.sentenceProcessCursor = sentenceProcessCursor;
     }
 }

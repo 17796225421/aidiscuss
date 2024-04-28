@@ -513,21 +513,7 @@ function displayKeyWordList(keyWordList) {
             const regex = new RegExp(keyWord, 'gu');
             if (sentenceText.innerHTML.includes(keyWord) && !sentenceText.innerHTML.includes('<b>' + keyWord + '</b>')) {
                 sentenceText.innerHTML = sentenceText.innerHTML.replace(regex, match => `<b>${match}</b>`);
-            }
-        });
-    });
-}
-
-
-function displayKeySentenceList(keySentenceList) {
-    const sentenceTexts = document.querySelectorAll('.sentence .text');
-    keySentenceList.forEach(keySentence => {
-        if (keySentence.trim() === '') return; // 跳过空字符串
-        sentenceTexts.forEach(sentenceText => {
-            const regex = new RegExp(keySentence, 'gu');
-            if (sentenceText.innerHTML.includes(keySentence) && !sentenceText.innerHTML.includes('<span class="highlight">' + keySentence + '</span>')) {
-                sentenceText.innerHTML = sentenceText.innerHTML.replace(regex, match => `<span class="highlight">${match}</span>`);
-            }
+d            }
         });
     });
 }
@@ -605,7 +591,6 @@ function displayDiscussInfo(discussInfo) {
     displaySegmentManagingupList(discussInfo.segmentManagingupList);
     displayTimeSlicedSummaryList(discussInfo.timeSlicedSummaryList);
     displayKeyWordList(discussInfo.keyWordList);
-    displayKeySentenceList(discussInfo.keySentenceList);
     displayQuestionAnswerList(discussInfo.discussId, discussInfo.questionAnswerList);
 
 }

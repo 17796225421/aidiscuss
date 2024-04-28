@@ -77,7 +77,7 @@ public class RedisService {
                     jedis.set("discussId", discussInfo.getDiscussId());
                     jedis.set("discussName", discussInfo.getDiscussName());
                     jedis.set("discussStatus", String.valueOf(discussInfo.getDiscussStatus()));
-                    jedis.set("realTimeSentence","");
+                    jedis.set("realTimeSentence", "");
 
                     jedis.del("sentenceList");
                     jedis.del("startTimeList");
@@ -110,6 +110,7 @@ public class RedisService {
                     jedis.set("segmentUnderstandCursor", "0");
                     jedis.set("timeSlicedSummaryCursor", "0");
                     jedis.set("keyWordCursor", "0");
+                    jedis.set("sentenceProcessCursor", "0");
                     break;
                 }
             }
@@ -163,6 +164,7 @@ public class RedisService {
         discussInfo.setSegmentManagingupCursor(Integer.parseInt(jedis.get("segmentManagingupCursor")));
         discussInfo.setTimeSlicedSummaryCursor(Integer.parseInt(jedis.get("timeSlicedSummaryCursor")));
         discussInfo.setKeyWordCursor(Integer.parseInt(jedis.get("keyWordCursor")));
+        discussInfo.setSentenceProcessCursor(Integer.parseInt(jedis.get("sentenceProcessCursor")));
 
         return discussInfo;
     }
@@ -330,6 +332,7 @@ public class RedisService {
         }
         jedis.lset("backgroundList", index, background);
     }
+
     public void deleteBackground(String discussId, int index) {
         Jedis jedis = findDiscussDatabase(discussId);
         long backgroundListLen = jedis.llen("backgroundList");
@@ -394,6 +397,7 @@ public class RedisService {
         Jedis jedis = findDiscussDatabase(discussId);
         jedis.set("segmentRemarkCursor", String.valueOf(segmentRemarkCursor));
     }
+
     public int getSegmentRestateCursor(String discussId) {
         Jedis jedis = findDiscussDatabase(discussId);
         return Integer.parseInt(jedis.get("segmentRestateCursor"));
@@ -408,6 +412,7 @@ public class RedisService {
         Jedis jedis = findDiscussDatabase(discussId);
         jedis.set("segmentRestateCursor", String.valueOf(segmentRestateCursor));
     }
+
     public int getSegmentAnalogyCursor(String discussId) {
         Jedis jedis = findDiscussDatabase(discussId);
         return Integer.parseInt(jedis.get("segmentAnalogyCursor"));
@@ -422,6 +427,7 @@ public class RedisService {
         Jedis jedis = findDiscussDatabase(discussId);
         jedis.set("segmentAnalogyCursor", String.valueOf(segmentAnalogyCursor));
     }
+
     public int getSegmentContinueCursor(String discussId) {
         Jedis jedis = findDiscussDatabase(discussId);
         return Integer.parseInt(jedis.get("segmentContinueCursor"));
@@ -436,6 +442,7 @@ public class RedisService {
         Jedis jedis = findDiscussDatabase(discussId);
         jedis.set("segmentContinueCursor", String.valueOf(segmentContinueCursor));
     }
+
     public int getSegmentMultiangleCursor(String discussId) {
         Jedis jedis = findDiscussDatabase(discussId);
         return Integer.parseInt(jedis.get("segmentMultiangleCursor"));
@@ -450,6 +457,7 @@ public class RedisService {
         Jedis jedis = findDiscussDatabase(discussId);
         jedis.set("segmentMultiangleCursor", String.valueOf(segmentMultiangleCursor));
     }
+
     public int getSegmentLogicCursor(String discussId) {
         Jedis jedis = findDiscussDatabase(discussId);
         return Integer.parseInt(jedis.get("segmentLogicCursor"));
@@ -464,6 +472,7 @@ public class RedisService {
         Jedis jedis = findDiscussDatabase(discussId);
         jedis.set("segmentLogicCursor", String.valueOf(segmentLogicCursor));
     }
+
     public int getSegmentManagingupCursor(String discussId) {
         Jedis jedis = findDiscussDatabase(discussId);
         return Integer.parseInt(jedis.get("segmentManagingupCursor"));
@@ -482,5 +491,21 @@ public class RedisService {
     public void updateRealTimeSentence(String discussId, String realTimeSentence) {
         Jedis jedis = findDiscussDatabase(discussId);
         jedis.set("realTimeSentence", realTimeSentence);
+    }
+
+    public int getSentenceProcessCursor(String discussId) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        return Integer.parseInt(jedis.get("sentenceProcessCursor"));
+    }
+
+    public void setSentenceProcess(String discussId, int sentenceProcessCursor, Sentence sentenceProcess) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        String sentenceJson = new Gson().toJson(sentenceProcess);
+        jedis.lset("sentenceList", sentenceProcessCursor, sentenceJson);
+    }
+
+    public void setSentenceProcessCursor(String discussId, int sentenceProcessCursor) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.set("sentenceProcessCursor", String.valueOf(sentenceProcessCursor));
     }
 }

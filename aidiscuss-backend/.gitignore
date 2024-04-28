@@ -40,3 +40,7 @@ build/
 data/
 
 .env
+
+.idea/
+node_modules/
+*.log

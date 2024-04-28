@@ -18,6 +18,7 @@ public class DiscussThread {
     private SegmentManagingupThread segmentManagingupThread;
     private TimeSlicedSummaryThread timeSlicedSummaryThread;
     private KeyWordThread keyWordThread;
+    private SentenceProcessThread sentenceProcessThread;
 
     public DiscussThread(String discussId) {
         this.externMicThread = new MicThread(discussId, MicTypeEnum.EXTERN);
@@ -35,6 +36,7 @@ public class DiscussThread {
         this.segmentManagingupThread = new SegmentManagingupThread(discussId);
         this.timeSlicedSummaryThread = new TimeSlicedSummaryThread(discussId);
         this.keyWordThread=new KeyWordThread(discussId);
+        this.sentenceProcessThread=new SentenceProcessThread(discussId);
     }
 
 
@@ -54,6 +56,7 @@ public class DiscussThread {
         segmentManagingupThread.start();
         timeSlicedSummaryThread.start();
         keyWordThread.start();
+        sentenceProcessThread.start();
     }
 
     public void stop() {
@@ -72,5 +75,6 @@ public class DiscussThread {
         segmentManagingupThread.stopRunning();
         timeSlicedSummaryThread.stopRunning();
         keyWordThread.stopRunning();
+        sentenceProcessThread.stopRunning();
     }
 }

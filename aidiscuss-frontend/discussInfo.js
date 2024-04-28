@@ -18,13 +18,10 @@ class DiscussInfo {
         this.segmentManagingupList = data.segmentManagingupList;
         this.timeSlicedSummaryList = data.timeSlicedSummaryList;
         this.keyWordList = data.keyWordList;
-        this.keySentenceList = data.keySentenceList;
         this.backgroundList = data.backgroundList;
         this.questionAnswerList = data.questionAnswerList;
         this.discussStatus = data.discussStatus;
         this.segmentSummaryCursor = data.segmentSummaryCursor;
-        this.segmentCorrectCursor = data.segmentCorrectCursor;
-        this.sentenceSummaryCursor = data.sentenceSummaryCursor;
         this.segmentQuestionCursor = data.segmentQuestionCursor;
         this.segmentUnderstandCursor = data.segmentUnderstandCursor;
         this.segmentRemarkCursor = data.segmentRemarkCursor;
@@ -36,6 +33,5 @@ class DiscussInfo {
         this.segmentManagingupCursor = data.segmentManagingupCursor;
         this.timeSlicedSummaryCursor = data.timeSlicedSummaryCursor;
         this.keyWordCursor = data.keyWordCursor;
-        this.keySentenceCursor = data.keySentenceCursor;
     }
 }

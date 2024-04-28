@@ -5,6 +5,7 @@ public class Sentence {
     String beginTime;
     MicTypeEnum micTypeEnum;
     String summary;
+    int score;
 
     public String getText() {
         return text;
@@ -36,5 +37,13 @@ public class Sentence {
 
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 }
