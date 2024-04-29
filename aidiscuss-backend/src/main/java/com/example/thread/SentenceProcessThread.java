@@ -3,6 +3,7 @@ package com.example.thread;
 import com.example.model.Sentence;
 import com.example.service.GptService;
 import com.example.service.RedisService;
+import com.example.util.JsonUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -39,19 +40,7 @@ public class SentenceProcessThread extends Thread {
                             "\n用JSON格式返回，格式为{\"correct\":语音转录纠正, \"summary\": 纠正后的缩句, \"score\": 内容质量评分}",
                             "背景信息：" + backgroundList.toString() + "\n" + "历史讨论语音转录记录：" + sentencesArray + "\n" + "对于以下这条转录记录，生成这条转录记录的语音转录纠正、纠正后的缩句、内容质量评分。内容质量评分范围1到5，评估与整体对话内容相比的重要性。\n" + sentenceProcess.getText());
 
-                    // 去除开头的非JSON字符
-                    int startIndex = gptJson.indexOf("{");
-                    if (startIndex != -1) {
-                        gptJson = gptJson.substring(startIndex);
-                    }
-
-                    // 去除结尾的非JSON字符
-                    int endIndex = gptJson.lastIndexOf("}");
-                    if (endIndex != -1) {
-                        gptJson = gptJson.substring(0, endIndex + 1);
-                    }
-
-                    JSONObject jsonObject = new JSONObject(gptJson);
+                    JSONObject jsonObject = JsonUtils.StringToJson(gptJson);
                     sentenceProcess.setText(jsonObject.getString("correct"));
                     sentenceProcess.setSummary(jsonObject.getString("summary"));
                     sentenceProcess.setScore(jsonObject.getInt("score"));

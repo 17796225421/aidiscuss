@@ -78,6 +78,7 @@ public class RedisService {
                     jedis.set("discussName", discussInfo.getDiscussName());
                     jedis.set("discussStatus", String.valueOf(discussInfo.getDiscussStatus()));
                     jedis.set("realTimeSentence", "");
+                    jedis.set("segmentDirectory", "");
 
                     jedis.del("sentenceList");
                     jedis.del("startTimeList");
@@ -111,6 +112,7 @@ public class RedisService {
                     jedis.set("timeSlicedSummaryCursor", "0");
                     jedis.set("keyWordCursor", "0");
                     jedis.set("sentenceProcessCursor", "0");
+                    jedis.set("segmentDirectoryCursor", "0");
                     break;
                 }
             }
@@ -125,6 +127,7 @@ public class RedisService {
         discussInfo.setDiscussName(jedis.get("discussName"));
         discussInfo.setDiscussStatus(Integer.parseInt(jedis.get("discussStatus")));
         discussInfo.setRealTimeSentence(jedis.get("realTimeSentence"));
+        discussInfo.setSegmentDirectory(jedis.get("segmentDirectory"));
 
         List<String> sentenceJsonList = jedis.lrange("sentenceList", 0, -1);
         List<Sentence> sentenceList = sentenceJsonList.stream()
@@ -165,6 +168,7 @@ public class RedisService {
         discussInfo.setTimeSlicedSummaryCursor(Integer.parseInt(jedis.get("timeSlicedSummaryCursor")));
         discussInfo.setKeyWordCursor(Integer.parseInt(jedis.get("keyWordCursor")));
         discussInfo.setSentenceProcessCursor(Integer.parseInt(jedis.get("sentenceProcessCursor")));
+        discussInfo.setSegmentDirectoryCursor(Integer.parseInt(jedis.get("segmentDirectoryCursor")));
 
         return discussInfo;
     }
@@ -507,5 +511,29 @@ public class RedisService {
     public void setSentenceProcessCursor(String discussId, int sentenceProcessCursor) {
         Jedis jedis = findDiscussDatabase(discussId);
         jedis.set("sentenceProcessCursor", String.valueOf(sentenceProcessCursor));
+    }
+
+    // 获取当前讨论的segmentDirectoryCursor
+    public int getSegmentDirectoryCursor(String discussId) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        return Integer.parseInt(jedis.get("segmentDirectoryCursor"));
+    }
+
+    // 获取当前讨论的segmentDirectory
+    public String getSegmentDirectory(String discussId) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        return jedis.get("segmentDirectory");
+    }
+
+    // 更新当前讨论的segmentDirectory
+    public void updateSegmentDirectory(String discussId, String newSegmentDirectory) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.set("segmentDirectory", newSegmentDirectory);
+    }
+
+    // 设置当前讨论的segmentDirectoryCursor
+    public void setSegmentDirectoryCursor(String discussId, int newCursor) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.set("segmentDirectoryCursor", String.valueOf(newCursor));
     }
 }

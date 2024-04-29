@@ -36,6 +36,7 @@ public class DiscussInfo {
     private List<String> backgroundList;
     // 问答列表
     private List<QuestionAnswer> questionAnswerList;
+    private  String segmentDirectory;
     // 讨论状态
     int discussStatus;
     // 片段总结游标
@@ -56,6 +57,7 @@ public class DiscussInfo {
     // 关键词游标
     private int keyWordCursor;
     private int sentenceProcessCursor;
+    private int segmentDirectoryCursor;
 
     public DiscussInfo() {
         sentenceList = new ArrayList<>();
@@ -237,6 +239,14 @@ public class DiscussInfo {
         this.segmentRemarkList = segmentRemarkList;
     }
 
+    public String getSegmentDirectory() {
+        return segmentDirectory;
+    }
+
+    public void setSegmentDirectory(String segmentDirectory) {
+        this.segmentDirectory = segmentDirectory;
+    }
+
     public int getSegmentRemarkCursor() {
         return segmentRemarkCursor;
     }
@@ -347,5 +357,13 @@ public class DiscussInfo {
 
     public void setSentenceProcessCursor(int sentenceProcessCursor) {
         this.sentenceProcessCursor = sentenceProcessCursor;
+    }
+
+    public int getSegmentDirectoryCursor() {
+        return segmentDirectoryCursor;
+    }
+
+    public void setSegmentDirectoryCursor(int segmentDirectoryCursor) {
+        this.segmentDirectoryCursor = segmentDirectoryCursor;
     }
 }
