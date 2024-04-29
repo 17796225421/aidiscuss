@@ -223,17 +223,15 @@ function displaySentenceList(sentenceList) {
     const sentenceListContainer = document.getElementById('sentenceList');
     const existingChildren = Array.from(sentenceListContainer.children).filter(child => child.className === 'sentence');
     sentenceList.forEach((sentence, index) => {
+        let sentenceElement;
         if (index < existingChildren.length) {
-            const sentenceElement = existingChildren[index];
-            updateTextIfNeeded(sentenceElement.querySelector('.text'), sentence.text);
-            updateTextIfNeeded(sentenceElement.querySelector('.summary'), sentence.summary);
-            sentenceElement.setAttribute('time', sentence.beginTime);
+            sentenceElement = existingChildren[index];
         } else {
-            const sentenceElement = document.createElement('div');
+            sentenceElement = document.createElement('div');
             sentenceElement.className = 'sentence';
-            sentenceElement.style.display = 'flex';  // 使用flex布局
-            sentenceElement.style.alignItems = 'center';  // 垂直居中对齐
-            sentenceElement.style.justifyContent = 'space-between';  // 子元素间隔均匀分布
+            sentenceElement.style.display = 'flex';
+            sentenceElement.style.alignItems = 'center';
+            sentenceElement.style.justifyContent = 'space-between';
 
             const textElement = document.createElement('div');
             textElement.className = 'text';
@@ -248,19 +246,32 @@ function displaySentenceList(sentenceList) {
             summaryElement.style.opacity = "0.3";
             summaryElement.style.fontSize = '12px';
             summaryElement.style.padding = '1px';
-            summaryElement.style.marginBottom = '2px'; // 添加2px的底部外边距
+            summaryElement.style.marginBottom = '2px';
             sentenceElement.appendChild(summaryElement);
 
-            sentenceElement.setAttribute('time', sentence.beginTime);
-            sentenceElement.setAttribute('micTypeEnum', sentence.micTypeEnum);
             sentenceListContainer.appendChild(sentenceElement);
+        }
+        updateTextIfNeeded(sentenceElement.querySelector('.text'), sentence.text);
+        updateTextIfNeeded(sentenceElement.querySelector('.summary'), sentence.summary);
+        sentenceElement.setAttribute('time', sentence.beginTime);
+        sentenceElement.setAttribute('micTypeEnum', sentence.micTypeEnum);
 
-            sentenceElement.setAttribute('time', sentence.beginTime);
-            sentenceElement.setAttribute('micTypeEnum', sentence.micTypeEnum);
-            sentenceListContainer.appendChild(sentenceElement);
+        if (sentence.score !== undefined) {
+            const oldScore = sentenceElement.getAttribute('score');
+            if (oldScore !== sentence.score.toString()) {
+                const textElement = sentenceElement.querySelector('.text');
+                if (sentence.score >= 1 && sentence.score <= 5) {
+                    textElement.style.fontSize = (12 + sentence.score) + 'px';
+                    textElement.style.opacity = (sentence.score * 2 * 0.1).toString();
+                }
+                sentenceElement.setAttribute('score', sentence.score);
+            }
+        } else {
+            sentenceElement.setAttribute('score', '未知');
         }
     });
 }
+
 
 function displayStartTimeList(startTimeList) {
     const sentenceListContainer = document.getElementById('sentenceList');
