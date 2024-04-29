@@ -159,15 +159,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function handleMouseMove(e) {
             if (!isResizing) return;
-
             const dx = e.clientX - x0;
-            console.log("dx:" + dx);
-
-            console.log("leftSide.style.width" + leftSide.style.width);
-
             // 计算新的宽度
             const newWidth = x0 + dx;
-            console.log("newWidth:" + newWidth);
             // 设置新的宽度
             leftSide.style.width = `${newWidth}px`;
         }
@@ -269,6 +263,7 @@ function displaySentenceList(sentenceList) {
             textElement.textContent = sentence.text;
             textElement.style.fontSize = '15px';
             textElement.style.padding = '1px';
+            textElement.style.marginBottom = '5px';
             sentenceElement.appendChild(textElement);
 
             const summaryElement = document.createElement('div');
@@ -277,7 +272,6 @@ function displaySentenceList(sentenceList) {
             summaryElement.style.opacity = "0.3";
             summaryElement.style.fontSize = '12px';
             summaryElement.style.padding = '1px';
-            summaryElement.style.marginBottom = '2px';
             sentenceElement.appendChild(summaryElement);
 
             sentenceListContainer.appendChild(sentenceElement);
@@ -563,7 +557,6 @@ function displayKeyWordList(keyWordList) {
             const regex = new RegExp(keyWord, 'gu');
             if (sentenceText.innerHTML.includes(keyWord) && !sentenceText.innerHTML.includes('<b>' + keyWord + '</b>')) {
                 sentenceText.innerHTML = sentenceText.innerHTML.replace(regex, match => `<b>${match}</b>`);
-                d
             }
         });
     });
