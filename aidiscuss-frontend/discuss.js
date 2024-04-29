@@ -141,6 +141,37 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        const resizer = document.querySelector('.resizer');
+        const leftSide = document.querySelector('.left');
+        leftSide.style.width = "500px";
+        let isResizing = false;
+        let x0 = leftSide.style.width;
+
+        resizer.addEventListener('mousedown', function (e) {
+            isResizing = true;
+            x0 = e.clientX;
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', () => {
+                isResizing = false;
+                document.removeEventListener('mousemove', handleMouseMove);
+            });
+        });
+
+        function handleMouseMove(e) {
+            if (!isResizing) return;
+
+            const dx = e.clientX - x0;
+            console.log("dx:" + dx);
+
+            console.log("leftSide.style.width" + leftSide.style.width);
+
+            // 计算新的宽度
+            const newWidth = x0 + dx;
+            console.log("newWidth:" + newWidth);
+            // 设置新的宽度
+            leftSide.style.width = `${newWidth}px`;
+        }
+
         discussInfoConnection(discussId);
     } else {
         console.error('缺少discussId参数');
