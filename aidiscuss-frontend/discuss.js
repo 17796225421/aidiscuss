@@ -533,19 +533,25 @@ function displaySegmentManagingupList(segmentManagingupList) {
 
 function displaySegmentDirectory(segmentDirectory) {
     const directory = JSON.parse(segmentDirectory);
-    const renderDirectory = (data, level = 0) => {
-        let html = '<ul>';
+    const directoryElement = document.getElementById('segmentDirectoryList');
+    directoryElement.textContent = ''; // 清空现有内容
+
+    const renderDirectory = (data, parentElement, level = 0) => {
+        const ul = document.createElement('ul');
+        ul.style.paddingLeft = "20px";
         data.forEach(item => {
-            html += `<li style="margin-left: ${level * 20}px;">${item.dir}`;
+            const li = document.createElement('li');
+            updateTextIfNeeded(li, item.dir);
+
             if (item.sub && item.sub.length > 0) {
-                html += renderDirectory(item.sub, level + 1);
+                renderDirectory(item.sub, li, level + 1);
             }
-            html += '</li>';
+            ul.appendChild(li);
         });
-        html += '</ul>';
-        return html;
+        parentElement.appendChild(ul);
     };
-    document.getElementById('segmentDirectoryList').innerHTML = renderDirectory(directory.data);
+
+    renderDirectory(directory.data, directoryElement);
 }
 
 
