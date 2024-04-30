@@ -608,7 +608,7 @@ function displaySegmentUml(segmentUmlList) {
             segmentUmlElement.src = imageUrl;
             segmentUmlElement.setAttribute("plantuml", segmentUml);
             segmentUmlElement.addEventListener('click', () => {
-                if (segmentUmlElement.style.transform === 'translate(-50%, -50%) scale(1.5)') {
+                if (segmentUmlElement.style.zIndex === '9999') {
                     segmentUmlElement.style.position = '';
                     segmentUmlElement.style.top = '';
                     segmentUmlElement.style.left = '';
@@ -618,7 +618,7 @@ function displaySegmentUml(segmentUmlList) {
                     segmentUmlElement.style.position = 'fixed';
                     segmentUmlElement.style.top = '50%';
                     segmentUmlElement.style.left = '50%';
-                    segmentUmlElement.style.transform = 'translate(-50%, -50%) scale(1.5)';
+                    segmentUmlElement.style.transform = 'translate(-50%, -50%) scale(1)';
                     segmentUmlElement.style.zIndex = '9999'; // 确保图片在最上层
                 }
             });
