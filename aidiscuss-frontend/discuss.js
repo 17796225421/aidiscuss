@@ -545,8 +545,7 @@ function displaySegmentDirectory(segmentDirectory) {
         html += '</ul>';
         return html;
     };
-    document.getElementById('segmentDirectory').innerHTML = renderDirectory(directory.data);
-    document.getElementById('segmentDirectory').style.display = 'block';
+    document.getElementById('segmentDirectoryList').innerHTML = renderDirectory(directory.data);
 }
 
 
