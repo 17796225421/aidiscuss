@@ -195,7 +195,7 @@ function discussInfoConnection(discussId) {
 
             if (!isWaitingToSend) {
                 isWaitingToSend = true;
-                setTimeout(sendRequest, 10 * 1000);
+                setTimeout(sendRequest, 1 * 1000);
             }
         });
     });
@@ -566,7 +566,7 @@ function displaySegmentDirectory(segmentDirectory) {
                 console.log(sentences);
                 const sentenceToScroll = sentences[index];
                 if (sentenceToScroll) {
-                    sentenceToScroll.scrollIntoView({ behavior: 'smooth' });
+                    sentenceToScroll.scrollIntoView({behavior: 'smooth'});
 
                     // 设置过渡效果
                     sentenceToScroll.style.transition = "background-color 0.5s ease-in-out";
@@ -575,7 +575,7 @@ function displaySegmentDirectory(segmentDirectory) {
                     sentenceToScroll.style.backgroundColor = 'yellow';
 
                     // 一秒后移除高亮
-                    setTimeout(function() {
+                    setTimeout(function () {
                         sentenceToScroll.style.backgroundColor = '';
                     }, 1000);
                 }
@@ -585,7 +585,19 @@ function displaySegmentDirectory(segmentDirectory) {
         }
     });
 }
+function displaySegmentUml(uml) {
+    let umlElement = document.getElementById('segmentUmlList');
 
+    let encodedUml = plantumlEncoder.encode(uml);
+    let imageUrl = "http://www.plantuml.com/plantuml/img/" + encodedUml;
+
+    console.log(imageUrl);
+    let imageElement = document.createElement('img');
+    imageElement.src = imageUrl;
+
+    umlElement.innerHTML = '';
+    umlElement.appendChild(imageElement);
+}
 
 function displayTimeSlicedSummaryList(timeSlicedSummaryList) {
     const timeSlicedSummaryListContainer = document.getElementById('timeSlicedSummaryList');
@@ -690,6 +702,52 @@ function displayDiscussInfo(discussInfo) {
     displaySegmentLogicList(discussInfo.segmentLogicList);
     displaySegmentManagingupList(discussInfo.segmentManagingupList);
     displaySegmentDirectory(discussInfo.segmentDirectory);
+    const uml = '@startuml\n' +
+        '\n' +
+        '\' 定义参与者\n' +
+        'participant "陈鑫" as CX\n' +
+        'participant "阿里集团研发团队" as Alibaba\n' +
+        'participant "AIGC对软件研发的影响" as AIGC\n' +
+        'participant "CPD模式" as CPD\n' +
+        'participant "未来研发Agent" as Agent\n' +
+        '\n' +
+        '\' 陈鑫的历史和角色\n' +
+        'note left of CX\n' +
+        '  陈鑫, 通信领码产品技术负责人\n' +
+        '  过去8年在阿里集团负责研发工具\n' +
+        'end note\n' +
+        '\n' +
+        '\' 阿里集团的技术发展历程\n' +
+        'Alibaba -> Alibaba : 2015年开始开发一站式的戴帽子平台\n' +
+        'Alibaba -> Alibaba : 转向云上的云霄，戴帽子平台云化\n' +
+        '\n' +
+        '\' AIGC的影响\n' +
+        'CX -> AIGC : 发现大模型时代的到来\n' +
+        'AIGC -> Alibaba : 导致软件工具面临革新\n' +
+        'AIGC -> CX : 推动开发通信领码，基于代码的大模型智能辅助工具\n' +
+        '\n' +
+        '\' 未来技术趋势和模式\n' +
+        'CX -> CPD : 介绍CPD模式\n' +
+        'CX -> Agent : 介绍未来研发Agent\n' +
+        '\n' +
+        '\' 主题分部\n' +
+        'note right of CX\n' +
+        '  今天的主题分为三部分：\n' +
+        '  1. AIGC对软件研发的根本性影响\n' +
+        '  2. CPD模式\n' +
+        '  3. 未来研发Agent\n' +
+        'end note\n' +
+        '\n' +
+        '\' 企业研发效能因素\n' +
+        'note over AIGC\n' +
+        '  企业研发效能核心影响因素：\n' +
+        '  1. 人员技能\n' +
+        '  2. 协同消耗\n' +
+        '  3. 专业分工\n' +
+        'end note\n' +
+        '\n' +
+        '@enduml\n';
+    displaySegmentUml(uml);
     displayTimeSlicedSummaryList(discussInfo.timeSlicedSummaryList);
     displayKeyWordList(discussInfo.keyWordList);
     displayQuestionAnswerList(discussInfo.discussId, discussInfo.questionAnswerList);
