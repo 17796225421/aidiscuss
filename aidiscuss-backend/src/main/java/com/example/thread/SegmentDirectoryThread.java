@@ -49,8 +49,8 @@ public class SegmentDirectoryThread extends Thread {
                     Gson gson = new Gson();
                     String text = gson.toJson(unprocessedTextList);
                     String gptJson = gptService.requestGpt4Json("gpt-4-turbo-2024-04-09",
-                            "用JSON格式返回，格式为[ { \"dir\": \"一级目录名\", \"i\": \"起始句子索引\", \"sub\": [ { \"dir\": \"二级目录名\", \"i\": \"起始句子索引\", \"sub\": [ { \"dir\": \"三级目录名\", \"sub\": \"起始句子索引\" } ] } ] } ]",
-                            "给你会议讨论的内容片段，是多条句子索引和句子。思考这些内容能不能给原目录补充一些目录项。\n目录应该越精简越概括越好，本次对原目录的修改应该尽可能少\n"+
+                            "用JSON格式返回，格式为[ { \"dir\": \"一级目录名\", \"i\": 起始句子索引（整数）, \"sub\": [ { \"dir\": \"二级目录名\", \"i\": 起始句子索引, \"sub\": [ { \"dir\": \"三级目录名\", \"i\": 起始句子索引 } ] } ] } ]",
+                            "给你会议讨论的内容片段，是多条句子索引和句子。思考这些内容能不能给原目录补充一些目录项。\n目录应该越精简越概括越好，本次对原目录的修改应该尽可能少，第三级目录不存在sub\n"+
                                     "原目录：" + segmentDirectory + "\n会议讨论内容片段：" + text);
                     JSONObject jsonObject = JsonUtils.StringToJson(gptJson);
                     redisService.updateSegmentDirectory(discussId, jsonObject.toString());
