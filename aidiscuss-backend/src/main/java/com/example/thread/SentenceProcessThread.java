@@ -3,7 +3,7 @@ package com.example.thread;
 import com.example.model.Sentence;
 import com.example.service.GptService;
 import com.example.service.RedisService;
-import com.example.util.JsonUtils;
+import com.example.util.GptResUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -40,7 +40,7 @@ public class SentenceProcessThread extends Thread {
                             "\n用JSON格式返回，格式为{\"correct\":语音转录纠正, \"summary\": 纠正后的缩句, \"score\": 内容质量评分}",
                             "背景信息：" + backgroundList.toString() + "\n" + "历史讨论语音转录记录：" + sentencesArray + "\n" + "对于以下这条转录记录，生成这条转录记录的语音转录纠正、纠正后的缩句、内容质量评分。内容质量评分范围1到5，评估与整体对话内容相比的重要性。\n" + sentenceProcess.getText());
 
-                    JSONObject jsonObject = JsonUtils.StringToJson(gptJson);
+                    JSONObject jsonObject = GptResUtils.StringToJson(gptJson);
                     sentenceProcess.setText(jsonObject.getString("correct"));
                     sentenceProcess.setSummary(jsonObject.getString("summary"));
                     sentenceProcess.setScore(jsonObject.getInt("score"));

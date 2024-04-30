@@ -28,6 +28,7 @@ public class DiscussInfo {
     private List<String> segmentMultiangleList;
     private List<String> segmentLogicList;
     private List<String> segmentManagingupList;
+    private List<String> segmentUmlList;
     // 时间切片总结列表
     private List<String> timeSlicedSummaryList;
     // 关键词列表
@@ -52,6 +53,7 @@ public class DiscussInfo {
     private int segmentMultiangleCursor;
     private int segmentLogicCursor;
     private int segmentManagingupCursor;
+    private int segmentUmlCursor;
     // 时间切片总结游标
     private int timeSlicedSummaryCursor;
     // 关键词游标
@@ -71,6 +73,7 @@ public class DiscussInfo {
         segmentAnalogyList = new ArrayList<>();
         segmentContinueList = new ArrayList<>();
         segmentMultiangleList = new ArrayList<>();
+        segmentUmlList=new ArrayList<>();
         segmentLogicList = new ArrayList<>();
         segmentManagingupList = new ArrayList<>();
         timeSlicedSummaryList = new ArrayList<>();
@@ -125,6 +128,14 @@ public class DiscussInfo {
 
     public void setSegmentSummaryList(List<String> segmentSummaryList) {
         this.segmentSummaryList = segmentSummaryList;
+    }
+
+    public List<String> getSegmentUmlList() {
+        return segmentUmlList;
+    }
+
+    public void setSegmentUmlList(List<String> segmentUmlList) {
+        this.segmentUmlList = segmentUmlList;
     }
 
     public List<String> getSegmentQuestionList() {
@@ -293,6 +304,14 @@ public class DiscussInfo {
 
     public void setSegmentContinueList(List<String> segmentContinueList) {
         this.segmentContinueList = segmentContinueList;
+    }
+
+    public int getSegmentUmlCursor() {
+        return segmentUmlCursor;
+    }
+
+    public void setSegmentUmlCursor(int segmentUmlCursor) {
+        this.segmentUmlCursor = segmentUmlCursor;
     }
 
     public int getSegmentContinueCursor() {

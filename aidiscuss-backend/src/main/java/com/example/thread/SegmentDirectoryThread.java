@@ -3,9 +3,8 @@ package com.example.thread;
 import com.example.model.Sentence;
 import com.example.service.GptService;
 import com.example.service.RedisService;
-import com.example.util.JsonUtils;
+import com.example.util.GptResUtils;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -52,7 +51,7 @@ public class SegmentDirectoryThread extends Thread {
                             "用JSON格式返回，格式为{ \"data\": [ { \"dir\": \"一级目录名\", \"i\": 起始句子索引（整数）, \"sub\": [ { \"dir\": \"二级目录名\", \"i\": 起始句子索引, \"sub\": [ { \"dir\": \"三级目录名\", \"i\": 起始句子索引 } ] } ] } ] }",
                             "给你会议讨论的内容片段，是多条句子索引和句子。思考这些内容能不能给原目录补充一些目录项。\n目录应该越精简越概括越好，本次对原目录的修改应该尽可能少，第三级目录不存在sub\n"+
                                     "原目录：" + segmentDirectory + "\n会议讨论内容片段：" + text);
-                    JSONObject jsonObject = JsonUtils.StringToJson(gptJson);
+                    JSONObject jsonObject = GptResUtils.StringToJson(gptJson);
                     redisService.updateSegmentDirectory(discussId, jsonObject.toString());
                     redisService.setSegmentDirectoryCursor(discussId, segmentDirectoryCursor);
                 }

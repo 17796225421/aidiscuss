@@ -532,6 +532,9 @@ function displaySegmentManagingupList(segmentManagingupList) {
 }
 
 function displaySegmentDirectory(segmentDirectory) {
+    if (segmentDirectory === "") {
+        return;
+    }
     const directory = JSON.parse(segmentDirectory);
     let directoryElement = document.getElementById('segmentDirectoryList');
     directoryElement.textContent = ''; // 清空现有内容
@@ -585,6 +588,7 @@ function displaySegmentDirectory(segmentDirectory) {
         }
     });
 }
+
 function displaySegmentUml(uml) {
     let umlElement = document.getElementById('segmentUmlList');
 

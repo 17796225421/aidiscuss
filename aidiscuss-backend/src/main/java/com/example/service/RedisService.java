@@ -91,6 +91,7 @@ public class RedisService {
                     jedis.del("segmentAnalogyList");
                     jedis.del("segmentContinueList");
                     jedis.del("segmentMultiangleList");
+                    jedis.del("segmentUmlList");
                     jedis.del("segmentLogicList");
                     jedis.del("segmentManagingupList");
                     jedis.del("timeSlicedSummaryList");
@@ -106,6 +107,7 @@ public class RedisService {
                     jedis.set("segmentAnalogyCursor", "0");
                     jedis.set("segmentContinueCursor", "0");
                     jedis.set("segmentMultiangleCursor", "0");
+                    jedis.set("segmentUmlCursor", "0");
                     jedis.set("segmentLogicCursor", "0");
                     jedis.set("segmentManagingupCursor", "0");
                     jedis.set("segmentUnderstandCursor", "0");
@@ -146,6 +148,7 @@ public class RedisService {
         discussInfo.setSegmentMultiangleList(jedis.lrange("segmentMultiangleList", 0, -1));
         discussInfo.setSegmentLogicList(jedis.lrange("segmentLogicList", 0, -1));
         discussInfo.setSegmentManagingupList(jedis.lrange("segmentManagingupList", 0, -1));
+        discussInfo.setSegmentUmlList(jedis.lrange("segmentUmlList", 0, -1));
         discussInfo.setTimeSlicedSummaryList(jedis.lrange("timeSlicedSummaryList", 0, -1));
         discussInfo.setKeyWordList(jedis.lrange("keyWordList", 0, -1));
         discussInfo.setBackgroundList(jedis.lrange("backgroundList", 0, -1));
@@ -165,6 +168,7 @@ public class RedisService {
         discussInfo.setSegmentMultiangleCursor(Integer.parseInt(jedis.get("segmentMultiangleCursor")));
         discussInfo.setSegmentLogicCursor(Integer.parseInt(jedis.get("segmentLogicCursor")));
         discussInfo.setSegmentManagingupCursor(Integer.parseInt(jedis.get("segmentManagingupCursor")));
+        discussInfo.setSegmentUmlCursor(Integer.parseInt(jedis.get("segmentUmlCursor")));
         discussInfo.setTimeSlicedSummaryCursor(Integer.parseInt(jedis.get("timeSlicedSummaryCursor")));
         discussInfo.setKeyWordCursor(Integer.parseInt(jedis.get("keyWordCursor")));
         discussInfo.setSentenceProcessCursor(Integer.parseInt(jedis.get("sentenceProcessCursor")));
@@ -535,5 +539,21 @@ public class RedisService {
     public void setSegmentDirectoryCursor(String discussId, int newCursor) {
         Jedis jedis = findDiscussDatabase(discussId);
         jedis.set("segmentDirectoryCursor", String.valueOf(newCursor));
+    }
+
+    public int getSegmentUmlCursor(String discussId) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        String cursor = jedis.get("segmentUmlCursor");
+        return cursor != null ? Integer.parseInt(cursor) : 0;
+    }
+
+    public void addSegmentUml(String discussId, String segmentUml) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.rpush("segmentUmlList", segmentUml);
+    }
+
+    public void setSegmentUmlCursor(String discussId, int segmentUmlCursor) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.set("segmentUmlCursor", String.valueOf(segmentUmlCursor));
     }
 }
