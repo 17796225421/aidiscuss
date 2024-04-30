@@ -190,7 +190,7 @@ function discussInfoConnection(discussId) {
                 const discussInfo = new DiscussInfo(data);
                 displayDiscussInfo(discussInfo);
 
-                formatTabContent();
+                formatMarkdownContent();
             }
 
             if (!isWaitingToSend) {
@@ -206,8 +206,8 @@ function discussInfoConnection(discussId) {
     }
 }
 
-function formatTabContent() {
-    const tabs = document.querySelectorAll('.tab-content');
+function formatMarkdownContent() {
+    const tabs = document.querySelectorAll('.tab-content.markdown');
     const renderer = new marked.Renderer();
 
     // 自定义列表的渲染方式
@@ -531,6 +531,10 @@ function displaySegmentManagingupList(segmentManagingupList) {
     });
 }
 
+function displaySegmentDirectory(segmentDirectory) {
+    console.log(segmentDirectory);
+}
+
 function displayTimeSlicedSummaryList(timeSlicedSummaryList) {
     const timeSlicedSummaryListContainer = document.getElementById('timeSlicedSummaryList');
     const existingChildren = timeSlicedSummaryListContainer.children;
@@ -633,10 +637,10 @@ function displayDiscussInfo(discussInfo) {
     displaySegmentMultiangleList(discussInfo.segmentMultiangleList);
     displaySegmentLogicList(discussInfo.segmentLogicList);
     displaySegmentManagingupList(discussInfo.segmentManagingupList);
+    displaySegmentDirectory(discussInfo.segmentDirectory);
     displayTimeSlicedSummaryList(discussInfo.timeSlicedSummaryList);
     displayKeyWordList(discussInfo.keyWordList);
     displayQuestionAnswerList(discussInfo.discussId, discussInfo.questionAnswerList);
-
 }
 
 function updateTextIfNeeded(element, newText) {
