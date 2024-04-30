@@ -596,7 +596,7 @@ function displaySegmentUml(segmentUmlList) {
         console.log(segmentUml);
         if (index < existingChildren.length) {
             const plantuml = existingChildren[index].getAttribute("plantuml");
-            if (plantuml !==segmentUml) {
+            if (plantuml !== segmentUml) {
                 let encodedUml = plantumlEncoder.encode(segmentUml);
                 let imageUrl = "http://www.plantuml.com/plantuml/img/" + encodedUml;
                 existingChildren[index].src = imageUrl;
@@ -607,6 +607,21 @@ function displaySegmentUml(segmentUmlList) {
             const segmentUmlElement = document.createElement('img');
             segmentUmlElement.src = imageUrl;
             segmentUmlElement.setAttribute("plantuml", segmentUml);
+            segmentUmlElement.addEventListener('click', () => {
+                if (segmentUmlElement.style.transform === 'translate(-50%, -50%) scale(1.5)') {
+                    segmentUmlElement.style.position = '';
+                    segmentUmlElement.style.top = '';
+                    segmentUmlElement.style.left = '';
+                    segmentUmlElement.style.transform = '';
+                    segmentUmlElement.style.zIndex = '';
+                } else {
+                    segmentUmlElement.style.position = 'fixed';
+                    segmentUmlElement.style.top = '50%';
+                    segmentUmlElement.style.left = '50%';
+                    segmentUmlElement.style.transform = 'translate(-50%, -50%) scale(1.5)';
+                    segmentUmlElement.style.zIndex = '9999'; // 确保图片在最上层
+                }
+            });
             segmentUmlListContainer.appendChild(segmentUmlElement);
         }
     });
