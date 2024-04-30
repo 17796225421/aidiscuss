@@ -16,6 +16,7 @@ class DiscussInfo {
         this.segmentMultiangleList = data.segmentMultiangleList;
         this.segmentLogicList = data.segmentLogicList;
         this.segmentManagingupList = data.segmentManagingupList;
+        this.segmentUmlList=data.segmentUmlList;
         this.segmentDirectory=data.segmentDirectory;
         this.timeSlicedSummaryList = data.timeSlicedSummaryList;
         this.keyWordList = data.keyWordList;

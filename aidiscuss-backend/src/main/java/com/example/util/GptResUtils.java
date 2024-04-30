@@ -25,8 +25,9 @@ public class GptResUtils {
             s = s.substring(startIndex);
         }
 
-        int endIndex = s.lastIndexOf("l");
+        int endIndex = s.lastIndexOf("@");
         if (endIndex != -1) {
+            endIndex += 6;
             s = s.substring(0, endIndex + 1);
         }
 
