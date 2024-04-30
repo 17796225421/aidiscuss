@@ -195,7 +195,7 @@ function discussInfoConnection(discussId) {
 
             if (!isWaitingToSend) {
                 isWaitingToSend = true;
-                setTimeout(sendRequest, 1 * 1000);
+                setTimeout(sendRequest, 10 * 1000);
             }
         });
     });
@@ -533,7 +533,7 @@ function displaySegmentManagingupList(segmentManagingupList) {
 
 function displaySegmentDirectory(segmentDirectory) {
     const directory = JSON.parse(segmentDirectory);
-    const directoryElement = document.getElementById('segmentDirectoryList');
+    let directoryElement = document.getElementById('segmentDirectoryList');
     directoryElement.textContent = ''; // 清空现有内容
 
     const renderDirectory = (data, parentElement, level = 0) => {
@@ -541,7 +541,8 @@ function displaySegmentDirectory(segmentDirectory) {
         ul.style.paddingLeft = "20px";
         data.forEach(item => {
             const li = document.createElement('li');
-            updateTextIfNeeded(li, item.dir);
+            li.innerText = item.dir;
+            li.setAttribute("index", item.i);
 
             if (item.sub && item.sub.length > 0) {
                 renderDirectory(item.sub, li, level + 1);
@@ -552,6 +553,37 @@ function displaySegmentDirectory(segmentDirectory) {
     };
 
     renderDirectory(directory.data, directoryElement);
+
+    directoryElement = document.getElementById('segmentDirectoryList');
+    directoryElement.addEventListener('click', function (event) {
+        let target = event.target;
+        while (target !== directoryElement) {
+            if (target.tagName === 'LI') {
+                const index = parseInt(target.getAttribute('index'));
+                console.log(index);
+                const sentenceList = document.getElementById('sentenceList');
+                const sentences = Array.from(sentenceList.querySelectorAll('.sentence')); // 只选取class为sentence的子元素
+                console.log(sentences);
+                const sentenceToScroll = sentences[index];
+                if (sentenceToScroll) {
+                    sentenceToScroll.scrollIntoView({ behavior: 'smooth' });
+
+                    // 设置过渡效果
+                    sentenceToScroll.style.transition = "background-color 0.5s ease-in-out";
+
+                    // 添加高亮
+                    sentenceToScroll.style.backgroundColor = 'yellow';
+
+                    // 一秒后移除高亮
+                    setTimeout(function() {
+                        sentenceToScroll.style.backgroundColor = '';
+                    }, 1000);
+                }
+                return;
+            }
+            target = target.parentNode;
+        }
+    });
 }
 
 
