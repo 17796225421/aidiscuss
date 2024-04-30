@@ -532,8 +532,23 @@ function displaySegmentManagingupList(segmentManagingupList) {
 }
 
 function displaySegmentDirectory(segmentDirectory) {
-    console.log(segmentDirectory);
+    const directory = JSON.parse(segmentDirectory);
+    const renderDirectory = (data, level = 0) => {
+        let html = '<ul>';
+        data.forEach(item => {
+            html += `<li style="margin-left: ${level * 20}px;">${item.dir}`;
+            if (item.sub && item.sub.length > 0) {
+                html += renderDirectory(item.sub, level + 1);
+            }
+            html += '</li>';
+        });
+        html += '</ul>';
+        return html;
+    };
+    document.getElementById('segmentDirectory').innerHTML = renderDirectory(directory.data);
+    document.getElementById('segmentDirectory').style.display = 'block';
 }
+
 
 function displayTimeSlicedSummaryList(timeSlicedSummaryList) {
     const timeSlicedSummaryListContainer = document.getElementById('timeSlicedSummaryList');
