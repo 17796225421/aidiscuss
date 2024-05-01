@@ -166,14 +166,27 @@ document.addEventListener('DOMContentLoaded', () => {
             leftSide.style.width = `${newWidth}px`;
         }
 
-        const audioPlayer = document.getElementById('audioPlayer');
-        const audioUrl = 'http://127.0.0.1:10002/audio';
+        const audioPlayer1 = document.getElementById('audioPlayer1');
+        const audioUrl1 = 'http://127.0.0.1:10002/audio1';
 
-        fetch(audioUrl)
+        fetch(audioUrl1)
             .then(response => response.blob())
             .then(blob => {
                 const audioObjectUrl = URL.createObjectURL(blob);
-                audioPlayer.src = audioObjectUrl;
+                audioPlayer1.src = audioObjectUrl;
+            })
+            .catch(error => {
+                console.error('获取音频失败:', error);
+            });
+
+        const audioPlayer2 = document.getElementById('audioPlayer2');
+        const audioUrl2 = 'http://127.0.0.1:10002/audio2';
+
+        fetch(audioUrl2)
+            .then(response => response.blob())
+            .then(blob => {
+                const audioObjectUrl = URL.createObjectURL(blob);
+                audioPlayer2.src = audioObjectUrl;
             })
             .catch(error => {
                 console.error('获取音频失败:', error);
@@ -183,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const audioPlayer = document.getElementById('audioPlayer');
             audioPlayer.currentTime = 3;
         });
-        
+
         discussInfoConnection(discussId);
     } else {
         console.error('缺少discussId参数');

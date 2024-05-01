@@ -85,9 +85,9 @@ public class DiscussController {
         return ResponseEntity.ok(backgroundList);
     }
 
-    @GetMapping("/audio")
-    public ResponseEntity<Resource> audio() throws IOException {
-        Path path = Paths.get("C:\\Users\\zhouzihong\\Desktop\\aidiscuss\\aidiscuss-backend\\test.wav");
+    @GetMapping("/audio1")
+    public ResponseEntity<Resource> audio1() throws IOException {
+        Path path = Paths.get("C:\\Users\\zhouzihong\\Desktop\\aidiscuss\\aidiscuss-backend\\test1.wav");
         Resource resource = new UrlResource(path.toUri());
         if (!resource.exists()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -98,6 +98,18 @@ public class DiscussController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
     }
-
+    @GetMapping("/audio2")
+    public ResponseEntity<Resource> audio2() throws IOException {
+        Path path = Paths.get("C:\\Users\\zhouzihong\\Desktop\\aidiscuss\\aidiscuss-backend\\test2.wav");
+        Resource resource = new UrlResource(path.toUri());
+        if (!resource.exists()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        String contentType = Files.probeContentType(path);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+    }
 
 }
