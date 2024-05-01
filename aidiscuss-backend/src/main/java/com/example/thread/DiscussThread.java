@@ -45,8 +45,8 @@ public class DiscussThread {
 
 
     public void start() {
-        externMicThread.start();
-        wireMicThread.start();
+//        externMicThread.start();
+//        wireMicThread.start();
         virtualMicThread.start();
         segmentSummaryThread.start();
         segmentQuestionThread.start();

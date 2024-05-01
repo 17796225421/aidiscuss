@@ -9,7 +9,7 @@ import com.alibaba.nls.client.protocol.asr.SpeechTranscriberListener;
 import com.alibaba.nls.client.protocol.asr.SpeechTranscriberResponse;
 
 import javax.sound.sampled.*;
-import java.io.IOException;
+import java.io.*;
 
 import com.example.model.MicTypeEnum;
 import com.example.model.Sentence;
@@ -105,11 +105,22 @@ public class MicTranscriberService {
         int nByte = 0;
         final int bufSize = 3200;
         byte[] buffer = new byte[bufSize];
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); // 用于存储录音数据
+        long startTime = System.currentTimeMillis(); // 记录录音开始时间
+
         while (micThread.isRunning()) { // 使用running变量控制循环
             try {
                 nByte = targetDataLine.read(buffer, 0, bufSize);
                 if (nByte > 0) {
                     transcriber.send(buffer, nByte);
+                    outputStream.write(buffer, 0, nByte); // 将录音数据写入 ByteArrayOutputStream
+                }
+
+                // 每秒更新一次录音文件
+                if (System.currentTimeMillis() - startTime >= 1000) {
+                    saveRecording(outputStream.toByteArray(), discussId); // 保存录音文件
+                    outputStream.reset(); // 清空 ByteArrayOutputStream
+                    startTime = System.currentTimeMillis(); // 更新录音开始时间
                 }
 
             } catch (Exception e) {
@@ -122,6 +133,39 @@ public class MicTranscriberService {
         transcriber.stop();
         transcriber.close();
     }
+
+    private void saveRecording(byte[] audioData, String discussId) {
+        String filePath = "C:\\Users\\zhouzihong\\Desktop\\aidiscuss\\aidiscuss-backend\\" + discussId + ".wav";
+
+        AudioFormat audioFormat = new AudioFormat(16000.0F, 16, 1, true, false);
+        ByteArrayInputStream bais = new ByteArrayInputStream(audioData);
+        AudioInputStream audioInputStream = new AudioInputStream(bais, audioFormat, audioData.length / audioFormat.getFrameSize());
+
+        File outputFile = new File(filePath);
+        try {
+            if (outputFile.exists()) {
+                AudioInputStream existingAudioInputStream = AudioSystem.getAudioInputStream(outputFile);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                AudioSystem.write(existingAudioInputStream, AudioFileFormat.Type.WAVE, baos);
+                existingAudioInputStream.close();
+
+                baos.write(audioData);
+
+                ByteArrayInputStream bais2 = new ByteArrayInputStream(baos.toByteArray());
+                AudioInputStream appendedAudioInputStream = new AudioInputStream(bais2, audioFormat, baos.size() / audioFormat.getFrameSize());
+
+                AudioSystem.write(appendedAudioInputStream, AudioFileFormat.Type.WAVE, outputFile);
+                appendedAudioInputStream.close();
+            } else {
+                AudioSystem.write(audioInputStream, AudioFileFormat.Type.WAVE, outputFile);
+            }
+            audioInputStream.close();
+        } catch (IOException | UnsupportedAudioFileException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     public SpeechTranscriberListener getTranscriberListener(String discussId, MicTypeEnum micTypeEnum) {
         SpeechTranscriberListener listener = new SpeechTranscriberListener() {
