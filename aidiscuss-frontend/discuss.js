@@ -179,6 +179,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('获取音频失败:', error);
             });
 
+        document.getElementById('setTime').addEventListener('click', function() {
+            const audioPlayer = document.getElementById('audioPlayer');
+            audioPlayer.currentTime = 3;
+        });
+        
         discussInfoConnection(discussId);
     } else {
         console.error('缺少discussId参数');
