@@ -6,13 +6,22 @@ import com.example.model.QuestionRequest;
 import com.example.model.Sentence;
 import com.example.service.DiscussService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -74,4 +83,41 @@ public class DiscussController {
         List<String> backgroundList = discussService.getBackground(discussId);
         return ResponseEntity.ok(backgroundList);
     }
+
+    @GetMapping("/audio")
+    public ResponseEntity<Resource> audio(HttpServletRequest request) throws IOException {
+        System.out.println(111);
+        Path path = Paths.get("C:\\Users\\zhouzihong\\Desktop\\aidiscuss\\aidiscuss-backend\\test.wav");
+        Resource resource = new UrlResource(path.toUri());
+
+        // 获取文件总长度
+        long fileLength = resource.contentLength();
+        // 获取请求中的Range头部
+        String range = request.getHeader("Range");
+        long start = 0, end = fileLength - 1;
+
+        // 解析Range头部
+        if (range != null) {
+            String[] ranges = range.replace("bytes=", "").split("-");
+            start = Long.parseLong(ranges[0]);
+            if (ranges.length > 1) {
+                end = Long.parseLong(ranges[1]);
+            }
+        }
+
+        // 计算内容长度和新的Content-Range头部
+        long contentLength = end - start + 1;
+        String contentRange = "bytes " + start + "-" + end + "/" + fileLength;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentLength(contentLength);
+        headers.set("Content-Range", contentRange);
+        headers.setContentType(MediaType.parseMediaType("audio/wav"));
+
+        // 以部分内容状态码返回请求的音频数据块
+        return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
+                .headers(headers)
+                .body(new InputStreamResource(resource.getInputStream()));
+    }
+
 }

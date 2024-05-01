@@ -166,6 +166,19 @@ document.addEventListener('DOMContentLoaded', () => {
             leftSide.style.width = `${newWidth}px`;
         }
 
+        const audioPlayer = document.getElementById('audioPlayer');
+        const audioUrl = 'http://127.0.0.1:10002/audio'; // 替换为实际的音频URL
+
+        fetch(audioUrl)
+            .then(response => response.blob())
+            .then(blob => {
+                const audioObjectUrl = URL.createObjectURL(blob);
+                audioPlayer.src = audioObjectUrl;
+            })
+            .catch(error => {
+                console.error('获取音频失败:', error);
+            });
+
         discussInfoConnection(discussId);
     } else {
         console.error('缺少discussId参数');
