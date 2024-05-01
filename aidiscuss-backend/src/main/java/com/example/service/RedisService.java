@@ -177,6 +177,11 @@ public class RedisService {
         return discussInfo;
     }
 
+    public String getDiscussName(String discussId) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        return jedis.get("discussName");
+    }
+
     public void clearDiscuss(String discussId) {
         Jedis jedis = findDiscussDatabase(discussId);
         jedis.flushDB();

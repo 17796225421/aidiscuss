@@ -53,6 +53,19 @@ public class ManageService {
         discussInfo.setDiscussStatus(DiscussStatusEnum.CREATED.getValue());
         redisService.createDiscuss(discussInfo);
 
+        // 在项目的根目录下创建一个data文件夹,用来存放数据文件
+        String baseDir = "data/";
+
+        // 这里用replace方法进行替换
+        String formattedDiscussName = discussInfo.getDiscussName().replace(" ", "_").replace(".", "-").replace(":", "-");
+
+        // 使用修改后的formattedDiscussName作为文件夹名
+        String dirName = baseDir + formattedDiscussName;
+        File dir = new File(dirName);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
         return new DiscussBaseInfo(discussId, discussName, DiscussStatusEnum.STARTED.getValue());
     }
 
@@ -101,7 +114,7 @@ public class ManageService {
 
     private void saveDiscussInfoToFile(DiscussInfo discussInfo) {
         // 在项目的根目录下创建一个data文件夹,用来存放数据文件
-        String baseDir = "data/discuss/closed/";
+        String baseDir = "data/";
 
         // 这里用replace方法进行替换
         String formattedDiscussName = discussInfo.getDiscussName().replace(" ", "_").replace(".", "-").replace(":", "-");
