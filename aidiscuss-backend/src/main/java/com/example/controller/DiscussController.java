@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -85,39 +86,18 @@ public class DiscussController {
     }
 
     @GetMapping("/audio")
-    public ResponseEntity<Resource> audio(HttpServletRequest request) throws IOException {
-        System.out.println(111);
+    public ResponseEntity<Resource> audio() throws IOException {
         Path path = Paths.get("C:\\Users\\zhouzihong\\Desktop\\aidiscuss\\aidiscuss-backend\\test.wav");
         Resource resource = new UrlResource(path.toUri());
-
-        // 获取文件总长度
-        long fileLength = resource.contentLength();
-        // 获取请求中的Range头部
-        String range = request.getHeader("Range");
-        long start = 0, end = fileLength - 1;
-
-        // 解析Range头部
-        if (range != null) {
-            String[] ranges = range.replace("bytes=", "").split("-");
-            start = Long.parseLong(ranges[0]);
-            if (ranges.length > 1) {
-                end = Long.parseLong(ranges[1]);
-            }
+        if (!resource.exists()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        // 计算内容长度和新的Content-Range头部
-        long contentLength = end - start + 1;
-        String contentRange = "bytes " + start + "-" + end + "/" + fileLength;
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentLength(contentLength);
-        headers.set("Content-Range", contentRange);
-        headers.setContentType(MediaType.parseMediaType("audio/wav"));
-
-        // 以部分内容状态码返回请求的音频数据块
-        return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
-                .headers(headers)
-                .body(new InputStreamResource(resource.getInputStream()));
+        String contentType = Files.probeContentType(path);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
     }
+
 
 }

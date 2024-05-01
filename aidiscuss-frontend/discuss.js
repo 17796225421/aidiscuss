@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const audioPlayer = document.getElementById('audioPlayer');
-        const audioUrl = 'http://127.0.0.1:10002/audio'; // 替换为实际的音频URL
+        const audioUrl = 'http://127.0.0.1:10002/audio';
 
         fetch(audioUrl)
             .then(response => response.blob())
