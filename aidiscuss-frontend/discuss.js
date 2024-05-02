@@ -230,6 +230,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        const noteHeader = document.getElementById('noteHeader');
+
+        noteHeader.addEventListener('dblclick', function() {
+            noteDialog.style.display = 'none';
+        });
         discussInfoConnection(discussId);
     } else {
         console.error('缺少discussId参数');
