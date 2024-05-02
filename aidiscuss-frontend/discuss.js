@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
             leftSide.style.width = `${newWidth}px`;
         }
 
-        document.getElementById('setTime').addEventListener('click', function() {
+        document.getElementById('setTime').addEventListener('click', function () {
             updateAudio(discussId);
         });
 
@@ -175,14 +175,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const seekSlider = document.getElementById('seekSlider');
 
         playPauseBtn.addEventListener('click', () => {
-            // updateAudio(discussId);
-            if (audioPlayers[0].paused) {
-                audioPlayers.forEach(player => player.play());
-                playPauseBtn.textContent = '暂停';
-            } else {
-                audioPlayers.forEach(player => player.pause());
-                playPauseBtn.textContent = '播放';
-            }
+            audioPlayers.forEach(player => player.pause());
+            updateAudio(discussId).then(() => {
+                if (playPauseBtn.textContent === '播放') {
+                    audioPlayers.forEach(player => player.play());
+                    playPauseBtn.textContent = '暂停';
+                } else {
+                    playPauseBtn.textContent = '播放';
+                }
+            });
         });
 
         seekSlider.addEventListener('input', () => {
@@ -275,7 +276,7 @@ function displayRealTimeSentence(realTimeSentence) {
     updateTextIfNeeded(realTimeSentenceElement, realTimeSentence);
 }
 
-function displaySentenceList(sentenceList) {
+function displaySentenceList(discussId, sentenceList) {
     const sentenceListContainer = document.getElementById('sentenceList');
     const existingChildren = Array.from(sentenceListContainer.children).filter(child => child.className === 'sentence');
     sentenceList.forEach((sentence, index) => {
@@ -308,7 +309,7 @@ function displaySentenceList(sentenceList) {
             sentenceListContainer.appendChild(sentenceElement);
 
             // 只在创建新元素时添加点击事件监听
-            sentenceElement.addEventListener('click', function() {
+            sentenceElement.addEventListener('click', function () {
                 const time = this.getAttribute('time');
                 console.log('time: ' + time);
 
@@ -323,6 +324,16 @@ function displaySentenceList(sentenceList) {
                     const seconds = getSecondsBetween(startTime, stopTime);
                     totalSeconds += seconds;
                 }
+
+                const audioPlayers = document.querySelectorAll('audio');
+                const seekSlider = document.getElementById('seekSlider');
+
+                updateAudio(discussId).then(r => {
+                    audioPlayers.forEach(player => player.currentTime = totalSeconds);
+
+                    const progress = (totalSeconds / audioPlayers[0].duration) * 100;
+                    seekSlider.value = progress;
+                });
 
                 console.log(`从会议开始到选中的句子,会议已进行了 ${totalSeconds} 秒`);
             });
@@ -768,6 +779,7 @@ function displayQuestionAnswerList(discussId, questionAnswerList) {
         questionAnswerListContainer.removeChild(existingChildren[i]);
     }
 }
+
 function updateAudio(discussId) {
     const audioPlayer1 = document.getElementById('audioPlayer1');
     const audioUrl1 = `http://127.0.0.1:10002/audio/virtual/${discussId}`;
@@ -819,11 +831,10 @@ function updateAudio(discussId) {
 }
 
 
-
 function displayDiscussInfo(discussInfo) {
     displayDiscussName(discussInfo.discussName);
     displayRealTimeSentence(discussInfo.realTimeSentence);
-    displaySentenceList(discussInfo.sentenceList);
+    displaySentenceList(discussInfo.discussId, discussInfo.sentenceList);
     displayStartTimeList(discussInfo.startTimeList);
     displayStopTimeList(discussInfo.stopTimeList);
     displaySegmentSummaryList(discussInfo.segmentSummaryList);
