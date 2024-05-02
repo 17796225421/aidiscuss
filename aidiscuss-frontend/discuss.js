@@ -257,6 +257,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
         editor.on('text-change', debouncedFetch);
 
+        editor.root.addEventListener('paste', (event) => {
+            const files = event.clipboardData.files;
+            if (files && files.length > 0) {
+                const file = files[0];
+                if (file.type.startsWith('image/')) {
+                    uploadImage(file);
+                }
+            }
+        });
+
+        function uploadImage(file) {
+            const formData = new FormData();
+            formData.append('image', file);
+
+            fetch('http://127.0.0.1:10002/uploadImage', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const range = editor.getSelection();
+                    editor.insertEmbed(range.index, 'image', data.url);
+                })
+                .catch(error => {
+                    console.error('图片上传失败:', error);
+                });
+        }
+
         discussInfoConnection(discussId);
     } else {
         console.error('缺少discussId参数');
