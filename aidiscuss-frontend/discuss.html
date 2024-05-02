@@ -91,22 +91,23 @@
             <button id="questionCancelInput">取消</button>
         </div>
         <div id="questionAnswerList" style="display: none;"></div>
-        <audio id="audioPlayer1" controls>
+        <audio id="audioPlayer1" controls style="display:none;">
             <source src="" type="audio/wav">
         </audio>
-        <audio id="audioPlayer2" controls>
+        <audio id="audioPlayer2" controls style="display:none;">
             <source src="" type="audio/wav">
         </audio>
-        <audio id="audioPlayer3" controls>
+        <audio id="audioPlayer3" controls style="display:none;">
             <source src="" type="audio/wav">
         </audio>
-        <div id="customAudioControls">
-            <button id="playPauseBtn">播放</button>
-            <span id="currentTime">00:00</span>
-            <input type="range" id="seekSlider" min="0" max="100" value="0">
-            <span id="duration">00:00</span>
+        <div id="customAudioControls" style="width: 100%; display: flex; align-items: center;">
+            <span id="playPauseBtn" style="cursor: pointer;">▶️</span>
+            <span id="timeDisplay" style="margin-left: 5px;">00:00 / 00:00</span>
+            <div style="flex: 1; margin-left: 10px;">
+                <input type="range" id="seekSlider" min="0" max="100" value="0" style="width: 100%;">
+            </div>
         </div>
-        <button id="setTime">设置时间</button>
+
         <div id="realTimeSentence"></div>
         <div id="sentenceList"></div>
     </div>

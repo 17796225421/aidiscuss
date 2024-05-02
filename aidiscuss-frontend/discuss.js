@@ -166,42 +166,50 @@ document.addEventListener('DOMContentLoaded', () => {
             leftSide.style.width = `${newWidth}px`;
         }
 
-        document.getElementById('setTime').addEventListener('click', function () {
-            updateAudio(discussId);
-        });
-
         const audioPlayers = document.querySelectorAll('audio');
         const playPauseBtn = document.getElementById('playPauseBtn');
         const seekSlider = document.getElementById('seekSlider');
+        const timeDisplay = document.getElementById('timeDisplay');
 
         playPauseBtn.addEventListener('click', () => {
-            audioPlayers.forEach(player => player.pause());
-            updateAudio(discussId).then(() => {
-                if (playPauseBtn.textContent === '播放') {
-                    audioPlayers.forEach(player => player.play());
-                    playPauseBtn.textContent = '暂停';
+            updateAudio(discussId).then(()=>{
+                audioPlayers.forEach(player => {
+                    if (player.paused) {
+                        player.play();
+                    } else {
+                        player.pause();
+                    }
+                });
+                if (playPauseBtn.textContent === '⏸️') {
+                    playPauseBtn.textContent = '▶️';
                 } else {
-                    playPauseBtn.textContent = '播放';
+                    playPauseBtn.textContent = '⏸️';
                 }
             });
-        });
-
-        seekSlider.addEventListener('input', () => {
-            const seekTime = audioPlayers[0].duration * (seekSlider.value / 100);
-            audioPlayers.forEach(player => player.currentTime = seekTime);
-
-            const currentTimeElement = document.getElementById('currentTime');
-            const currentMinutes = Math.floor(seekTime / 60);
-            const currentSeconds = Math.floor(seekTime % 60);
-            currentTimeElement.textContent = `${currentMinutes.toString().padStart(2, '0')}:${currentSeconds.toString().padStart(2, '0')}`;
         });
 
         audioPlayers.forEach(player => {
             player.addEventListener('timeupdate', () => {
                 const progress = (player.currentTime / player.duration) * 100;
                 seekSlider.value = progress;
+                const currentTime = formatTime(player.currentTime);
+                const duration = formatTime(player.duration);
+                timeDisplay.textContent = `${currentTime} / ${duration}`;
             });
         });
+
+        seekSlider.addEventListener('input', () => {
+            audioPlayers.forEach(player => {
+                const seekTime = player.duration * (seekSlider.value / 100);
+                player.currentTime = seekTime;
+            });
+        });
+
+        function formatTime(time) {
+            const minutes = Math.floor(time / 60);
+            const seconds = Math.floor(time % 60);
+            return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
 
         discussInfoConnection(discussId);
     } else {
@@ -783,6 +791,7 @@ function displayQuestionAnswerList(discussId, questionAnswerList) {
         questionAnswerListContainer.removeChild(existingChildren[i]);
     }
 }
+
 function updateAudio(discussId) {
     const audioPlayer1 = document.getElementById('audioPlayer1');
     const audioUrl1 = `http://127.0.0.1:10002/audio/virtual/${discussId}`;
@@ -799,7 +808,7 @@ function updateAudio(discussId) {
     const isPlaying3 = !audioPlayer3.paused;
     const currentTime3 = audioPlayer3.currentTime;
 
-    const maxDurationDisplay = document.getElementById('duration');
+    const timeDisplay = document.getElementById('timeDisplay');
 
     return Promise.all([
         fetch(audioUrl1).then(response => response.blob()),
@@ -820,7 +829,9 @@ function updateAudio(discussId) {
             audio.onloadedmetadata = () => {
                 if (audio.duration > maxDuration) {
                     maxDuration = audio.duration;
-                    maxDurationDisplay.textContent = formatTime(maxDuration);
+                    const currentTime = formatTime(audio.currentTime);
+                    const duration = formatTime(maxDuration);
+                    timeDisplay.textContent = `${currentTime} / ${duration}`;
                 }
             };
         });
