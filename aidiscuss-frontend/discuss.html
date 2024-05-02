@@ -97,16 +97,18 @@
             background-color: #f1f1f1;
         }
 
-        #noteText {
+        #editor {
             width: 100%;
             height: calc(100% - 40px);
-            resize: none;
             border: none;
         }
+
     </style>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.1/dist/quill.core.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.1/dist/quill.core.js"></script>
 </head>
 <body>
 <div class="container">
@@ -132,7 +134,9 @@
         <button id="note">笔记</button>
         <div id="noteDialog" style="display: none;">
             <div id="noteHeader"></div>
-            <textarea id="noteText"></textarea></div>
+            <div id="editor">1</div>
+        </div>
+
         <audio id="audioPlayer1" controls style="display:none;">
             <source src="" type="audio/wav">
         </audio>

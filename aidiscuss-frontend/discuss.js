@@ -214,11 +214,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const noteButton = document.getElementById('note');
         const noteDialog = document.getElementById('noteDialog');
+        const editor = new Quill('#editor');
 
         noteButton.addEventListener('click', function () {
             if (noteDialog.style.display === 'none') {
                 noteDialog.style.display = 'block';
-                document.getElementById('noteText').value = discussInfo.noteText;
+                editor.root.innerHTML = discussInfo.noteText;
             } else {
                 noteDialog.style.display = 'none';
             }
@@ -240,19 +241,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function debounce(func, wait) {
             let timeout;
-            return function () {
-                const context = this;
-                const args = arguments;
+            return function (...args) {
                 clearTimeout(timeout);
-                timeout = setTimeout(() => func.apply(context, args), wait);
+                timeout = setTimeout(() => {
+                    func.apply(this, args);
+                }, wait);
             };
         }
 
-        document.getElementById('noteText').addEventListener('input', debounce(function () {
-            fetch(`http://127.0.0.1:10002/postNoteText?discussId=${discussId}&text=${encodeURIComponent(this.value)}`, {
+        const debouncedFetch = debounce(function () {
+            fetch(`http://127.0.0.1:10002/postNoteText?discussId=${discussId}&text=${encodeURIComponent(editor.root.innerHTML)}`, {
                 method: 'POST'
             });
-        }, 500));
+        }, 500);
+
+        editor.on('text-change', debouncedFetch);
+
         discussInfoConnection(discussId);
     } else {
         console.error('缺少discussId参数');
