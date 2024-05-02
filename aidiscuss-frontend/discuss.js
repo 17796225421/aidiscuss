@@ -167,8 +167,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         document.getElementById('setTime').addEventListener('click', function() {
-            const audioPlayer = document.getElementById('audioPlayer');
-            audioPlayer.currentTime = 3;
+            updateAudio(discussId);
+        });
+
+        const audioPlayers = document.querySelectorAll('audio');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const seekSlider = document.getElementById('seekSlider');
+
+        playPauseBtn.addEventListener('click', () => {
+            if (audioPlayers[0].paused) {
+                audioPlayers.forEach(player => player.play());
+                playPauseBtn.textContent = '暂停';
+            } else {
+                audioPlayers.forEach(player => player.pause());
+                playPauseBtn.textContent = '播放';
+            }
+        });
+
+        seekSlider.addEventListener('input', () => {
+            const seekTime = audioPlayers[0].duration * (seekSlider.value / 100);
+            console.log(seekTime);
+            audioPlayers.forEach(player => player.currentTime = seekTime);
+        });
+
+        audioPlayers.forEach(player => {
+            player.addEventListener('timeupdate', () => {
+                const progress = (player.currentTime / player.duration) * 100;
+                seekSlider.value = progress;
+            });
         });
 
         discussInfoConnection(discussId);
