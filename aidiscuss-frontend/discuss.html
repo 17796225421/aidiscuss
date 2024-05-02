@@ -68,6 +68,17 @@
             color: #495057; /* 字体颜色 */
             font-size: 15px;
         }
+        #noteDialog {
+            width: 50%;  /* 宽度自定义 */
+            height: 300px; /* 高度自定义 */
+            border: 1px solid #ccc; /* 边框，可按需调整 */
+            z-index: 9999;
+        }
+        #noteText {
+            width: 100%;
+            height: 100%;
+            resize: none;
+        }
     </style>
 </head>
 <body>
@@ -91,6 +102,10 @@
             <button id="questionCancelInput">取消</button>
         </div>
         <div id="questionAnswerList" style="display: none;"></div>
+        <button id="note">笔记</button>
+        <dialog id="noteDialog" style="display: none;">
+            <textarea id="noteText"></textarea>
+        </dialog>
         <audio id="audioPlayer1" controls style="display:none;">
             <source src="" type="audio/wav">
         </audio>

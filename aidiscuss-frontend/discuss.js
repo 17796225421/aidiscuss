@@ -211,6 +211,17 @@ document.addEventListener('DOMContentLoaded', () => {
             return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
 
+        const noteButton = document.getElementById('note');
+        const noteDialog = document.getElementById('noteDialog');
+
+        noteButton.addEventListener('click', function() {
+            if (noteDialog.style.display === 'none') {
+                noteDialog.style.display = 'block';
+            } else {
+                noteDialog.style.display = 'none';
+            }
+        });
+
         discussInfoConnection(discussId);
     } else {
         console.error('缺少discussId参数');
