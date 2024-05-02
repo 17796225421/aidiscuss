@@ -185,7 +185,6 @@ function discussInfoConnection(discussId) {
     let isWaitingToSend = false;
 
     stompClient.connect({}, function (frame) {
-        console.log('Connected: ' + frame);
         sendRequest();
 
         stompClient.subscribe(`/topic/discussInfoConnection/${discussId}`, function (message) {
@@ -280,6 +279,26 @@ function displaySentenceList(sentenceList) {
             sentenceElement.appendChild(summaryElement);
 
             sentenceListContainer.appendChild(sentenceElement);
+
+            // 只在创建新元素时添加点击事件监听
+            sentenceElement.addEventListener('click', function() {
+                const time = this.getAttribute('time');
+                console.log('time: ' + time);
+
+                const startTimeList = Array.from(document.querySelectorAll('.startTime')).map(el => el.getAttribute('time'));
+                const stopTimeList = Array.from(document.querySelectorAll('.stopTime')).map(el => el.getAttribute('time'));
+
+                let totalSeconds = 0;
+                for (let i = 0; i < startTimeList.length; i++) {
+                    const startTime = startTimeList[i];
+                    const stopTime = stopTimeList[i] || time;
+
+                    const seconds = getSecondsBetween(startTime, stopTime);
+                    totalSeconds += seconds;
+                }
+
+                console.log(`从会议开始到选中的句子,会议已进行了 ${totalSeconds} 秒`);
+            });
         }
         updateTextIfNeeded(sentenceElement.querySelector('.text'), sentence.text);
         updateTextIfNeeded(sentenceElement.querySelector('.summary'), sentence.summary);
@@ -302,6 +321,15 @@ function displaySentenceList(sentenceList) {
     });
 }
 
+function getSecondsBetween(startTime, endTime) {
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+
+    const diffInMilliseconds = end - start;
+    const diffInSeconds = Math.floor(diffInMilliseconds / 1000);
+
+    return diffInSeconds;
+}
 
 function displayStartTimeList(startTimeList) {
     const sentenceListContainer = document.getElementById('sentenceList');
@@ -568,10 +596,8 @@ function displaySegmentDirectory(segmentDirectory) {
         while (target !== directoryElement) {
             if (target.tagName === 'LI') {
                 const index = parseInt(target.getAttribute('index'));
-                console.log(index);
                 const sentenceList = document.getElementById('sentenceList');
                 const sentences = Array.from(sentenceList.querySelectorAll('.sentence')); // 只选取class为sentence的子元素
-                console.log(sentences);
                 const sentenceToScroll = sentences[index];
                 if (sentenceToScroll) {
                     sentenceToScroll.scrollIntoView({behavior: 'smooth'});
@@ -598,7 +624,6 @@ function displaySegmentUml(segmentUmlList) {
     let segmentUmlListContainer = document.getElementById('segmentUmlList');
     const existingChildren = segmentUmlListContainer.children;
     segmentUmlList.forEach((segmentUml, index) => {
-        console.log(segmentUml);
         if (index < existingChildren.length) {
             const plantuml = existingChildren[index].getAttribute("plantuml");
             if (plantuml !== segmentUml) {
@@ -782,7 +807,6 @@ function displayDiscussInfo(discussInfo) {
     displayTimeSlicedSummaryList(discussInfo.timeSlicedSummaryList);
     displayKeyWordList(discussInfo.keyWordList);
     displayQuestionAnswerList(discussInfo.discussId, discussInfo.questionAnswerList);
-    updateAudio(discussInfo.discussId);
 }
 
 function updateTextIfNeeded(element, newText) {
