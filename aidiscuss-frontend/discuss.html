@@ -7,23 +7,28 @@
         #discussName {
             font-weight: bold; /* 加粗样式 */
         }
+
         #sentenceList {
             display: flex;
             flex-direction: column-reverse;
         }
+
         .container {
             display: flex;
             width: 100%;
         }
+
         .left {
             width: 500px;
             flex-shrink: 0; /* 防止左侧被压缩 */
             overflow: auto;
         }
+
         .right {
             flex-grow: 1; /* 右侧自动占据剩余空间 */
             overflow: auto;
         }
+
         .resizer {
             cursor: ew-resize;
             flex-shrink: 0;
@@ -31,9 +36,11 @@
             width: 5px;
             transition: transform 0.2s ease; /* 添加过渡效果 */
         }
+
         .resizer:hover {
             transform: scaleX(5); /* 鼠标悬停时放大5倍 */
         }
+
         #background > div, #questionAnswerList > div {
             max-height: 150px;
             overflow-y: auto;
@@ -41,26 +48,32 @@
             border: 1px solid black;
             margin-bottom: 2px;
         }
+
         .tab-nav {
             display: flex;
             border-bottom: 1px solid #ccc;
         }
+
         .tab-item {
             padding: 1px 5px;
             cursor: pointer;
             font-size: 13px;
         }
+
         .tab-item:hover {
             background-color: #f5f5f5;
         }
+
         .tab-item.active {
             border-bottom: 2px solid #333;
         }
-        .tab-content{
+
+        .tab-content {
             display: flex;
             flex-direction: column-reverse;
             font-size: 13px;
         }
+
         #realTimeSentence {
             background-color: #E9ECEF; /* 浅灰色背景 */
             padding: 10px; /* 内边距 */
@@ -68,18 +81,32 @@
             color: #495057; /* 字体颜色 */
             font-size: 15px;
         }
+
         #noteDialog {
-            width: 50%;  /* 宽度自定义 */
-            height: 300px; /* 高度自定义 */
-            border: 1px solid #ccc; /* 边框，可按需调整 */
+            width: 50%;
+            height: 300px;
+            border: 1px solid #ccc;
             z-index: 9999;
+            position: absolute;
+            background-color: white;
         }
+
+        #noteHeader {
+            padding: 10px;
+            cursor: move;
+            background-color: #f1f1f1;
+        }
+
         #noteText {
             width: 100%;
-            height: 100%;
+            height: calc(100% - 40px);
             resize: none;
+            border: none;
         }
     </style>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 </head>
 <body>
 <div class="container">
@@ -103,9 +130,9 @@
         </div>
         <div id="questionAnswerList" style="display: none;"></div>
         <button id="note">笔记</button>
-        <dialog id="noteDialog" style="display: none;">
-            <textarea id="noteText"></textarea>
-        </dialog>
+        <div id="noteDialog" style="display: none;">
+            <div id="noteHeader"></div>
+            <textarea id="noteText"></textarea></div>
         <audio id="audioPlayer1" controls style="display:none;">
             <source src="" type="audio/wav">
         </audio>
@@ -156,7 +183,8 @@
         <div id="segmentManagingupList" class="tab-content markdown" style="display:none;"></div>
         <div id="segmentDirectoryList" class="tab-content" style="display:none;"></div>
         <div id="segmentUmlList" class="tab-content" style="display:none;"></div>
-        <div id="timeSlicedSummaryList" class="tab-content markdown" style="display:none;"></div>    </div>
+        <div id="timeSlicedSummaryList" class="tab-content markdown" style="display:none;"></div>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.0/dist/sockjs.min.js"></script>

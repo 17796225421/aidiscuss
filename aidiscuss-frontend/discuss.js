@@ -222,6 +222,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        $(function() {
+            $("#noteDialog").draggable({
+                handle: "#noteHeader"
+            }).resizable({
+                handles: "all"
+            });
+        });
+
         discussInfoConnection(discussId);
     } else {
         console.error('缺少discussId参数');
