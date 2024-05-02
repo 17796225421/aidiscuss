@@ -235,6 +235,24 @@ document.addEventListener('DOMContentLoaded', () => {
         noteHeader.addEventListener('dblclick', function() {
             noteDialog.style.display = 'none';
         });
+
+        function debounce(func, wait) {
+            let timeout;
+            return function () {
+                const context = this;
+                const args = arguments;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), wait);
+            };
+        }
+
+        document.getElementById('noteText').addEventListener('input', debounce(function() {
+            fetch(`http://127.0.0.1:10002/postNoteText`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({discussId: discussId, text: this.value})
+            });
+        }, 500));
         discussInfoConnection(discussId);
     } else {
         console.error('缺少discussId参数');
