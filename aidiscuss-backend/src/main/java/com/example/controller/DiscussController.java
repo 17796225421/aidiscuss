@@ -84,7 +84,7 @@ public class DiscussController {
     }
 
     @GetMapping("/audio/virtual/{discussId}")
-    public ResponseEntity<Resource> audio1(@PathVariable String discussId) throws IOException {
+    public ResponseEntity<Resource> virtualAudio(@PathVariable String discussId) throws IOException {
         Resource audio = discussService.audio(discussId, MicTypeEnum.VIRTUAL);
         if (!audio.exists()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -96,18 +96,30 @@ public class DiscussController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + audio.getFilename() + "\"")
                 .body(audio);
     }
-    @GetMapping("/audio2")
-    public ResponseEntity<Resource> audio2() throws IOException {
-        Path path = Paths.get("C:\\Users\\zhouzihong\\Desktop\\aidiscuss\\aidiscuss-backend\\test2.wav");
-        Resource resource = new UrlResource(path.toUri());
-        if (!resource.exists()) {
+    @GetMapping("/audio/wire/{discussId}")
+    public ResponseEntity<Resource> wireAudio(@PathVariable String discussId) throws IOException {
+        Resource audio = discussService.audio(discussId, MicTypeEnum.WIRE);
+        if (!audio.exists()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        Path path = Paths.get(audio.getURI());
         String contentType = Files.probeContentType(path);
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + audio.getFilename() + "\"")
+                .body(audio);
     }
-
+    @GetMapping("/audio/extern/{discussId}")
+    public ResponseEntity<Resource> externAudio(@PathVariable String discussId) throws IOException {
+        Resource audio = discussService.audio(discussId, MicTypeEnum.EXTERN);
+        if (!audio.exists()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        Path path = Paths.get(audio.getURI());
+        String contentType = Files.probeContentType(path);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + audio.getFilename() + "\"")
+                .body(audio);
+    }
 }

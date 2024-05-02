@@ -116,8 +116,8 @@ public class MicTranscriberService {
                     outputStream.write(buffer, 0, nByte); // 将录音数据写入 ByteArrayOutputStream
                 }
 
-                // 每秒更新一次录音文件
-                if (System.currentTimeMillis() - startTime >= 1000) {
+                // 每10秒更新一次录音文件
+                if (System.currentTimeMillis() - startTime >= 10000) {
                     saveRecording(outputStream.toByteArray(), discussId, micTypeEnum); // 保存录音文件
                     outputStream.reset(); // 清空 ByteArrayOutputStream
                     startTime = System.currentTimeMillis(); // 更新录音开始时间

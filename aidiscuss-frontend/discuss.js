@@ -718,7 +718,7 @@ function displayQuestionAnswerList(discussId, questionAnswerList) {
 }
 
 
-function displayAudio(discussId) {
+function updateAudio(discussId) {
     const audioPlayer1 = document.getElementById('audioPlayer1');
     const audioUrl1 = `http://127.0.0.1:10002/audio/virtual/${discussId}`;
 
@@ -732,6 +732,31 @@ function displayAudio(discussId) {
             console.error('获取音频失败:', error);
         });
 
+    const audioPlayer2 = document.getElementById('audioPlayer2');
+    const audioUrl2 = `http://127.0.0.1:10002/audio/wire/${discussId}`;
+
+    fetch(audioUrl2)
+        .then(response => response.blob())
+        .then(blob => {
+            const audioObjectUrl = URL.createObjectURL(blob);
+            audioPlayer2.src = audioObjectUrl;
+        })
+        .catch(error => {
+            console.error('获取音频失败:', error);
+        });
+
+    const audioPlayer3 = document.getElementById('audioPlayer3');
+    const audioUrl3 = `http://127.0.0.1:10002/audio/extern/${discussId}`;
+
+    fetch(audioUrl3)
+        .then(response => response.blob())
+        .then(blob => {
+            const audioObjectUrl = URL.createObjectURL(blob);
+            audioPlayer3.src = audioObjectUrl;
+        })
+        .catch(error => {
+            console.error('获取音频失败:', error);
+        });
 }
 
 
@@ -757,7 +782,7 @@ function displayDiscussInfo(discussInfo) {
     displayTimeSlicedSummaryList(discussInfo.timeSlicedSummaryList);
     displayKeyWordList(discussInfo.keyWordList);
     displayQuestionAnswerList(discussInfo.discussId, discussInfo.questionAnswerList);
-    displayAudio(discussInfo.discussId);
+    updateAudio(discussInfo.discussId);
 }
 
 function updateTextIfNeeded(element, newText) {
