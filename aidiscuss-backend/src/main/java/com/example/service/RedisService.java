@@ -79,6 +79,7 @@ public class RedisService {
                     jedis.set("discussStatus", String.valueOf(discussInfo.getDiscussStatus()));
                     jedis.set("realTimeSentence", "");
                     jedis.set("segmentDirectory", "");
+                    jedis.set("noteText", "");
 
                     jedis.del("sentenceList");
                     jedis.del("startTimeList");
@@ -129,6 +130,7 @@ public class RedisService {
         discussInfo.setDiscussName(jedis.get("discussName"));
         discussInfo.setDiscussStatus(Integer.parseInt(jedis.get("discussStatus")));
         discussInfo.setRealTimeSentence(jedis.get("realTimeSentence"));
+        discussInfo.setNoteText(jedis.get("noteText"));
         discussInfo.setSegmentDirectory(jedis.get("segmentDirectory"));
 
         List<String> sentenceJsonList = jedis.lrange("sentenceList", 0, -1);
@@ -560,5 +562,10 @@ public class RedisService {
     public void setSegmentUmlCursor(String discussId, int segmentUmlCursor) {
         Jedis jedis = findDiscussDatabase(discussId);
         jedis.set("segmentUmlCursor", String.valueOf(segmentUmlCursor));
+    }
+
+    public void setNoteText(String discussId, String text) {
+        Jedis jedis = findDiscussDatabase(discussId);
+        jedis.set("noteText", text);
     }
 }

@@ -9,6 +9,7 @@ public class DiscussInfo {
     // 讨论名称
     String discussName;
     String realTimeSentence;
+    String noteText;
     // 句子列表
     List<Sentence> sentenceList;
     // 开始时间列表
@@ -112,6 +113,14 @@ public class DiscussInfo {
 
     public void setStartTimeList(List<String> startTimeList) {
         this.startTimeList = startTimeList;
+    }
+
+    public String getNoteText() {
+        return noteText;
+    }
+
+    public void setNoteText(String noteText) {
+        this.noteText = noteText;
     }
 
     public List<String> getStopTimeList() {

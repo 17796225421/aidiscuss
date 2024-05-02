@@ -122,4 +122,10 @@ public class DiscussController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + audio.getFilename() + "\"")
                 .body(audio);
     }
+    @PostMapping("/postNoteText")
+    public ResponseEntity<Void> postNoteText(@RequestParam String discussId, @RequestParam String text) {
+        discussService.postNoteText(discussId, text);
+        return ResponseEntity.ok().build();
+    }
+
 }

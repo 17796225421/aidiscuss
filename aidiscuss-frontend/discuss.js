@@ -1,3 +1,4 @@
+let discussInfo;
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const discussId = urlParams.get('discussId');
@@ -172,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const timeDisplay = document.getElementById('timeDisplay');
 
         playPauseBtn.addEventListener('click', () => {
-            updateAudio(discussId).then(()=>{
+            updateAudio(discussId).then(() => {
                 audioPlayers.forEach(player => {
                     if (player.paused) {
                         player.play();
@@ -214,15 +215,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const noteButton = document.getElementById('note');
         const noteDialog = document.getElementById('noteDialog');
 
-        noteButton.addEventListener('click', function() {
+        noteButton.addEventListener('click', function () {
             if (noteDialog.style.display === 'none') {
                 noteDialog.style.display = 'block';
+                document.getElementById('noteText').value = discussInfo.noteText;
             } else {
                 noteDialog.style.display = 'none';
             }
         });
 
-        $(function() {
+        $(function () {
             $("#noteDialog").draggable({
                 handle: "#noteHeader"
             }).resizable({
@@ -232,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const noteHeader = document.getElementById('noteHeader');
 
-        noteHeader.addEventListener('dblclick', function() {
+        noteHeader.addEventListener('dblclick', function () {
             noteDialog.style.display = 'none';
         });
 
@@ -246,11 +248,9 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
 
-        document.getElementById('noteText').addEventListener('input', debounce(function() {
-            fetch(`http://127.0.0.1:10002/postNoteText`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({discussId: discussId, text: this.value})
+        document.getElementById('noteText').addEventListener('input', debounce(function () {
+            fetch(`http://127.0.0.1:10002/postNoteText?discussId=${discussId}&text=${encodeURIComponent(this.value)}`, {
+                method: 'POST'
             });
         }, 500));
         discussInfoConnection(discussId);
@@ -273,8 +273,8 @@ function discussInfoConnection(discussId) {
             if (message.body && message.body.trim() !== '') {
                 console.log("discussInfo:" + message.body);
                 const data = JSON.parse(message.body);
-                const discussInfo = new DiscussInfo(data);
-                displayDiscussInfo(discussInfo);
+                discussInfo = new DiscussInfo(data);
+                displayDiscussInfo();
 
                 formatMarkdownContent();
             }
@@ -910,7 +910,7 @@ function formatTime(time) {
 }
 
 
-function displayDiscussInfo(discussInfo) {
+function displayDiscussInfo() {
     displayDiscussName(discussInfo.discussName);
     displayRealTimeSentence(discussInfo.realTimeSentence);
     displaySentenceList(discussInfo.discussId, discussInfo.sentenceList);

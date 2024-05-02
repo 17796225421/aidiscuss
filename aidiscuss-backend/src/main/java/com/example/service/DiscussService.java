@@ -145,4 +145,8 @@ public class DiscussService {
         Path path = Paths.get(fileName);
         return  new UrlResource(path.toUri());
     }
+
+    public void postNoteText(String discussId, String text) {
+        redisService.setNoteText(discussId,text);
+    }
 }

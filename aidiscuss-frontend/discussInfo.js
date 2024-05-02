@@ -35,5 +35,6 @@ class DiscussInfo {
         this.segmentManagingupCursor = data.segmentManagingupCursor;
         this.timeSlicedSummaryCursor = data.timeSlicedSummaryCursor;
         this.keyWordCursor = data.keyWordCursor;
+        this.noteText=data.noteText;
     }
 }
