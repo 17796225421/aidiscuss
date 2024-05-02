@@ -108,25 +108,28 @@ public class MicTranscriberService {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); // 用于存储录音数据
         long startTime = System.currentTimeMillis(); // 记录录音开始时间
 
-        while (micThread.isRunning()) { // 使用running变量控制循环
+        while (micThread.isRunning()) {
             try {
                 nByte = targetDataLine.read(buffer, 0, bufSize);
                 if (nByte > 0) {
                     transcriber.send(buffer, nByte);
-                    outputStream.write(buffer, 0, nByte); // 将录音数据写入 ByteArrayOutputStream
+                    outputStream.write(buffer, 0, nByte);
                 }
 
-                // 每10秒更新一次录音文件
                 if (System.currentTimeMillis() - startTime >= 10000) {
-                    saveRecording(outputStream.toByteArray(), discussId, micTypeEnum); // 保存录音文件
-                    outputStream.reset(); // 清空 ByteArrayOutputStream
-                    startTime = System.currentTimeMillis(); // 更新录音开始时间
+                    saveRecording(outputStream.toByteArray(), discussId, micTypeEnum);
+                    outputStream.reset();
+                    startTime = System.currentTimeMillis();
                 }
 
             } catch (Exception e) {
                 e.printStackTrace();
                 break;
             }
+        }
+        // 循环结束后保存剩余数据
+        if (outputStream.size() > 0) {
+            saveRecording(outputStream.toByteArray(), discussId, micTypeEnum);
         }
         targetDataLine.stop();
         targetDataLine.close();
