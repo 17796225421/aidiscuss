@@ -118,7 +118,7 @@ public class MicTranscriberService {
 
                 // 每秒更新一次录音文件
                 if (System.currentTimeMillis() - startTime >= 1000) {
-                    saveRecording(outputStream.toByteArray(), discussId); // 保存录音文件
+                    saveRecording(outputStream.toByteArray(), discussId, micTypeEnum); // 保存录音文件
                     outputStream.reset(); // 清空 ByteArrayOutputStream
                     startTime = System.currentTimeMillis(); // 更新录音开始时间
                 }
@@ -134,14 +134,25 @@ public class MicTranscriberService {
         transcriber.close();
     }
 
-    private void saveRecording(byte[] audioData, String discussId) {
-        String filePath = "C:\\Users\\zhouzihong\\Desktop\\aidiscuss\\aidiscuss-backend\\" + discussId + ".wav";
+    private void saveRecording(byte[] audioData, String discussId, MicTypeEnum micTypeEnum) {
+        String discussName = redisService.getDiscussName(discussId);
+
+        // 在项目的根目录下创建一个data文件夹,用来存放数据文件
+        String baseDir = "data/";
+
+        // 这里用replace方法进行替换
+        String formattedDiscussName = discussName.replace(" ", "_").replace(".", "-").replace(":", "-");
+
+        // 使用修改后的formattedDiscussName作为文件夹名
+        String dirName = baseDir + formattedDiscussName;
+
+        String fileName = dirName + "/" + micTypeEnum + ".wav";
 
         AudioFormat audioFormat = new AudioFormat(16000.0F, 16, 1, true, false);
         ByteArrayInputStream bais = new ByteArrayInputStream(audioData);
         AudioInputStream audioInputStream = new AudioInputStream(bais, audioFormat, audioData.length / audioFormat.getFrameSize());
 
-        File outputFile = new File(filePath);
+        File outputFile = new File(fileName);
         try {
             if (outputFile.exists()) {
                 AudioInputStream existingAudioInputStream = AudioSystem.getAudioInputStream(outputFile);
@@ -164,7 +175,6 @@ public class MicTranscriberService {
             e.printStackTrace();
         }
     }
-
 
 
     public SpeechTranscriberListener getTranscriberListener(String discussId, MicTypeEnum micTypeEnum) {
