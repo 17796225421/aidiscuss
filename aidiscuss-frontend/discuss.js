@@ -188,8 +188,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         seekSlider.addEventListener('input', () => {
             const seekTime = audioPlayers[0].duration * (seekSlider.value / 100);
-            console.log(seekTime);
             audioPlayers.forEach(player => player.currentTime = seekTime);
+
+            const currentTimeElement = document.getElementById('currentTime');
+            const currentMinutes = Math.floor(seekTime / 60);
+            const currentSeconds = Math.floor(seekTime % 60);
+            currentTimeElement.textContent = `${currentMinutes.toString().padStart(2, '0')}:${currentSeconds.toString().padStart(2, '0')}`;
         });
 
         audioPlayers.forEach(player => {
@@ -779,7 +783,6 @@ function displayQuestionAnswerList(discussId, questionAnswerList) {
         questionAnswerListContainer.removeChild(existingChildren[i]);
     }
 }
-
 function updateAudio(discussId) {
     const audioPlayer1 = document.getElementById('audioPlayer1');
     const audioUrl1 = `http://127.0.0.1:10002/audio/virtual/${discussId}`;
@@ -796,14 +799,31 @@ function updateAudio(discussId) {
     const isPlaying3 = !audioPlayer3.paused;
     const currentTime3 = audioPlayer3.currentTime;
 
+    const maxDurationDisplay = document.getElementById('duration');
+
     return Promise.all([
         fetch(audioUrl1).then(response => response.blob()),
         fetch(audioUrl2).then(response => response.blob()),
         fetch(audioUrl3).then(response => response.blob())
     ]).then(([blob1, blob2, blob3]) => {
-        audioPlayer1.src = URL.createObjectURL(blob1);
-        audioPlayer2.src = URL.createObjectURL(blob2);
-        audioPlayer3.src = URL.createObjectURL(blob3);
+        const url1 = URL.createObjectURL(blob1);
+        const url2 = URL.createObjectURL(blob2);
+        const url3 = URL.createObjectURL(blob3);
+
+        audioPlayer1.src = url1;
+        audioPlayer2.src = url2;
+        audioPlayer3.src = url3;
+
+        let maxDuration = 0;
+        const audios = [audioPlayer1, audioPlayer2, audioPlayer3];
+        audios.forEach(audio => {
+            audio.onloadedmetadata = () => {
+                if (audio.duration > maxDuration) {
+                    maxDuration = audio.duration;
+                    maxDurationDisplay.textContent = formatTime(maxDuration);
+                }
+            };
+        });
 
         if (isPlaying1) {
             audioPlayer1.currentTime = currentTime1;
@@ -828,6 +848,12 @@ function updateAudio(discussId) {
     }).catch(error => {
         console.error('获取音频失败:', error);
     });
+}
+
+function formatTime(time) {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
 }
 
 
