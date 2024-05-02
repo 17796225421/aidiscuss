@@ -175,6 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const seekSlider = document.getElementById('seekSlider');
 
         playPauseBtn.addEventListener('click', () => {
+            // updateAudio(discussId);
             if (audioPlayers[0].paused) {
                 audioPlayers.forEach(player => player.play());
                 playPauseBtn.textContent = '暂停';
@@ -767,47 +768,54 @@ function displayQuestionAnswerList(discussId, questionAnswerList) {
         questionAnswerListContainer.removeChild(existingChildren[i]);
     }
 }
-
-
 function updateAudio(discussId) {
     const audioPlayer1 = document.getElementById('audioPlayer1');
     const audioUrl1 = `http://127.0.0.1:10002/audio/virtual/${discussId}`;
-
-    fetch(audioUrl1)
-        .then(response => response.blob())
-        .then(blob => {
-            const audioObjectUrl = URL.createObjectURL(blob);
-            audioPlayer1.src = audioObjectUrl;
-        })
-        .catch(error => {
-            console.error('获取音频失败:', error);
-        });
+    const isPlaying1 = !audioPlayer1.paused;
+    const currentTime1 = audioPlayer1.currentTime;
 
     const audioPlayer2 = document.getElementById('audioPlayer2');
     const audioUrl2 = `http://127.0.0.1:10002/audio/wire/${discussId}`;
-
-    fetch(audioUrl2)
-        .then(response => response.blob())
-        .then(blob => {
-            const audioObjectUrl = URL.createObjectURL(blob);
-            audioPlayer2.src = audioObjectUrl;
-        })
-        .catch(error => {
-            console.error('获取音频失败:', error);
-        });
+    const isPlaying2 = !audioPlayer2.paused;
+    const currentTime2 = audioPlayer2.currentTime;
 
     const audioPlayer3 = document.getElementById('audioPlayer3');
     const audioUrl3 = `http://127.0.0.1:10002/audio/extern/${discussId}`;
+    const isPlaying3 = !audioPlayer3.paused;
+    const currentTime3 = audioPlayer3.currentTime;
 
-    fetch(audioUrl3)
-        .then(response => response.blob())
-        .then(blob => {
-            const audioObjectUrl = URL.createObjectURL(blob);
-            audioPlayer3.src = audioObjectUrl;
-        })
-        .catch(error => {
-            console.error('获取音频失败:', error);
-        });
+    return Promise.all([
+        fetch(audioUrl1).then(response => response.blob()),
+        fetch(audioUrl2).then(response => response.blob()),
+        fetch(audioUrl3).then(response => response.blob())
+    ]).then(([blob1, blob2, blob3]) => {
+        audioPlayer1.src = URL.createObjectURL(blob1);
+        audioPlayer2.src = URL.createObjectURL(blob2);
+        audioPlayer3.src = URL.createObjectURL(blob3);
+
+        if (isPlaying1) {
+            audioPlayer1.currentTime = currentTime1;
+            audioPlayer1.play();
+        } else {
+            audioPlayer1.currentTime = currentTime1;
+        }
+
+        if (isPlaying2) {
+            audioPlayer2.currentTime = currentTime2;
+            audioPlayer2.play();
+        } else {
+            audioPlayer2.currentTime = currentTime2;
+        }
+
+        if (isPlaying3) {
+            audioPlayer3.currentTime = currentTime3;
+            audioPlayer3.play();
+        } else {
+            audioPlayer3.currentTime = currentTime3;
+        }
+    }).catch(error => {
+        console.error('获取音频失败:', error);
+    });
 }
 
 
