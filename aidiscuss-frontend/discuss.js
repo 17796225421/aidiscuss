@@ -277,7 +277,9 @@ document.addEventListener('DOMContentLoaded', () => {
             })
                 .then(response => response.json())
                 .then(data => {
+                    console.log(data);
                     const range = editor.getSelection();
+                    data.url='https://img2.imgtp.com/2024/05/03/K8luNaCV.png';
                     editor.insertEmbed(range.index, 'image', data.url);
                 })
                 .catch(error => {

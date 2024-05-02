@@ -14,14 +14,15 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @RestController
 public class DiscussController {
@@ -127,5 +128,24 @@ public class DiscussController {
         discussService.postNoteText(discussId, text);
         return ResponseEntity.ok().build();
     }
+
+//    @PostMapping("/uploadImage")
+//    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("image") MultipartFile file) {
+//        try {
+//            String originalFileName = file.getOriginalFilename();
+//            String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+//            String randomFileName = UUID.randomUUID().toString() + fileExtension;
+//            String filePath = "C:\\Users\\zhouzihong\\Desktop\\aidiscuss\\aidiscuss-backend\\" + randomFileName;
+//            file.transferTo(new File(filePath));
+//
+//            String imageUrl = "http://127.0.0.1:10002/images/" + randomFileName;
+//            Map<String, String> response = new HashMap<>();
+//            response.put("url", imageUrl);
+//            return ResponseEntity.ok(response);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
+//    }
 
 }

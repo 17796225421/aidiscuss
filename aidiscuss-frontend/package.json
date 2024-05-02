@@ -6,6 +6,7 @@
     "start": "http-server -c-1 -p 10001"
   },
   "dependencies": {
-    "http-server": "^0.12.3"
+    "http-server": "^0.12.3",
+    "quill": "^2.0.1"
   }
 }
