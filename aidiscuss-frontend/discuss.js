@@ -166,32 +166,6 @@ document.addEventListener('DOMContentLoaded', () => {
             leftSide.style.width = `${newWidth}px`;
         }
 
-        const audioPlayer1 = document.getElementById('audioPlayer1');
-        const audioUrl1 = 'http://127.0.0.1:10002/audio1';
-
-        fetch(audioUrl1)
-            .then(response => response.blob())
-            .then(blob => {
-                const audioObjectUrl = URL.createObjectURL(blob);
-                audioPlayer1.src = audioObjectUrl;
-            })
-            .catch(error => {
-                console.error('获取音频失败:', error);
-            });
-
-        const audioPlayer2 = document.getElementById('audioPlayer2');
-        const audioUrl2 = 'http://127.0.0.1:10002/audio2';
-
-        fetch(audioUrl2)
-            .then(response => response.blob())
-            .then(blob => {
-                const audioObjectUrl = URL.createObjectURL(blob);
-                audioPlayer2.src = audioObjectUrl;
-            })
-            .catch(error => {
-                console.error('获取音频失败:', error);
-            });
-
         document.getElementById('setTime').addEventListener('click', function() {
             const audioPlayer = document.getElementById('audioPlayer');
             audioPlayer.currentTime = 3;
@@ -744,6 +718,24 @@ function displayQuestionAnswerList(discussId, questionAnswerList) {
 }
 
 
+function displayAudio(discussId) {
+    const audioPlayer1 = document.getElementById('audioPlayer1');
+    const audioUrl1 = `http://127.0.0.1:10002/audio/virtual/${discussId}`;
+
+    fetch(audioUrl1)
+        .then(response => response.blob())
+        .then(blob => {
+            const audioObjectUrl = URL.createObjectURL(blob);
+            audioPlayer1.src = audioObjectUrl;
+        })
+        .catch(error => {
+            console.error('获取音频失败:', error);
+        });
+
+}
+
+
+
 function displayDiscussInfo(discussInfo) {
     displayDiscussName(discussInfo.discussName);
     displayRealTimeSentence(discussInfo.realTimeSentence);
@@ -765,6 +757,7 @@ function displayDiscussInfo(discussInfo) {
     displayTimeSlicedSummaryList(discussInfo.timeSlicedSummaryList);
     displayKeyWordList(discussInfo.keyWordList);
     displayQuestionAnswerList(discussInfo.discussId, discussInfo.questionAnswerList);
+    displayAudio(discussInfo.discussId);
 }
 
 function updateTextIfNeeded(element, newText) {

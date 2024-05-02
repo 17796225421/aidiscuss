@@ -6,9 +6,16 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import okio.BufferedSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -81,7 +88,7 @@ public class DiscussService {
                                     long currentTime = System.currentTimeMillis();
                                     if (!accumulativeContent.toString().equals(lastContent) && currentTime - lastPrintTime >= 1000) {
                                         QuestionAnswer questionAnswer = new QuestionAnswer(questionRequest.getQuestion(), accumulativeContent.toString());
-                                        redisService.setQuestionAnswer(questionRequest.getDiscussId(),questionAnswer);
+                                        redisService.setQuestionAnswer(questionRequest.getDiscussId(), questionAnswer);
                                         lastContent = accumulativeContent.toString();
 
                                         System.out.println(lastContent);
@@ -94,14 +101,14 @@ public class DiscussService {
                 }
             }
             QuestionAnswer questionAnswer = new QuestionAnswer(questionRequest.getQuestion(), accumulativeContent.toString());
-            redisService.setQuestionAnswer(questionRequest.getDiscussId(),questionAnswer);
+            redisService.setQuestionAnswer(questionRequest.getDiscussId(), questionAnswer);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void deleteQuestion(QuestionRequest questionRequest){
-        redisService.deleteQuestion(questionRequest.getDiscussId(),questionRequest.getQuestion());
+    public void deleteQuestion(QuestionRequest questionRequest) {
+        redisService.deleteQuestion(questionRequest.getDiscussId(), questionRequest.getQuestion());
     }
 
     public void updateBackground(BackgroundRequest backgroundRequest) {
@@ -126,5 +133,16 @@ public class DiscussService {
     public List<String> getBackground(String discussId) {
         // 直接从Redis中获取背景列表并返回
         return redisService.getBackgroundList(discussId);
+    }
+
+    public Resource audio(String discussId, MicTypeEnum micTypeEnum) throws IOException {
+        String discussName = redisService.getDiscussName(discussId);
+        String baseDir = "data/";
+        String formattedDiscussName = discussName.replace(" ", "_").replace(".", "-").replace(":", "-");
+        String dirName = baseDir + formattedDiscussName;
+
+        String fileName = dirName + "/" + micTypeEnum + ".wav";
+        Path path = Paths.get(fileName);
+        return  new UrlResource(path.toUri());
     }
 }
