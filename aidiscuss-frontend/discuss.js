@@ -679,7 +679,23 @@ function displaySegmentLogicList(segmentLogicList) {
         }
     });
 }
-
+function displaySegmentTeachList(segmentTeachList) {
+    const segmentTeachListContainer = document.getElementById('segmentTeachList');
+    const existingChildren = segmentTeachListContainer.children;
+    segmentTeachList.forEach((segmentTeach, index) => {
+        const segmentTeachText = `${segmentTeach}`;
+        if (index < existingChildren.length) {
+            updateTextIfNeeded(existingChildren[index], segmentTeachText);
+        } else {
+            const segmentTeachElement = document.createElement('div');
+            segmentTeachElement.textContent = segmentTeachText;
+            // 设置内边距和边框样式增加可读性
+            segmentTeachElement.style.padding = '10px';
+            segmentTeachElement.style.borderBottom = '1px solid #cccccc';
+            segmentTeachListContainer.appendChild(segmentTeachElement);
+        }
+    });
+}
 function displaySegmentManagingupList(segmentManagingupList) {
     const segmentManagingupListContainer = document.getElementById('segmentManagingupList');
     const existingChildren = segmentManagingupListContainer.children;
@@ -967,6 +983,7 @@ function displayDiscussInfo() {
     displaySegmentContinueList(discussInfo.segmentContinueList);
     displaySegmentMultiangleList(discussInfo.segmentMultiangleList);
     displaySegmentLogicList(discussInfo.segmentLogicList);
+    displaySegmentTeachList(discussInfo.segmentTeachList);
     displaySegmentManagingupList(discussInfo.segmentManagingupList);
     displaySegmentDirectory(discussInfo.segmentDirectory);
     displaySegmentUml(discussInfo.segmentUmlList);

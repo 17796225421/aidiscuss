@@ -15,6 +15,7 @@ class DiscussInfo {
         this.segmentContinueList = data.segmentContinueList;
         this.segmentMultiangleList = data.segmentMultiangleList;
         this.segmentLogicList = data.segmentLogicList;
+        this.segmentTeachList = data.segmentTeachList;
         this.segmentManagingupList = data.segmentManagingupList;
         this.segmentUmlList=data.segmentUmlList;
         this.segmentDirectory=data.segmentDirectory;
@@ -32,6 +33,7 @@ class DiscussInfo {
         this.segmentContinueCursor = data.segmentContinueCursor;
         this.segmentMultiangleCursor = data.segmentMultiangleCursor;
         this.segmentLogicCursor = data.segmentLogicCursor;
+        this.segmentTeachCursor = data.segmentTeachCursor;
         this.segmentManagingupCursor = data.segmentManagingupCursor;
         this.timeSlicedSummaryCursor = data.timeSlicedSummaryCursor;
         this.keyWordCursor = data.keyWordCursor;
