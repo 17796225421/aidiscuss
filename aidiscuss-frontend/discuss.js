@@ -278,7 +278,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(response => response.json())
                 .then(data => {
                     const range = editor.getSelection();
-                    editor.insertEmbed(range.index, 'image', data.url);
+                    if (range) {
+                        if (editor.getLine(range.index)) {
+                            let lineBounds = editor.getLine(range.index);
+                            let lineContent = lineBounds[0].domNode.innerHTML;
+                            if (lineContent.includes('data:image/png;base64,')) {
+                                lineBounds[0].domNode.innerHTML = lineContent.replace(/<img src="data:image\/png;base64,[^"]+">/, `<img src="${data.url}">`);
+                            } else {
+                                editor.insertEmbed(range.index, 'image', data.url);
+                            }
+                            const range = editor.getSelection();
+                            if (range) {
+                                const imageIndex = range.index;
+                                editor.insertText(imageIndex + 1, '\n', Quill.sources.USER);
+                                editor.setSelection(imageIndex + 2, 0);
+                            }
+                        }
+                    }
                 })
                 .catch(error => {
                     console.error('图片上传失败:', error);
