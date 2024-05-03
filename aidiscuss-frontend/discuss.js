@@ -287,12 +287,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             } else {
                                 editor.insertEmbed(range.index, 'image', data.url);
                             }
-                            const range = editor.getSelection();
-                            if (range) {
-                                const imageIndex = range.index;
-                                editor.insertText(imageIndex + 1, '\n', Quill.sources.USER);
-                                editor.setSelection(imageIndex + 2, 0);
-                            }
                         }
                     }
                 })
