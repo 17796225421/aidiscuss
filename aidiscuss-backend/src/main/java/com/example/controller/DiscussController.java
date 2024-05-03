@@ -129,23 +129,37 @@ public class DiscussController {
         return ResponseEntity.ok().build();
     }
 
-//    @PostMapping("/uploadImage")
-//    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("image") MultipartFile file) {
-//        try {
-//            String originalFileName = file.getOriginalFilename();
-//            String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
-//            String randomFileName = UUID.randomUUID().toString() + fileExtension;
-//            String filePath = "C:\\Users\\zhouzihong\\Desktop\\aidiscuss\\aidiscuss-backend\\" + randomFileName;
-//            file.transferTo(new File(filePath));
-//
-//            String imageUrl = "http://127.0.0.1:10002/images/" + randomFileName;
-//            Map<String, String> response = new HashMap<>();
-//            response.put("url", imageUrl);
-//            return ResponseEntity.ok(response);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
-//    }
+    @PostMapping("/uploadImage")
+    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("image") MultipartFile file) {
+        try {
+            String originalFileName = file.getOriginalFilename();
+            String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+            String randomFileName = UUID.randomUUID().toString() + fileExtension;
+            String filePath = "C:\\Users\\zhouzihong\\Desktop\\aidiscuss\\aidiscuss-backend\\" + randomFileName;
+            file.transferTo(new File(filePath));
 
+            String imageUrl = "http://127.0.0.1:10002/images/" + randomFileName;
+            Map<String, String> response = new HashMap<>();
+            response.put("url", imageUrl);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    @GetMapping("/images/{fileName}")
+    public ResponseEntity<Resource> getImage(@PathVariable String fileName) throws IOException {
+        String filePath = "C:\\Users\\zhouzihong\\Desktop\\aidiscuss\\aidiscuss-backend\\"+ fileName;
+        Path path = Paths.get(filePath);
+        Resource resource = new UrlResource(path.toUri());
+        
+        if (resource.exists() && resource.isReadable()) {
+            String contentType = Files.probeContentType(path);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .body(resource);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
