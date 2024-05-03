@@ -130,15 +130,9 @@ public class DiscussController {
     }
 
     @PostMapping("/uploadImage")
-    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("image") MultipartFile file) {
+    public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("image") MultipartFile file, @RequestParam String discussId) {
         try {
-            String originalFileName = file.getOriginalFilename();
-            String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
-            String randomFileName = UUID.randomUUID().toString() + fileExtension;
-            String filePath = "C:\\Users\\zhouzihong\\Desktop\\aidiscuss\\aidiscuss-backend\\" + randomFileName;
-            file.transferTo(new File(filePath));
-
-            String imageUrl = "http://127.0.0.1:10002/images/" + randomFileName;
+            String imageUrl = discussService.uploadImage(file, discussId);
             Map<String, String> response = new HashMap<>();
             response.put("url", imageUrl);
             return ResponseEntity.ok(response);
@@ -147,13 +141,13 @@ public class DiscussController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
     @GetMapping("/images/{fileName}")
-    public ResponseEntity<Resource> getImage(@PathVariable String fileName) throws IOException {
-        String filePath = "C:\\Users\\zhouzihong\\Desktop\\aidiscuss\\aidiscuss-backend\\"+ fileName;
-        Path path = Paths.get(filePath);
-        Resource resource = new UrlResource(path.toUri());
-        
+    public ResponseEntity<Resource> getImage(@PathVariable String fileName, @RequestParam String discussId) throws IOException {
+        Resource resource = discussService.getImage(fileName, discussId);
+
         if (resource.exists() && resource.isReadable()) {
+            Path path = Paths.get(resource.getURI());
             String contentType = Files.probeContentType(path);
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(contentType))

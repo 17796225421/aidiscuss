@@ -10,15 +10,13 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class DiscussService {
@@ -143,10 +141,39 @@ public class DiscussService {
 
         String fileName = dirName + "/" + micTypeEnum + ".wav";
         Path path = Paths.get(fileName);
-        return  new UrlResource(path.toUri());
+        return new UrlResource(path.toUri());
     }
 
     public void postNoteText(String discussId, String text) {
-        redisService.setNoteText(discussId,text);
+        redisService.setNoteText(discussId, text);
+    }
+
+    public String uploadImage(MultipartFile file, String discussId) throws IOException {
+        String discussName = redisService.getDiscussName(discussId);
+        String baseDir = System.getProperty("user.dir") + "/data/";
+        String formattedDiscussName = discussName.replace(" ", "_").replace(".", "-").replace(":", "-");
+        String dirName = baseDir + formattedDiscussName;
+
+
+        String originalFileName = file.getOriginalFilename();
+        String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+        String randomFileName = UUID.randomUUID().toString() + fileExtension;
+        String filePath = dirName + "/" + randomFileName;
+        file.transferTo(new File(filePath));
+
+        String imageUrl = "http://127.0.0.1:10002/images/" + randomFileName;
+        return imageUrl;
+    }
+
+    public Resource getImage(String fileName, String discussId) throws IOException {
+        String discussName = redisService.getDiscussName(discussId);
+        String baseDir = "data/";
+        String formattedDiscussName = discussName.replace(" ", "_").replace(".", "-").replace(":", "-");
+        String dirName = baseDir + formattedDiscussName;
+
+        String filePath = dirName + "/" + fileName;
+        Path path = Paths.get(filePath);
+        Resource resource = new UrlResource(path.toUri());
+        return resource;
     }
 }

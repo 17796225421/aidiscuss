@@ -270,6 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
         function uploadImage(file) {
             const formData = new FormData();
             formData.append('image', file);
+            formData.append('discussId', discussId);
 
             fetch('http://127.0.0.1:10002/uploadImage', {
                 method: 'POST',
@@ -283,9 +284,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             let lineBounds = editor.getLine(range.index);
                             let lineContent = lineBounds[0].domNode.innerHTML;
                             if (lineContent.includes('data:image/png;base64,')) {
-                                lineBounds[0].domNode.innerHTML = lineContent.replace(/<img src="data:image\/png;base64,[^"]+">/, `<img src="${data.url}">`);
+                                lineBounds[0].domNode.innerHTML = lineContent.replace(/<img src="data:image\/png;base64,[^"]+">/, `<img src="${data.url}?discussId=${discussId}">`);
                             } else {
-                                editor.insertEmbed(range.index, 'image', data.url);
+                                editor.insertEmbed(range.index, 'image', `${data.url}?discussId=${discussId}`);
                             }
                         }
                     }
@@ -294,7 +295,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error('图片上传失败:', error);
                 });
         }
-
         discussInfoConnection(discussId);
     } else {
         console.error('缺少discussId参数');
