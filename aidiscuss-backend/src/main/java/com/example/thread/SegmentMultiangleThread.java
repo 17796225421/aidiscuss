@@ -26,6 +26,7 @@ public class SegmentMultiangleThread extends Thread {
                 List<Sentence> sentenceList = redisService.getSentences(discussId);
 
                 int segmentMultiangleCursor = redisService.getSegmentMultiangleCursor(discussId);
+                List<String> backgroundList = redisService.getBackgroundList(discussId);
 
                 // 初始化未处理文本的StringBuilder
                 StringBuilder unprocessedText = new StringBuilder();
@@ -37,7 +38,9 @@ public class SegmentMultiangleThread extends Thread {
 
                 if (unprocessedText.length() > MAX_TEXT_LENGTH) {
                     String text = unprocessedText.toString();
-                    String segmentMultiangle = gptService.requestLlama3("llama3-70b-8192", "你是一个思维发散头脑灵活知识广度大的程序员", "从多角度分析以下内容：" + text);
+                    String segmentMultiangle = gptService.requestQwen("qwen1.5-110b-chat", "你是一个思维发散头脑灵活知识广度大的程序员",
+                            "背景信息：" + backgroundList.toString() + "\n背景信息结束\n" +
+                            "从多角度分析以下内容：" + text);
 //                    System.out.println("segmentMultiangle" + segmentMultiangle);
                     redisService.addSegmentMultiangle(discussId, segmentMultiangle);
 

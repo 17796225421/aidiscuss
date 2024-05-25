@@ -26,6 +26,7 @@ public class SegmentRemarkThread extends Thread {
                 List<Sentence> sentenceList = redisService.getSentences(discussId);
 
                 int segmentRemarkCursor = redisService.getSegmentRemarkCursor(discussId);
+                List<String> backgroundList = redisService.getBackgroundList(discussId);
 
                 // 初始化未处理文本的StringBuilder
                 StringBuilder unprocessedText = new StringBuilder();
@@ -37,7 +38,9 @@ public class SegmentRemarkThread extends Thread {
 
                 if (unprocessedText.length() > MAX_TEXT_LENGTH) {
                     String text = unprocessedText.toString();
-                    String segmentRemark = gptService.requestLlama3("llama3-70b-8192", "你是一个擅长通过发言表达自己想法的程序员", text + "\n对于以上内容，如果你是对话中的一员，输出你会说的话");
+                    String segmentRemark = gptService.requestQwen("qwen1.5-110b-chat", "你是一个擅长通过发言表达自己想法的程序员",
+                            "背景信息：" + backgroundList.toString() + "\n背景信息结束\n" +
+                            text + "\n对于以上内容，如果你是对话中的一员，输出你会说的话");
 //                    System.out.println("segmentRemark" + segmentRemark);
                     redisService.addSegmentRemark(discussId, segmentRemark);
 

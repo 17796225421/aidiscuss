@@ -26,7 +26,7 @@ public class SegmentLogicThread extends Thread {
                 List<Sentence> sentenceList = redisService.getSentences(discussId);
 
                 int segmentLogicCursor = redisService.getSegmentLogicCursor(discussId);
-
+                List<String> backgroundList = redisService.getBackgroundList(discussId);
                 // 初始化未处理文本的StringBuilder
                 StringBuilder unprocessedText = new StringBuilder();
 
@@ -37,7 +37,9 @@ public class SegmentLogicThread extends Thread {
 
                 if (unprocessedText.length() > MAX_TEXT_LENGTH) {
                     String text = unprocessedText.toString();
-                    String segmentLogic = gptService.requestLlama3("llama3-70b-8192", "你擅长找出大段文字中的逻辑链路，分析前因后果", "从逻辑上分析下面这段话：" + text);
+                    String segmentLogic = gptService.requestQwen("qwen1.5-110b-chat", "你擅长找出大段文字中的逻辑链路，分析前因后果",
+                            "背景信息：" + backgroundList.toString() + "\n背景信息结束\n" +
+                                    "从逻辑上分析下面这段话：" + text);
 //                    System.out.println("segmentLogic" + segmentLogic);
                     redisService.addSegmentLogic(discussId, segmentLogic);
 

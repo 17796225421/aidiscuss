@@ -26,6 +26,7 @@ public class KeyWordThread extends Thread {
                 List<Sentence> sentenceList = redisService.getSentences(discussId);
 
                 int keyWordCursor = redisService.getKeyWordCursor(discussId);
+                List<String> backgroundList = redisService.getBackgroundList(discussId);
 
                 // 初始化未处理文本的StringBuilder
                 StringBuilder unprocessedText = new StringBuilder();
@@ -37,8 +38,10 @@ public class KeyWordThread extends Thread {
 
                 if (unprocessedText.length() > MAX_TEXT_LENGTH) {
                     String text = unprocessedText.toString();
-                    String gptText = gptService.requestGpt4("gpt-4-turbo-2024-04-09", "你擅长从大段文字中找出关键词组", "给你一段文字，找出关键词组，每个关键词语输出一行：" + text);
-//                    String gptText = gptService.requestLlama3("llama3-70b-8192", "你是一个有帮助的助手", text);
+                    String gptText = gptService.requestQwen("qwen1.5-110b-chat", "你擅长从大段文字中找出关键词组",
+                            "背景信息：" + backgroundList.toString() + "\n背景信息结束\n" +
+                                    "给你一段文字，找出关键词组，每个关键词语输出一行：" + text);
+//                    String gptText = gptService.requestQwen("qwen1.5-110b-chat", "你是一个有帮助的助手", text);
                     List<String> keyWordList = Arrays.asList(gptText.split("\n"));
                     redisService.addKeyWordList(discussId, keyWordList);
 

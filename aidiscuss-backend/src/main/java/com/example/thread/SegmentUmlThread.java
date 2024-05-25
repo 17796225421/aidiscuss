@@ -25,6 +25,7 @@ public class SegmentUmlThread extends Thread {
                 List<Sentence> sentenceList = redisService.getSentences(discussId);
 
                 int segmentUmlCursor = redisService.getSegmentUmlCursor(discussId);
+                List<String> backgroundList = redisService.getBackgroundList(discussId);
 
                 // 初始化未处理文本的StringBuilder
                 StringBuilder unprocessedText = new StringBuilder();
@@ -36,8 +37,9 @@ public class SegmentUmlThread extends Thread {
 
                 if (unprocessedText.length() > MAX_TEXT_LENGTH) {
                     String text = unprocessedText.toString();
-                    String segmentUml = gptService.requestGpt4("gpt-4-turbo-2024-04-09",
+                    String segmentUml = gptService.requestQwen("qwen1.5-110b-chat",
                             "你擅长生成plantuml代码",
+                            "背景信息：" + backgroundList.toString() + "\n背景信息结束\n" +
                             "根据以下内容，生成plantuml代码逻辑：" + text);
 
                     String plantUml = GptResUtils.getPlantUml(segmentUml);

@@ -36,17 +36,36 @@ public class SentenceProcessThread extends Thread {
                         jsonObject.put("score", sentence.getScore());
                         sentencesArray.put(jsonObject);
                     }
-                    String gptJson = gptService.requestGpt4Json("gpt-4-turbo-2024-04-09",
-                            "\n用JSON格式返回，格式为{\"correct\":语音转录纠正, \"summary\": 纠正后的缩句, \"score\": 内容质量评分}",
-                            "背景信息：" + backgroundList.toString() + "\n" + "历史讨论语音转录记录：" + sentencesArray + "\n" + "对于以下这条转录记录，生成这条转录记录的语音转录纠正、纠正后的缩句、内容质量评分。内容质量评分范围1到5，评估与整体对话内容相比的重要性。\n" + sentenceProcess.getText());
 
-                    JSONObject jsonObject = GptResUtils.StringToJson(gptJson);
-                    sentenceProcess.setText(jsonObject.getString("correct"));
-                    sentenceProcess.setSummary(jsonObject.getString("summary"));
-                    sentenceProcess.setScore(jsonObject.getInt("score"));
 
-                    redisService.setSentenceProcess(discussId, sentenceProcessCursor, sentenceProcess);
-                    redisService.setSentenceProcessCursor(discussId, sentenceProcessCursor + 1);
+
+                    int retryCount = 0;
+                    boolean success = false;
+                    while (retryCount < 3 && !success) {
+                        try {
+                            String gptJson = gptService.requestQwen("qwen1.5-110b-chat",
+                                    "\n用JSON格式返回，格式为{\"correct\":语音转录纠正, \"summary\": 纠正后的缩句, \"score\": 内容质量评分}",
+                                    "背景信息：" + backgroundList.toString() + "\n背景信息结束\n" +
+                                            "历史讨论语音转录记录：" + sentencesArray + "\n" + "对于以下这条转录记录，生成这条转录记录的语音转录纠正、纠正后的缩句、内容质量评分。内容质量评分范围1到5，评估与整体对话内容相比的重要性。\n" + sentenceProcess.getText());
+
+                            JSONObject jsonObject = GptResUtils.StringToJson(gptJson);
+                            sentenceProcess.setText(jsonObject.getString("correct"));
+                            sentenceProcess.setSummary(jsonObject.getString("summary"));
+                            sentenceProcess.setScore(jsonObject.getInt("score"));
+
+                            redisService.setSentenceProcess(discussId, sentenceProcessCursor, sentenceProcess);
+                            success = true;
+                        } catch (Exception e) {
+                            retryCount++;
+                        }
+                    }
+
+                    if (!success) {
+                        // 超过重试次数，只更新 sentenceProcessCursor
+                        redisService.setSentenceProcessCursor(discussId, sentenceProcessCursor + 1);
+                    } else {
+                        redisService.setSentenceProcessCursor(discussId, sentenceProcessCursor + 1);
+                    }
                 }
                 Thread.sleep(1000);
             }
@@ -54,6 +73,8 @@ public class SentenceProcessThread extends Thread {
             e.printStackTrace();
         }
     }
+
+
 
     public void stopRunning() {
         running = false;

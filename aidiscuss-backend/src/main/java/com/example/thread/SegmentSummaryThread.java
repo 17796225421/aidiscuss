@@ -26,6 +26,7 @@ public class SegmentSummaryThread extends Thread {
                 List<Sentence> sentenceList = redisService.getSentences(discussId);
 
                 int segmentSummaryCursor = redisService.getSegmentSummaryCursor(discussId);
+                List<String> backgroundList = redisService.getBackgroundList(discussId);
 
                 // 初始化未处理文本的StringBuilder
                 StringBuilder unprocessedText = new StringBuilder();
@@ -38,7 +39,9 @@ public class SegmentSummaryThread extends Thread {
                 if (unprocessedText.length() > MAX_TEXT_LENGTH) {
                     String text = unprocessedText.toString();
 //                    String segmentSummary = gptService.requestGpt3("gpt-3.5-turbo", "你是一个有帮助的助手", text);
-                    String segmentSummary = gptService.requestLlama3("llama3-70b-8192", "你是一个擅长将大段文字总结成简单摘要的程序员", "将以下内容总结成简单摘要\n" + text);
+                    String segmentSummary = gptService.requestQwen("qwen1.5-110b-chat", "你是一个擅长将大段文字总结成简单摘要的程序员",
+                            "背景信息：" + backgroundList.toString() + "\n背景信息结束\n" +
+                            "将以下内容总结成简单摘要\n" + text);
 //                    System.out.println("segmentSummary" + segmentSummary);
                     redisService.addSegmentSummary(discussId, segmentSummary);
 

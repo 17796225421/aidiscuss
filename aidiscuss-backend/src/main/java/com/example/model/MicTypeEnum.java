@@ -2,7 +2,7 @@ package com.example.model;
 
 public enum MicTypeEnum {
     EXTERN("M3"),
-    WIRE("Realtek"),
+    WIRE("MacBook"),
     VIRTUAL("B1");
 
     private final String value;

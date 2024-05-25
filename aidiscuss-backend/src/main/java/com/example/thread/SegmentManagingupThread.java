@@ -26,7 +26,7 @@ public class SegmentManagingupThread extends Thread {
                 List<Sentence> sentenceList = redisService.getSentences(discussId);
 
                 int segmentManagingupCursor = redisService.getSegmentManagingupCursor(discussId);
-
+                List<String> backgroundList = redisService.getBackgroundList(discussId);
                 // 初始化未处理文本的StringBuilder
                 StringBuilder unprocessedText = new StringBuilder();
 
@@ -37,7 +37,9 @@ public class SegmentManagingupThread extends Thread {
 
                 if (unprocessedText.length() > MAX_TEXT_LENGTH) {
                     String text = unprocessedText.toString();
-                    String segmentManagingup = gptService.requestLlama3("llama3-70b-8192", "你是一个久经职场擅长向上管理的程序员", text + "\n对于以上情况，我如何向上管理？");
+                    String segmentManagingup = gptService.requestQwen("qwen1.5-110b-chat", "你是一个久经职场擅长向上管理的程序员",
+                            "背景信息：" + backgroundList.toString() + "\n背景信息结束\n" +
+                                    text + "\n对于以上情况，我如何向上管理？");
 //                    System.out.println("segmentManagingup" + segmentManagingup);
                     redisService.addSegmentManagingup(discussId, segmentManagingup);
 

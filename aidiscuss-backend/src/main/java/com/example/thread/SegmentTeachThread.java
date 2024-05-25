@@ -24,6 +24,7 @@ public class SegmentTeachThread extends Thread {
                 List<Sentence> sentenceList = redisService.getSentences(discussId);
 
                 int segmentTeachCursor = redisService.getSegmentTeachCursor(discussId);
+                List<String> backgroundList = redisService.getBackgroundList(discussId);
 
                 // 初始化未处理文本的StringBuilder
                 StringBuilder unprocessedText = new StringBuilder();
@@ -35,9 +36,10 @@ public class SegmentTeachThread extends Thread {
 
                 if (unprocessedText.length() > MAX_TEXT_LENGTH) {
                     String text = unprocessedText.toString();
-                    String segmentTeach = gptService.requestGpt4("gpt-4-turbo-2024-04-09",
+                    String segmentTeach = gptService.requestQwen("qwen1.5-110b-chat",
                             "你擅长使用费曼技巧进行解释",
-                            "使用费曼技巧进行解释\n" +
+                            "背景信息：" + backgroundList.toString() + "\n背景信息结束\n" +
+                                    "使用费曼技巧进行解释\n" +
                             "L1 儿童 （child）：假想的费曼对象是儿童，8 岁以下，景知识为 0，抽象理解能力接近为 0（主要靠具体事物来理解，很难抽象思考）。\n" +
                             "L2 初中生 （teen）：假想对象是 13~18 岁的中学时。有一定的知识储备，具备了一定的抽象思考能力。这个级别的费曼，信息量明显提升，除了基本概念之外，还可以探讨如何研究，意义如何。\n" +
                             "L3 大一新生 （college student）：典型对象是大一学生，具有成年人该有的正常的知识储备、正常的理解能力。我在写书和互联网分享时，给自己设定的费曼等级就是L3。我默认我的读者是成年人，有大学生的学习能力，有普通成年人该有的知识储备和理解能力。\n" +

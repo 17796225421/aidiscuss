@@ -30,6 +30,7 @@ public class TimeSlicedSummaryThread extends Thread {
                 }
 
                 List<Sentence> sentenceList = redisService.getSentences(discussId);
+                List<String> backgroundList = redisService.getBackgroundList(discussId);
 
                 int timeSlicedSummaryCursor = redisService.getTimeSlicedSummaryCursor(discussId);
 
@@ -43,7 +44,9 @@ public class TimeSlicedSummaryThread extends Thread {
 
                 if (unprocessedText.length() > 0) {
                     String text = unprocessedText.toString();
-                    String timeSlicedSummary = gptService.requestLlama3("llama3-70b-8192", "你是一个擅长将大段文字总结成简单摘要的程序员", "将以下内容总结成简单摘要\n" + text);
+                    String timeSlicedSummary = gptService.requestQwen("qwen1.5-110b-chat", "你是一个擅长将大段文字总结成简单摘要的程序员",
+                            "背景信息：" + backgroundList.toString() + "\n背景信息结束\n" +
+                            "将以下内容总结成简单摘要\n" + text);
 //                    System.out.println("timeSlicedSummary" + timeSlicedSummary);
                     redisService.addTimeSlicedSummary(discussId, timeSlicedSummary);
 
